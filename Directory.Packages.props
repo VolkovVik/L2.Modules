@@ -3,18 +3,17 @@
     <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageVersion Include="NBomber" Version="6.1.2" />
     <PackageVersion Include="NBomber.Http" Version="6.1.0" />
-	<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
-	<PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1"/>
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.11.2" />
   </ItemGroup>
-
   <ItemGroup>
-  	<GlobalPackageReference Include="SonarAnalyzer.CSharp" Version="10.16.1.129956" >
-  	  <PrivateAssets>all</PrivateAssets>
-  	  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-  	</GlobalPackageReference>
+    <GlobalPackageReference Include="SonarAnalyzer.CSharp" Version="10.16.1.129956">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </GlobalPackageReference>
   </ItemGroup>
 </Project>
