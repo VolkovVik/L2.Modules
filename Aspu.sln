@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{1F0DF801-46CC-48B9-A2C6-E360B99F861A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{E92DCE4B-0CE9-4BC2-BCCF-D5DCE090A7F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{54067325-4610-4ADF-9F0E-FF957694C203}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EF18002B-2963-4FD5-8FA7-212031AD3040}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A0B995E2-D228-4B44-B00A-C97A93F0A2F1}"
+	ProjectSection(SolutionItems) = preProject
+		docs\commit.md = docs\commit.md
+		docs\dddpatterns.md = docs\dddpatterns.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspu.Api", "source\API\Aspu.Api\Aspu.Api.csproj", "{E4073379-5687-4E50-ADC2-E9F678059C6B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{951918D7-7C86-4172-ABC8-76E9E425B5DF}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "load", "load", "{3A1EBB13-FE5D-4E00-871C-1A5F2B56C293}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspu.LoadTests", "tests\load\Aspu.LoadTests\Aspu.LoadTests.csproj", "{37B793F5-E7B8-4F90-AB75-6FC792EA1475}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4073379-5687-4E50-ADC2-E9F678059C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4073379-5687-4E50-ADC2-E9F678059C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4073379-5687-4E50-ADC2-E9F678059C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4073379-5687-4E50-ADC2-E9F678059C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37B793F5-E7B8-4F90-AB75-6FC792EA1475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37B793F5-E7B8-4F90-AB75-6FC792EA1475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37B793F5-E7B8-4F90-AB75-6FC792EA1475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37B793F5-E7B8-4F90-AB75-6FC792EA1475}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1F0DF801-46CC-48B9-A2C6-E360B99F861A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E92DCE4B-0CE9-4BC2-BCCF-D5DCE090A7F7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{54067325-4610-4ADF-9F0E-FF957694C203} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E4073379-5687-4E50-ADC2-E9F678059C6B} = {1F0DF801-46CC-48B9-A2C6-E360B99F861A}
+		{3A1EBB13-FE5D-4E00-871C-1A5F2B56C293} = {EF18002B-2963-4FD5-8FA7-212031AD3040}
+		{37B793F5-E7B8-4F90-AB75-6FC792EA1475} = {3A1EBB13-FE5D-4E00-871C-1A5F2B56C293}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E57E1B35-1B66-419D-A5EE-C3BB68BBF193}
+	EndGlobalSection
+EndGlobal

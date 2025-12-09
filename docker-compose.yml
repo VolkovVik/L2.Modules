@@ -1,0 +1,10 @@
+services:
+  aspu.api:
+    image: ${DOCKER_REGISTRY-}aspuapi
+    container_name: Aspu.Api
+    build:
+      context: .
+      dockerfile: source/API/Aspu.Api/Dockerfile
+    ports:
+      - 5000:8080
+      - 5001:8081
