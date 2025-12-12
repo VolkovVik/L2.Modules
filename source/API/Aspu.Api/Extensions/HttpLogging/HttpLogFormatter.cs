@@ -53,14 +53,14 @@ public class HttpLogFormatter() : ITextFormatter
         logEvent.Properties.TryGetValue(name, out var value) ? value.ToString().Trim('"') : string.Empty;
 
     private static string TransformBody(string body) =>
-        body.Trim('"')
-            .Replace("\\\"", "\"")
+        body.Replace("\\\"", "\"")
             .Replace("\r\n    ", string.Empty)
             .Replace("\r\n  ", string.Empty)
             .Replace("\r\n", string.Empty)
             .Replace("\n    ", string.Empty)
             .Replace("\n  ", string.Empty)
-            .Replace("\n", string.Empty);
+            .Replace("\n", string.Empty)
+            .Trim('"');
 
     private static string AbbreviateLogLevel(LogEventLevel level) =>
         level switch
