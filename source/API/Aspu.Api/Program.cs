@@ -1,5 +1,6 @@
 using System.Reflection;
 using Aspu.Api.Extensions;
+using Aspu.Api.Extensions.HttpLogging;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -17,9 +18,12 @@ try
         loggerConfiguration
             .ReadFrom.Configuration(builder.Configuration)
             .ReadFrom.Services(provider)
-            .Enrich.FromLogContext());
+            .Enrich.FromLogContext()
+            .Enrich.WithMachineName()
+            .Enrich.WithProcessId()
+            .Enrich.WithThreadId());
 
-    builder.Services.AddHttpLogging(options => { });
+    builder.AddHttpRequestLogging();
 
     int[] versions = [1, 2];
     builder.Services.AddOpenApi(versions);

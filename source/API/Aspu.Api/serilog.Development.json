@@ -29,9 +29,9 @@
       //      {
       //        "Name": "Console",
       //        "Args": {
-      //          //"restrictedToMinimumLevel": "Debug",
-      //          //"theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console"
-      //          "formatter": "Aspu.Api.Extensions.LoggingHandlers.DynamicFormatter, Aspu.Api"
+      //          "restrictedToMinimumLevel": "Debug",
+      //          "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console"
+      //          //"formatter": "Aspu.Api.Extensions.LoggingHandlers.DynamicFormatter, Aspu.Api"
       //        }
       //      }
       //    ]
@@ -47,13 +47,14 @@
                 "restrictedToMinimumLevel": "Debug",
                 "path": "logs/server.log",
                 "rollingInterval": "Day",
-                "retainedFileCountLimit": 63,
+                "retainedFileCountLimit": 100,
                 "rollOnFileSizeLimit": true,
                 "fileSizeLimitBytes": 268435456,
                 "buffered": true,
                 "flushToDiskInterval": "00:00:05", // hh:mm:ss
+                //"outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
                 "formatter": {
-                  "type": "Aspu.Api.Extensions.LoggingHandlers.DynamicFormatter, Aspu.Api"
+                  "type": "Aspu.Api.Extensions.HttpLogging.DynamicFormatter, Aspu.Api"
                 }
               }
             }
