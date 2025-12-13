@@ -1,4 +1,5 @@
 using System.Reflection;
+using Aspu.Api.Adapters.Http;
 using Aspu.Api.Extensions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
@@ -24,6 +25,8 @@ try
     int[] versions = [1, 2];
     builder.Services.AddOpenApi(versions);
 
+    builder.Services.AddApiEndpoint();
+
     var app = builder.Build();
 
     app.UseHttpLogging();
@@ -41,9 +44,11 @@ try
     app.UseHttpsRedirection();
 
     app.MapGet("/", () => "Hello from ASPU.API")
-        .WithTags("Api")
-        .WithName("Version")
-        .WithDescription("Returns API version");
+        .WithTags(Tags.Api)
+        .WithName("Hello")
+        .WithDescription("Return hello message");
+
+    app.UseApiEndpoint(versions);
 
     var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
     Log.Information("Running ASPU API application: {@Version}", version);

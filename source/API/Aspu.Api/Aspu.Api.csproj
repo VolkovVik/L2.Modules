@@ -34,4 +34,8 @@
     <Folder Include="logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Aspu.Common.Presentation\Aspu.Common.Presentation.csproj" />
+  </ItemGroup>
+
 </Project>

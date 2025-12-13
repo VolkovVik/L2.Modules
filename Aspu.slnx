@@ -15,7 +15,9 @@
   <Folder Name="/source/API/">
     <Project Path="source/API/Aspu.Api/Aspu.Api.csproj" />
   </Folder>
-  <Folder Name="/source/Common/" />
+  <Folder Name="/source/Common/">
+    <Project Path="source/Common/Aspu.Common.Presentation/Aspu.Common.Presentation.csproj" Id="2980d21a-9d1f-40a3-afce-26b57e6da47b" />
+  </Folder>
   <Folder Name="/source/Modules/" />
   <Folder Name="/tests/" />
   <Folder Name="/tests/load/">
