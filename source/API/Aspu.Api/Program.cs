@@ -4,7 +4,7 @@ using Aspu.Api.Extensions.HttpLogging;
 using Scalar.AspNetCore;
 using Serilog;
 
-SerilogExtensions.AddDefaultConfiguration();
+SerilogExtensions.AddDefaultLogging();
 
 Log.Information("Starting ASPU API application");
 
@@ -14,14 +14,7 @@ try
 
     builder.Configuration.AddModuleConfiguration([]);
 
-    builder.Services.AddSerilog((provider, loggerConfiguration) =>
-        loggerConfiguration
-            .ReadFrom.Configuration(builder.Configuration)
-            .ReadFrom.Services(provider)
-            .Enrich.FromLogContext()
-            .Enrich.WithMachineName()
-            .Enrich.WithProcessId()
-            .Enrich.WithThreadId());
+    builder.Services.AddLogging(builder.Configuration);
 
     builder.AddHttpRequestLogging();
 
