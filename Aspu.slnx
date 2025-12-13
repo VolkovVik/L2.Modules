@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/commit.md" />
+    <File Path="docs/dddpatterns.md" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/source/" />
+  <Folder Name="/source/API/">
+    <Project Path="source/API/Aspu.Api/Aspu.Api.csproj" />
+  </Folder>
+  <Folder Name="/source/Common/" />
+  <Folder Name="/source/Modules/" />
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/load/">
+    <Project Path="tests/load/Aspu.LoadTests/Aspu.LoadTests.csproj" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+</Solution>
