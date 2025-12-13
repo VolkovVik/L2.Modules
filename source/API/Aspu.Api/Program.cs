@@ -1,5 +1,6 @@
 using System.Reflection;
 using Aspu.Api.Extensions;
+using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
 using Scalar.AspNetCore;
 using Serilog;
@@ -18,12 +19,18 @@ try
 
     builder.AddHttpRequestLogging();
 
+    builder.Services.AddExceptionHandlers();
+
     int[] versions = [1, 2];
     builder.Services.AddOpenApi(versions);
 
     var app = builder.Build();
 
     app.UseHttpLogging();
+
+    app.UseExceptionHandler();
+
+    app.UseStatusCodePages();
 
     if (app.Environment.IsDevelopment())
     {
