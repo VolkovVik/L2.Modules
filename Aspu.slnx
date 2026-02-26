@@ -3,6 +3,7 @@
     <Project Path="benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/docs/">
+    <File Path="docs/articles.md" />
     <File Path="docs/commit.md" />
     <File Path="docs/dddpatterns.md" />
   </Folder>

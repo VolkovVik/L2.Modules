@@ -1,8 +1,10 @@
 using System.Reflection;
-using Aspu.Api.Adapters.Http;
+using Aspu.Api;
 using Aspu.Api.Extensions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
+using Aspu.Api.Middleware;
+using FluentValidation;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -27,6 +29,18 @@ try
 
     builder.Services.AddApiEndpoint();
 
+    builder.Services.AddMediator((Mediator.MediatorOptions options) =>
+    {
+        options.ServiceLifetime = ServiceLifetime.Scoped;
+        options.PipelineBehaviors = [typeof(ValidationBehavior<,>)];
+        options.GenerateTypesAsInternal = true;
+    });
+
+    builder.Services.AddValidatorsFromAssemblies([AssemblyReference.Assembly], includeInternalTypes: true);
+    ///builder.Services.AddScoped<IValidator<Ping>, PingValidator>();
+
+    builder.Services.AddHttpContextAccessor();
+
     var app = builder.Build();
 
     app.UseHttpLogging();
@@ -42,11 +56,6 @@ try
     }
 
     app.UseHttpsRedirection();
-
-    app.MapGet("/", () => "Hello from ASPU.API")
-        .WithTags(Tags.Api)
-        .WithName("Hello")
-        .WithDescription("Return hello message");
 
     app.UseApiEndpoint(versions);
 

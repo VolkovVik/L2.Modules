@@ -35,6 +35,8 @@ internal static class EndpointExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        MapMainEndpoint(app);
+
         var apiVersionSetBuilder = app.NewApiVersionSet();
 
         foreach (var version in versions)
@@ -51,5 +53,15 @@ internal static class EndpointExtensions
         MainModule.MapEndpoints(app, routeGroupBuilder);
 
         return app;
+    }
+
+    private static void MapMainEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapGet("/", () => "Hello from ASPU.API")
+            .AllowAnonymous()
+            .WithName("Hello")
+            .WithSummary("Hello")
+            .WithDescription("Return hello message")
+            .WithTags(Tags.Api);
     }
 }

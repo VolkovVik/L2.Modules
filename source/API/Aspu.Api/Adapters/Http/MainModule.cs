@@ -6,9 +6,12 @@ public static class MainModule
         IEndpointRouteBuilder app,
         RouteGroupBuilder? routeGroupBuilder = null)
     {
-        var builder = routeGroupBuilder ?? app;
+        var builder = (routeGroupBuilder ?? app)
+            .MapGroup("test");
 
         GetVersion1.MapEndpoint(builder);
         GetVersion2.MapEndpoint(builder);
+        PingRequest.MapEndpoint(builder);
+        Ping1Request.MapEndpoint(builder);
     }
 }

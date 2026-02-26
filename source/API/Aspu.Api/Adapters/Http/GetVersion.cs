@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Aspu.Api.Adapters.Http;
 
@@ -6,15 +7,18 @@ internal static class GetVersion1
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/version", () =>
+        app.MapGet("/version", Results<Ok<string>, NotFound> () =>
         {
-            var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
-            return version;
+            var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            return version is not null
+                ? TypedResults.Ok(version)
+                : TypedResults.NotFound();
         })
-        .WithTags(Tags.Api)
-        .WithName("Get version 1")
+        .WithName("GetVersion1")
+        .WithSummary("Get version")
         .WithDescription("Returns API version")
-        .MapToApiVersion(1);
+        .MapToApiVersion(1)
+        .WithTags(Tags.Api);
     }
 }
 
@@ -27,9 +31,12 @@ internal static class GetVersion2
             var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
             return $"API version: {version}";
         })
-        .WithTags(Tags.Api)
-        .WithName("Get version 2")
+        .WithName("GetVersion2")
+        .WithSummary("Get version")
         .WithDescription("Returns API version")
-        .MapToApiVersion(2);
+        .Produces<string>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .MapToApiVersion(2)
+        .WithTags(Tags.Api);
     }
 }
