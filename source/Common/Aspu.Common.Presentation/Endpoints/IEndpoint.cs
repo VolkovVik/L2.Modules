@@ -4,5 +4,6 @@ namespace Aspu.Common.Presentation.Endpoints;
 
 public interface IEndpoint
 {
-    void MapEndpoint(IEndpointRouteBuilder app);
+    string Tags { get; }
+    void MapEndpoint(IEndpointRouteBuilder routes);
 }

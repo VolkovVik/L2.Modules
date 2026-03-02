@@ -1,5 +1,4 @@
 using System.Reflection;
-using Aspu.Api.Adapters.Http;
 using Aspu.Api.Extensions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
@@ -27,6 +26,10 @@ try
 
     builder.Services.AddApiEndpoint();
 
+    builder.Services.AddRequest();
+
+    builder.Services.AddHttpContextAccessor();
+
     var app = builder.Build();
 
     app.UseHttpLogging();
@@ -42,11 +45,6 @@ try
     }
 
     app.UseHttpsRedirection();
-
-    app.MapGet("/", () => "Hello from ASPU.API")
-        .WithTags(Tags.Api)
-        .WithName("Hello")
-        .WithDescription("Return hello message");
 
     app.UseApiEndpoint(versions);
 

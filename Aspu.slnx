@@ -3,8 +3,12 @@
     <Project Path="benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/docs/">
+    <File Path="docs/articles.md" />
     <File Path="docs/commit.md" />
     <File Path="docs/dddpatterns.md" />
+  </Folder>
+  <Folder Name="/generators/">
+    <Project Path="generators/SourceGeneratorsLibrary/SourceGeneratorsLibrary.csproj" Id="9385fb69-1a3f-41ea-b2d1-f68b7c47fcf0" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
