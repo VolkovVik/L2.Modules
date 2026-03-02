@@ -95,7 +95,7 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
 
         sb.AppendLine($"namespace {assemblyName}.{Namespace};");
         sb.AppendLine();
-        sb.AppendLine("public static class RegisterEndpointExtensions");
+        sb.AppendLine("public static class EndpointsRegistrationGenerator");
         sb.AppendLine("{");
         sb.AppendLine("    public static IEndpointRouteBuilder MapEndpoints(");
         sb.AppendLine("        IEndpointRouteBuilder app,");
