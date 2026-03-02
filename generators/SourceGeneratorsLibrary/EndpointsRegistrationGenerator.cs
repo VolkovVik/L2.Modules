@@ -7,11 +7,11 @@ using Microsoft.CodeAnalysis.Text;
 namespace SourceGeneratorsLibrary;
 
 [Generator]
-public sealed class RegisterEndpointsGenerator : IIncrementalGenerator
+public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
 {
     private const string InterfaceName = "IEndpoint";
 
-    private static string Namespace => typeof(RegisterEndpointsGenerator).Namespace;
+    private static string Namespace => typeof(EndpointsRegistrationGenerator).Namespace;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -32,7 +32,7 @@ public sealed class RegisterEndpointsGenerator : IIncrementalGenerator
     }
 
     private static bool IsCandidate(SyntaxNode node) =>
-        node is ClassDeclarationSyntax;
+        node is ClassDeclarationSyntax cds && cds.BaseList is not null;
 
     private static INamedTypeSymbol? GetSemanticTarget(GeneratorSyntaxContext context)
     {
@@ -140,7 +140,7 @@ public sealed class RegisterEndpointsGenerator : IIncrementalGenerator
         sb.AppendLine("            : $\"/{input.ToLower(CultureInfo.InvariantCulture)}\";");
         sb.AppendLine();
         sb.AppendLine("}");
-        context.AddSource("RegisterEndpointExtensions.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
+        context.AddSource("EndpointsRegistrationGenerator.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
     }
 
     private static INamedTypeSymbol? FindInterface(Compilation compilation, string name) =>
