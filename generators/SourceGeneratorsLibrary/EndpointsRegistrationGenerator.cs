@@ -40,10 +40,10 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         if (context.SemanticModel.GetDeclaredSymbol(classDecl) is not INamedTypeSymbol symbol)
             return null;
 
-        if (symbol.TypeKind != TypeKind.Class)
+        if (symbol.TypeKind is not TypeKind.Class)
             return null;
 
-        if (symbol.DeclaredAccessibility != Accessibility.Internal)
+        if (symbol.DeclaredAccessibility is not Accessibility.Internal)
             return null;
 
         if (!symbol.IsSealed)
@@ -138,7 +138,6 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         sb.AppendLine("        string.IsNullOrWhiteSpace(input)");
         sb.AppendLine("            ? input");
         sb.AppendLine("            : $\"/{input.ToLower(CultureInfo.InvariantCulture)}\";");
-        sb.AppendLine();
         sb.AppendLine("}");
         context.AddSource("EndpointsRegistrationGenerator.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
     }

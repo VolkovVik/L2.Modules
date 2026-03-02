@@ -6,22 +6,82 @@ using Serilog;
 
 namespace Aspu.Api.Adapters.Http;
 
-internal sealed class PingRequest : IEndpoint
+internal sealed class Ping1Request : IEndpoint
 {
-    public string Tags => "Ping";
+    public string Tags => "Ping1";
 
     public void MapEndpoint(IEndpointRouteBuilder routes)
     {
-        routes.MapGet("/ping", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
+        routes.MapGet("/ping1", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
         {
             var response = await mediator.Send(new Ping(Guid.NewGuid()), cancellationToken);
-            return response is not null
+            return response is null
                 ? TypedResults.NotFound()
                 : TypedResults.Ok(response);
         })
-        .WithName("PingRequest")
+        .WithName("PingRequest1")
+        .WithSummary("Ping request1")
+        .WithDescription("Returns pong1")
+        .MapToApiVersion(1);
+    }
+}
+
+internal sealed class Ping2Request : IEndpoint
+{
+    public string Tags => "Ping2";
+
+    public void MapEndpoint(IEndpointRouteBuilder routes)
+    {
+        routes.MapGet("/ping2", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var response = await mediator.Send(new Ping(Guid.NewGuid()), cancellationToken);
+            return response is null
+                ? TypedResults.NotFound()
+                : TypedResults.Ok(response);
+        })
+        .WithName("PingRequest2")
         .WithSummary("Ping request")
         .WithDescription("Returns pong")
+        .MapToApiVersion(1);
+    }
+}
+
+internal sealed class Ping3Request : IEndpoint
+{
+    public string Tags => "Ping3";
+
+    public void MapEndpoint(IEndpointRouteBuilder routes)
+    {
+        routes.MapGet("/ping3", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var response = await mediator.Send(new Ping(Guid.NewGuid()), cancellationToken);
+            return response is null
+                ? TypedResults.NotFound()
+                : TypedResults.Ok(response);
+        })
+        .WithName("PingRequest3")
+        .WithSummary("Ping request 3")
+        .WithDescription("Returns pong 3")
+        .MapToApiVersion(1);
+    }
+}
+
+internal sealed class Ping4Request : IEndpoint
+{
+    public string Tags => "Ping4";
+
+    public void MapEndpoint(IEndpointRouteBuilder routes)
+    {
+        routes.MapGet("/ping4", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var response = await mediator.Send(new Ping(Guid.NewGuid()), cancellationToken);
+            return response is null
+                ? TypedResults.NotFound()
+                : TypedResults.Ok(response);
+        })
+        .WithName("PingRequest4")
+        .WithSummary("Ping request 4")
+        .WithDescription("Returns pong 4")
         .MapToApiVersion(1);
     }
 }
@@ -30,7 +90,7 @@ public sealed record Ping(Guid? Id) : IRequest<Pong?>;
 
 public sealed record Pong(Guid Id);
 
-public sealed class PingValidator : AbstractValidator<Ping>
+internal sealed class PingValidator : AbstractValidator<Ping>
 {
     public PingValidator()
     {
