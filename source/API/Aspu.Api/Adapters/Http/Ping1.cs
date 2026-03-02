@@ -1,15 +1,18 @@
-﻿using FluentValidation;
+﻿using Aspu.Common.Presentation.Endpoints;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Serilog;
 
 namespace Aspu.Api.Adapters.Http;
 
-internal static class Ping1Request
+internal sealed class Ping1Request : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public string Tags => "Ping1";
+
+    public void MapEndpoint(IEndpointRouteBuilder routes)
     {
-        app.MapGet("/ping", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
+        routes.MapGet("/ping1", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
         {
             var response = await mediator.Send(new Ping(Guid.NewGuid()), cancellationToken);
             return response is not null
@@ -19,8 +22,7 @@ internal static class Ping1Request
         .WithName("PingRequest1")
         .WithSummary("Ping request 1")
         .WithDescription("Returns pong 1")
-        .MapToApiVersion(1)
-        .WithTags(Tags.Api);
+        .MapToApiVersion(1);
     }
 }
 

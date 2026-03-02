@@ -9,6 +9,8 @@
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="Mediator.Abstractions" Version="3.0.1" />
     <PackageVersion Include="Mediator.SourceGenerator" Version="3.0.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
     <PackageVersion Include="NBomber" Version="6.2.0" />
     <PackageVersion Include="NBomber.Http" Version="6.1.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />

@@ -1,5 +1,4 @@
 ﻿using Asp.Versioning;
-using Aspu.Api.Adapters.Http;
 
 namespace Aspu.Api.Extensions;
 
@@ -35,10 +34,7 @@ internal static class EndpointExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        MapMainEndpoint(app);
-
         var apiVersionSetBuilder = app.NewApiVersionSet();
-
         foreach (var version in versions)
             apiVersionSetBuilder.HasApiVersion(new ApiVersion(version));
 
@@ -50,18 +46,25 @@ internal static class EndpointExtensions
             .MapGroup("api/v{version:apiVersion}")
             .WithApiVersionSet(apiVersionSet);
 
-        MainModule.MapEndpoints(app, routeGroupBuilder);
+        MapEndpoints(app, routeGroupBuilder);
 
         return app;
     }
 
-    private static void MapMainEndpoint(IEndpointRouteBuilder app)
+    private static void MapEndpoints(
+        IEndpointRouteBuilder app,
+        RouteGroupBuilder? routeGroupBuilder = null)
     {
+        MapHelloEndpoint(app);
+
+        SourceGeneratorsLibrary.RegisterEndpointExtensions.MapEndpoints(app, routeGroupBuilder);
+    }
+
+    private static void MapHelloEndpoint(IEndpointRouteBuilder app) =>
         app.MapGet("/", () => "Hello from ASPU.API")
             .AllowAnonymous()
             .WithName("Hello")
             .WithSummary("Hello")
             .WithDescription("Return hello message")
-            .WithTags(Tags.Api);
-    }
+            .WithTags("Hello");
 }
