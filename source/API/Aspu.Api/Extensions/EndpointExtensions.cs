@@ -10,8 +10,6 @@ internal static class EndpointExtensions
 
     internal static IServiceCollection AddApiEndpoint(this IServiceCollection services)
     {
-        /// services.AddEndpoints(AssemblyReference.Assembly);
-
         services.AddApiVersioning(options =>
         {
             options.DefaultApiVersion = new ApiVersion(1);
@@ -57,9 +55,7 @@ internal static class EndpointExtensions
     {
         MapHelloEndpoint(app);
 
-        ///SourceGeneratorsLibrary.EndpointsRegistrationGenerator.MapEndpoints(app, routeGroupBuilder);
-
-        EndpointsRegistrationGenerator111.MapEndpoints(app, routeGroupBuilder);
+        SourceGeneratorsLibrary.EndpointsRegistrationGenerator.MapEndpoints(app, routeGroupBuilder);
     }
 
     private static void MapHelloEndpoint(IEndpointRouteBuilder app) =>
