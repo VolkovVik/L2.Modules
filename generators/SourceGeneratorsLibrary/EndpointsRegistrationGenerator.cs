@@ -50,8 +50,8 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
             return null;
 
         return symbol.AllInterfaces.Any(a =>
-            !string.Equals(a.Name, InterfaceName, StringComparison.OrdinalIgnoreCase))
-                ? null : symbol;
+            string.Equals(a.Name, InterfaceName, StringComparison.OrdinalIgnoreCase))
+                ? symbol : null;
     }
 
     private static void Generate(SourceProductionContext context, (Compilation compilation, ImmutableArray<INamedTypeSymbol?> classes) data)
