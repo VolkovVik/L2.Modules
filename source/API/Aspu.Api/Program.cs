@@ -2,6 +2,7 @@ using System.Reflection;
 using Aspu.Api.Extensions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
+using Aspu.Api.Options;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -15,16 +16,20 @@ try
 
     builder.Configuration.AddModuleConfiguration([]);
 
+    builder.Services.AddOptions(builder.Configuration);
+
+    var apiVersionOptions = builder.Configuration.GetSection(ApiVersionOptions.SectionName).Get<ApiVersionOptions>()
+        ?? new ApiVersionOptions();
+
     builder.Services.AddLogging(builder.Configuration);
 
     builder.AddHttpRequestLogging();
 
     builder.Services.AddExceptionHandlers();
 
-    int[] versions = [1, 2];
-    builder.Services.AddOpenApi(versions);
+    builder.Services.AddOpenApi(apiVersionOptions);
 
-    builder.Services.AddApiEndpoint();
+    builder.Services.AddApiEndpoint(apiVersionOptions);
 
     builder.Services.AddRequest();
 
@@ -41,12 +46,12 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.MapOpenApi();
-        app.MapScalarApiReference(versions);
+        app.MapScalarApiReference(apiVersionOptions);
     }
 
     app.UseHttpsRedirection();
 
-    app.UseApiEndpoint(versions);
+    app.UseApiEndpoint(apiVersionOptions);
 
     var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
     Log.Information("Running ASPU API application: {@Version}", version);

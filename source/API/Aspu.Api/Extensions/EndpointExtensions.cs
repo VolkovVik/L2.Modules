@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
+using Aspu.Api.Options;
 
 namespace Aspu.Api.Extensions;
 
@@ -8,11 +9,11 @@ internal static class EndpointExtensions
     /// https://www.milanjovanovic.tech/blog/api-versioning-in-aspnetcore
     /// </remarks>
 
-    internal static IServiceCollection AddApiEndpoint(this IServiceCollection services)
+    internal static IServiceCollection AddApiEndpoint(this IServiceCollection services, ApiVersionOptions apiVersionOptions)
     {
         services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = new ApiVersion(1);
+            options.DefaultApiVersion = new ApiVersion(apiVersionOptions.DefaultVersion);
             options.ReportApiVersions = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ApiVersionReader = ApiVersionReader.Combine(
@@ -28,12 +29,12 @@ internal static class EndpointExtensions
         return services;
     }
 
-    internal static IApplicationBuilder UseApiEndpoint(this WebApplication app, int[] versions)
+    internal static IApplicationBuilder UseApiEndpoint(this WebApplication app, ApiVersionOptions apiVersionOptions)
     {
         ArgumentNullException.ThrowIfNull(app);
 
         var apiVersionSetBuilder = app.NewApiVersionSet();
-        foreach (var version in versions)
+        foreach (var version in apiVersionOptions.Versions)
             apiVersionSetBuilder.HasApiVersion(new ApiVersion(version));
 
         var apiVersionSet = apiVersionSetBuilder

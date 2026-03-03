@@ -1,4 +1,4 @@
-﻿using Aspu.Common.Presentation.Endpoints;
+using Aspu.Common.Presentation.Endpoints;
 using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -42,7 +42,7 @@ public sealed class PingHandler(IMediator _mediator) : IRequestHandler<Ping, Pon
 {
     public async ValueTask<Pong?> Handle(Ping request, CancellationToken cancellationToken)
     {
-        var id = request?.Id ?? Guid.NewGuid();
+        var id = request.Id!.Value;
         Log.Debug("Start {@Id}", id);
         var result = new Pong(id);
         Log.Debug("Publish {@Id}", id);

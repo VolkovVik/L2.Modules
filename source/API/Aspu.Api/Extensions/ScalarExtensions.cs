@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.OpenApi;
+using Aspu.Api.Options;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 
@@ -6,9 +7,9 @@ namespace Aspu.Api.Extensions;
 
 internal static class ScalarExtensions
 {
-    internal static IServiceCollection AddOpenApi(this IServiceCollection services, int[] versions)
+    internal static IServiceCollection AddOpenApi(this IServiceCollection services, ApiVersionOptions apiVersionOptions)
     {
-        foreach (var version in versions)
+        foreach (var version in apiVersionOptions.Versions)
             services.AddOpenApi($"v{version}", options => GetOptions(options, $"ASPU API Reference version {version}"));
 
         return services;
@@ -33,13 +34,13 @@ internal static class ScalarExtensions
     }
 
 
-    internal static IEndpointRouteBuilder MapScalarApiReference(this IEndpointRouteBuilder endpoints, int[] versions)
+    internal static IEndpointRouteBuilder MapScalarApiReference(this IEndpointRouteBuilder endpoints, ApiVersionOptions apiVersionOptions)
     {
         endpoints.MapScalarApiReference(options =>
         {
             options.WithTitle("ASPU API Reference")
                 .WithTheme(ScalarTheme.BluePlanet)
-                .AddDocuments(versions.Select(x => $"v{x}"))
+                .AddDocuments(apiVersionOptions.Versions.Select(x => $"v{x}"))
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
         });
         return endpoints;
