@@ -27,3 +27,7 @@ https://antondevtips.com/blog/logging-requests-and-responses-for-api-requests-an
 https://nblumhardt.com/2020/10/bootstrap-logger/
 
 https://nblumhardt.com/2024/04/serilog-net8-0-minimal/
+
+# Analyzer
+
+https://www.meziantou.net/enforcing-asynchronous-code-good-practices-using-a-roslyn-analyzer.htm

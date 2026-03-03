@@ -49,17 +49,19 @@ public class HttpLogFormatter() : ITextFormatter
         }
     }
 
+#pragma warning disable MA0011 // IFormatProvider is missing
     private static string FormatEvent(LogEvent logEvent, string name) =>
         logEvent.Properties.TryGetValue(name, out var value) ? value.ToString().Trim('"') : string.Empty;
+#pragma warning restore MA0011 // IFormatProvider is missing
 
     private static string TransformBody(string body) =>
-        body.Replace("\\\"", "\"")
-            .Replace("\r\n    ", string.Empty)
-            .Replace("\r\n  ", string.Empty)
-            .Replace("\r\n", string.Empty)
-            .Replace("\n    ", string.Empty)
-            .Replace("\n  ", string.Empty)
-            .Replace("\n", string.Empty)
+        body.Replace("\\\"", "\"", StringComparison.OrdinalIgnoreCase)
+            .Replace("\r\n    ", string.Empty, StringComparison.Ordinal)
+            .Replace("\r\n  ", string.Empty, StringComparison.Ordinal)
+            .Replace("\r\n", string.Empty, StringComparison.Ordinal)
+            .Replace("\n    ", string.Empty, StringComparison.Ordinal)
+            .Replace("\n  ", string.Empty, StringComparison.Ordinal)
+            .Replace("\n", string.Empty, StringComparison.Ordinal)
             .Trim('"');
 
     private static string AbbreviateLogLevel(LogEventLevel level) =>
@@ -71,6 +73,6 @@ public class HttpLogFormatter() : ITextFormatter
             LogEventLevel.Warning => "[WRN]",
             LogEventLevel.Error => "[ERR]",
             LogEventLevel.Fatal => "[FTL]",
-            _ => level.ToString().ToUpper(CultureInfo.InvariantCulture)[..3] // Fallback
+            _ => level.ToString().ToUpper(CultureInfo.InvariantCulture)[..3], // Fallback
         };
 }

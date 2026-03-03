@@ -403,3 +403,11 @@ dotnet_diagnostic.S4136.severity = none
 dotnet_diagnostic.S6605.severity = none
 
 dotnet_diagnostic.S3260.severity = error
+
+# Meziantou.Analyzer rules
+
+# MA0004: Use Task.ConfigureAwait
+dotnet_diagnostic.MA0004.severity = none
+
+# MA0048: File name must match type name
+dotnet_diagnostic.MA0048.severity = none

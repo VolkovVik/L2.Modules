@@ -5,11 +5,10 @@ namespace Aspu.Api.Extensions;
 
 internal static class SerilogExtensions
 {
-    /// <remarks>
+    /// <summary>
     /// https://nblumhardt.com/2020/10/bootstrap-logger/
     /// https://nblumhardt.com/2024/04/serilog-net8-0-minimal/
-    /// </remarks>
-
+    /// </summary>
     internal static void AddDefaultLogging()
     {
         Log.Logger = new LoggerConfiguration()

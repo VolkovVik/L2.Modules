@@ -17,11 +17,11 @@ internal sealed class ValidationExceptionHandler(
             return;
 
         var errors = validationException.Errors
-            .GroupBy(e => e.PropertyName)
+            .GroupBy(e => e.PropertyName, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(
                 g => g.Key.ToLowerInvariant(),
-                g => g.Select(e => e.ErrorMessage).ToArray()
-            );
+                g => g.Select(e => e.ErrorMessage).ToArray(),
+                StringComparer.OrdinalIgnoreCase);
         context.ProblemDetails.Extensions.Add("errors", errors);
     }
 }

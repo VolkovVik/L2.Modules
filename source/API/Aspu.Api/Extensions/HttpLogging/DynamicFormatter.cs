@@ -13,8 +13,10 @@ public class DynamicFormatter() : ITextFormatter
 
     public void Format(LogEvent logEvent, TextWriter output)
     {
+#pragma warning disable MA0011 // IFormatProvider is missing
         var context = logEvent.Properties.TryGetValue("SourceContext", out var sourceContext)
             ? sourceContext.ToString() : null;
+#pragma warning restore MA0011 // IFormatProvider is missing
 
         var formatter = !string.IsNullOrWhiteSpace(context) &&
             string.Equals(context, MiddlewareName, StringComparison.OrdinalIgnoreCase)
