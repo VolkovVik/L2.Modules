@@ -411,3 +411,6 @@ dotnet_diagnostic.MA0004.severity = none
 
 # MA0048: File name must match type name
 dotnet_diagnostic.MA0048.severity = none
+
+#MA0097: A class that implements IComparable<T> or IComparable should override comparison operators
+dotnet_diagnostic.MA0097.severity = none
