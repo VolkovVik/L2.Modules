@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" />
+    <PackageReference Include="Mediator.Abstractions" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Ulid" />
+  </ItemGroup>
+
+</Project>

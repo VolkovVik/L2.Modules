@@ -5,10 +5,12 @@ namespace Aspu.Api.Extensions;
 
 internal static class EndpointExtensions
 {
-    /// <remarks>
+    /// <summary>
     /// https://www.milanjovanovic.tech/blog/api-versioning-in-aspnetcore
-    /// </remarks>
-
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="apiVersionOptions"></param>
+    /// <returns></returns>
     internal static IServiceCollection AddApiEndpoint(this IServiceCollection services, ApiVersionOptions apiVersionOptions)
     {
         services.AddApiVersioning(options =>
