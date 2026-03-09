@@ -41,7 +41,10 @@ public record Result<TValue> : Result<TValue, Error>
 public record Result<TValue, TError> : IResult<TValue, TError>
     where TError : IError
 {
+    [MemberNotNullWhen(true, nameof(Value))]
     public bool IsSuccess { get; }
+
+    [MemberNotNullWhen(true, nameof(Error))]
     public bool IsFailure => !IsSuccess;
 
     [NotNull]

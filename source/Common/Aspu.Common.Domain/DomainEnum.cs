@@ -1,10 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using CSharpFunctionalExtensions;
 
 namespace Aspu.Common.Domain;
 
 /// <summary>
-///     Базовый класс для перечислений
+///     Base class for enumerations
 /// </summary>
 public abstract class DomainEnum : ValueObject
 {
@@ -17,14 +17,14 @@ public abstract class DomainEnum : ValueObject
     /// <summary>
     ///     Ctr
     /// </summary>
-    /// <param name="name">Название</param>
+    /// <param name="name">Name</param>
     protected DomainEnum(string name) : this()
     {
         Name = name;
     }
 
     /// <summary>
-    ///     Название
+    ///     Name
     /// </summary>
     public string Name { get; private set; }
 

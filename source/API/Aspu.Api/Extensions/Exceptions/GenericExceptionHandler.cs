@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aspu.Api.Extensions.Exceptions;
@@ -39,13 +39,13 @@ internal abstract class GenericExceptionHandler<TException>(
                 Type = ProblemDetailType,
                 Title = ProblemDetailTitle,
                 Status = ProblemDetailStatus,
-                Detail = currentException.Message
-            }
+                Detail = currentException.Message,
+            },
         };
 
         UpdateProblemDetails(context, currentException);
 
-        /// Возможно, придется корректировать контекст
+        /// Context may need to be adjusted
         /// await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         /// return true;
 

@@ -2,6 +2,8 @@ namespace Aspu.Common.Domain.Errors;
 
 public sealed record ValidationError : Error
 {
+    public Error[] Errors { get; }
+
     public ValidationError(Error[] errors)
         : base(
             "General.Validation",
@@ -10,6 +12,4 @@ public sealed record ValidationError : Error
     {
         Errors = errors;
     }
-
-    public Error[] Errors { get; }
 }

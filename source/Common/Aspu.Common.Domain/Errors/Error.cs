@@ -2,6 +2,31 @@ namespace Aspu.Common.Domain.Errors;
 
 public record Error : IError
 {
+    private Error() { }
+
+    public Error(string code, string description, ErrorType type)
+    {
+        Code = code;
+        Type = type;
+        Description = description;
+    }
+
+    /// <summary>
+    ///     Error code
+    /// </summary>
+    public string Code { get; }
+
+    /// <summary>
+    ///     Error description
+    /// </summary>
+    public string Description { get; }
+
+    /// <summary>
+    ///     Error type
+    /// </summary>
+    public ErrorType Type { get; }
+
+
     public static readonly Error None = new(string.Empty, string.Empty, ErrorType.None);
 
     public static readonly Error Default = new(
@@ -13,30 +38,6 @@ public record Error : IError
         "General.Null",
         "Null value was provided",
         ErrorType.Failure);
-
-    private Error() { }
-
-    public Error(string code, string description, ErrorType type)
-    {
-        Code = code;
-        Type = type;
-        Description = description;
-    }
-
-    /// <summary>
-    ///     Код ошибки
-    /// </summary>
-    public string Code { get; }
-
-    /// <summary>
-    ///     Описание ошибки
-    /// </summary>
-    public string Description { get; }
-
-    /// <summary>
-    ///     Тип ошибки
-    /// </summary>
-    public ErrorType Type { get; }
 
     public static Error Failure(string code, string description) =>
         new(code, description, ErrorType.Failure);
