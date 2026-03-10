@@ -26,6 +26,14 @@
     <Project Path="source/Common/Aspu.Common.Presentation/Aspu.Common.Presentation.csproj" Id="2980d21a-9d1f-40a3-afce-26b57e6da47b" />
   </Folder>
   <Folder Name="/source/Modules/" />
+  <Folder Name="/source/Modules/Orders/">
+    <Project Path="source/Modules/Orders/Aspu.Modules.Orders.Application/Aspu.Modules.Orders.Application.csproj" Id="7681042e-976d-4476-bb3d-8f3c793f017b" />
+    <Project Path="source/Modules/Orders/Aspu.Modules.Orders.Domain/Aspu.Modules.Orders.Domain.csproj" Id="b2e5031d-2747-4a8a-abab-c6aba38ea2b5" />
+    <Project Path="source/Modules/Orders/Aspu.Modules.Orders.Infrastructure/Aspu.Modules.Orders.Infrastructure.csproj" Id="e1d35de1-bb33-465c-ba2f-29fa7cc18bf4" />
+    <Project Path="source/Modules/Orders/Aspu.Modules.Orders.IntegrationEvents/Aspu.Modules.Orders.IntegrationEvents.csproj" Id="5db16613-0197-4f91-a0a9-4de9a16cc567" />
+    <Project Path="source/Modules/Orders/Aspu.Modules.Orders.Presentation/Aspu.Modules.Orders.Presentation.csproj" Id="c75e434d-1bb4-418d-b4ab-964b4199d292" />
+    <Project Path="source/Modules/Orders/Aspu.Modules.Orders.PublicApi/Aspu.Modules.Orders.PublicApi.csproj" Id="d862f15f-6812-4bbd-a65b-f6c0a035b1e9" />
+  </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/load/">
     <Project Path="tests/load/Aspu.LoadTests/Aspu.LoadTests.csproj" />
