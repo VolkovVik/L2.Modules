@@ -26,7 +26,7 @@ public abstract class DomainEnum : ValueObject
     /// <summary>
     ///     Name
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; init; }
 
     [ExcludeFromCodeCoverage]
     public override string ToString() => Name;
