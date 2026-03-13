@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.HttpLogging;
 
 namespace Aspu.Api.Extensions.HttpLogging;
@@ -16,6 +16,7 @@ public class CustomLoggingInterceptor : IHttpLoggingInterceptor
 
         var user = logContext.HttpContext.User?.Identity?.Name ?? "-";
         logContext.AddParameter("User", user);
+        logContext.AddParameter("Host", logContext.HttpContext.Request.Host.Value ?? string.Empty);
 
         if (!string.IsNullOrWhiteSpace(logContext.HttpContext.Request.Path.Value) &&
             (logContext.HttpContext.Request.Path.Value.Contains("scalar") ||

@@ -4,12 +4,11 @@ namespace Aspu.Api.Extensions.HttpLogging;
 
 internal static class HttpLoggingExtensions
 {
-    ///<remarks>
+    /// <summary>
     /// HTTP logging in ASP.NET Core
     /// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/http-logging/?view=aspnetcore-9.0
     /// https://antondevtips.com/blog/logging-requests-and-responses-for-api-requests-and-httpclient-in-aspnetcore
-    ///</remarks>
-
+    ///</summary>
     internal static WebApplicationBuilder AddHttpRequestLogging(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpLogging(options =>
