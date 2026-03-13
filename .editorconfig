@@ -390,8 +390,14 @@ dotnet_diagnostic.S2094.severity = none
 # S2365: Properties should not make collection or array copies
 dotnet_diagnostic.S2365.severity = none
 
+# S3260: Non-derived "private" classes should be "sealed"
+dotnet_diagnostic.S3260.severity = error
+
 # S3267: Loops should be simplified with "LINQ" expressions
 dotnet_diagnostic.S3267.severity = none
+
+# S3776: Cognitive Complexity of methods should not be too high
+dotnet_diagnostic.S3776.severity = none
 
 # S3881: "IDisposable" should be implemented correctly
 dotnet_diagnostic.S3881.severity = none
@@ -401,8 +407,6 @@ dotnet_diagnostic.S4136.severity = none
 
 # S6605: Collection-specific "Exists" method should be used instead of the "Any" extension
 dotnet_diagnostic.S6605.severity = none
-
-dotnet_diagnostic.S3260.severity = error
 
 # Meziantou.Analyzer rules
 
