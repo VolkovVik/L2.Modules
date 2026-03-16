@@ -11,6 +11,8 @@ public class HttpLogFormatter() : ITextFormatter
     private const int ScalarNumberBufferSize = 64;
     private const string TimePattern = "yyyy-MM-dd HH:mm:ss.fff zzz";
 
+    private static readonly CultureInfo UsedCultureInfo = CultureInfo.InvariantCulture;
+
     public void Format(LogEvent logEvent, TextWriter output)
     {
         ArgumentNullException.ThrowIfNull(logEvent);
@@ -43,13 +45,13 @@ public class HttpLogFormatter() : ITextFormatter
     {
         Span<char> buffer = stackalloc char[TimestampBufferSize];
         var utcTimestamp = timestamp.UtcDateTime;
-        if (utcTimestamp.TryFormat(buffer, out var written, TimePattern, CultureInfo.InvariantCulture))
+        if (utcTimestamp.TryFormat(buffer, out var written, TimePattern, UsedCultureInfo))
         {
             output.Write(buffer[..written]);
             return;
         }
 
-        output.Write(utcTimestamp.ToString(TimePattern, CultureInfo.InvariantCulture));
+        output.Write(utcTimestamp.ToString(TimePattern, UsedCultureInfo));
     }
 
     private static void WriteLogLevel(TextWriter output, LogEventLevel level)
@@ -70,7 +72,7 @@ public class HttpLogFormatter() : ITextFormatter
             return;
         }
 
-        var s = level.ToString().ToUpper(CultureInfo.InvariantCulture);
+        var s = level.ToString().ToUpper(UsedCultureInfo);
         output.Write('[');
         output.Write(s.Length > 3 ? s.AsSpan(0, 3) : s.AsSpan());
         output.Write(']');
@@ -102,7 +104,7 @@ public class HttpLogFormatter() : ITextFormatter
 
         var span = value is ScalarValue { Value: string s }
             ? s.AsSpan()
-            : value.ToString(format: null, CultureInfo.InvariantCulture).AsSpan();
+            : value.ToString(format: null, UsedCultureInfo).AsSpan();
         span = TrimQuotes(span);
         if (span.IsEmpty)
             return;
@@ -118,24 +120,24 @@ public class HttpLogFormatter() : ITextFormatter
             return TrimQuotes(s.AsSpan());
 
         if (value is not ScalarValue { Value: var scalarValue })
-            return TrimQuotes(value.ToString(format: null, CultureInfo.InvariantCulture).AsSpan());
+            return TrimQuotes(value.ToString(format: null, UsedCultureInfo).AsSpan());
 
         var written = 0;
         var result = scalarValue switch
         {
-            byte number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            sbyte number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            short number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            ushort number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            int number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            uint number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            long number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            ulong number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            nint number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            nuint number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            float number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            double number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
-            decimal number => number.TryFormat(buffer, out written, provider: CultureInfo.InvariantCulture),
+            byte number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            sbyte number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            short number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            ushort number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            int number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            uint number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            long number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            ulong number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            nint number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            nuint number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            float number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            double number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
+            decimal number => number.TryFormat(buffer, out written, provider: UsedCultureInfo),
             _ => false,
         };
         return result ? buffer[..written] : [];
