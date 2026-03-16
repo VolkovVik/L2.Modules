@@ -11,7 +11,6 @@ public class GeneratorInternal<TGenerator>
     private static Type Type => typeof(TGenerator);
     private static string Namespace => Type.Namespace;
     private static string AttributeName => Type.Name.Replace("Generator", "Attribute");
-    private static string AttributeFullName => $"{Namespace}.{AttributeName}";
 
     protected static void CreateAttribute(IncrementalGeneratorInitializationContext context) =>
         context.RegisterPostInitializationOutput(ctx =>
@@ -36,14 +35,17 @@ public class GeneratorInternal<TGenerator>
         if (context.SemanticModel.GetDeclaredSymbol(classDecl) is not INamedTypeSymbol symbol)
             return null;
 
-        var compilation = context.SemanticModel.Compilation;
-        var attribute = compilation.GetTypeByMetadataName(AttributeFullName);
-        if (attribute is null)
+        if (symbol.TypeKind is not TypeKind.Class)
+            return null;
+
+        if (symbol.DeclaredAccessibility is not Accessibility.Public)
+            return null;
+
+        if (!symbol.IsSealed)
             return null;
 
         return symbol.GetAttributes().Any(a =>
-            SymbolEqualityComparer.Default.Equals(a.AttributeClass, attribute))
-            ? symbol
-            : null;
+            string.Equals(a.AttributeClass?.Name, AttributeName, StringComparison.Ordinal))
+                ? symbol : null;
     }
 }

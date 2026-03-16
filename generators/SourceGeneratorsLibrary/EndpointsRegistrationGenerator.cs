@@ -51,7 +51,7 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
             return null;
 
         return symbol.AllInterfaces.Any(a =>
-            string.Equals(a.Name, InterfaceName, StringComparison.OrdinalIgnoreCase))
+            string.Equals(a.Name, InterfaceName, StringComparison.Ordinal))
                 ? symbol : null;
     }
 
