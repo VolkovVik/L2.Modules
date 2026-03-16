@@ -28,7 +28,7 @@ public sealed class Volume : ValueObject
     /// <summary>
     ///     Value
     /// </summary>
-    public int Value { get; private set; }
+    public int Value { get; }
 
     /// <summary>
     ///     Factory Method
@@ -49,11 +49,8 @@ public sealed class Volume : ValueObject
     /// <param name="first">Volume 1</param>
     /// <param name="second">Volume 2</param>
     /// <returns>Result</returns>
-    public static bool operator <(Volume first, Volume second)
-    {
-        var result = first.Value < second.Value;
-        return result;
-    }
+    public static bool operator <(Volume first, Volume second) =>
+        first.Value < second.Value;
 
     /// <summary>
     ///     Compares two volumes
@@ -61,11 +58,8 @@ public sealed class Volume : ValueObject
     /// <param name="first">Volume 1</param>
     /// <param name="second">Volume 2</param>
     /// <returns>Result</returns>
-    public static bool operator <=(Volume first, Volume second)
-    {
-        var result = first.Value <= second.Value;
-        return result;
-    }
+    public static bool operator <=(Volume first, Volume second) =>
+        first.Value <= second.Value;
 
     /// <summary>
     ///     Compares two volumes
@@ -73,11 +67,8 @@ public sealed class Volume : ValueObject
     /// <param name="first">Volume 1</param>
     /// <param name="second">Volume 2</param>
     /// <returns>Result</returns>
-    public static bool operator >(Volume first, Volume second)
-    {
-        var result = first.Value > second.Value;
-        return result;
-    }
+    public static bool operator >(Volume first, Volume second) =>
+        first.Value > second.Value;
 
     /// <summary>
     ///     Compares two volumes
@@ -85,11 +76,8 @@ public sealed class Volume : ValueObject
     /// <param name="first">Volume 1</param>
     /// <param name="second">Volume 2</param>
     /// <returns>Result</returns>
-    public static bool operator >=(Volume first, Volume second)
-    {
-        var result = first.Value >= second.Value;
-        return result;
-    }
+    public static bool operator >=(Volume first, Volume second) =>
+        first.Value >= second.Value;
 
     /// <summary>
     ///     Gets the value encoded in the marking code
@@ -101,8 +89,7 @@ public sealed class Volume : ValueObject
         var shift = decimalPlaces == 3 ? 1 : Math.Pow(10, 3 - decimalPlaces);
         var firstPath = decimalPlaces.ToString("D", CultureInfo.CurrentCulture);
         var secondPath = ((int)(Value / shift)).ToString("D", CultureInfo.CurrentCulture).PadLeft(6, '0');
-        var value = firstPath + secondPath;
-        return value;
+        return firstPath + secondPath;
     }
 
     /// <summary>

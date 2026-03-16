@@ -28,7 +28,7 @@ public sealed class Weight : ValueObject
     /// <summary>
     ///     Value
     /// </summary>
-    public int Value { get; private set; }
+    public int Value { get; }
 
     /// <summary>
     ///     Factory Method
@@ -49,11 +49,8 @@ public sealed class Weight : ValueObject
     /// <param name="first">Weight 1</param>
     /// <param name="second">Weight 2</param>
     /// <returns>Result</returns>
-    public static bool operator <(Weight first, Weight second)
-    {
-        var result = first.Value < second.Value;
-        return result;
-    }
+    public static bool operator <(Weight first, Weight second) =>
+        first.Value < second.Value;
 
     /// <summary>
     ///     Compares two weights
@@ -61,11 +58,8 @@ public sealed class Weight : ValueObject
     /// <param name="first">Weight 1</param>
     /// <param name="second">Weight 2</param>
     /// <returns>Result</returns>
-    public static bool operator <=(Weight first, Weight second)
-    {
-        var result = first.Value <= second.Value;
-        return result;
-    }
+    public static bool operator <=(Weight first, Weight second) =>
+        first.Value <= second.Value;
 
     /// <summary>
     ///     Compares two weights
@@ -73,11 +67,8 @@ public sealed class Weight : ValueObject
     /// <param name="first">Weight 1</param>
     /// <param name="second">Weight 2</param>
     /// <returns>Result</returns>
-    public static bool operator >(Weight first, Weight second)
-    {
-        var result = first.Value > second.Value;
-        return result;
-    }
+    public static bool operator >(Weight first, Weight second) =>
+        first.Value > second.Value;
 
     /// <summary>
     ///     Compares two weights
@@ -85,11 +76,8 @@ public sealed class Weight : ValueObject
     /// <param name="first">Weight 1</param>
     /// <param name="second">Weight 2</param>
     /// <returns>Result</returns>
-    public static bool operator >=(Weight first, Weight second)
-    {
-        var result = first.Value >= second.Value;
-        return result;
-    }
+    public static bool operator >=(Weight first, Weight second) =>
+        first.Value >= second.Value;
 
     /// <summary>
     ///     Gets the value encoded in the marking code

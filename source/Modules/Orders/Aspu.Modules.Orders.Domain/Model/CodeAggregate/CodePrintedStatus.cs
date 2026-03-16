@@ -8,7 +8,7 @@ namespace Aspu.Modules.Orders.Domain.Model.CodeAggregate;
 [DomainEnum]
 public sealed partial class CodePrintedStatus
 {
-    public static CodePrintedStatus Unprinted { get; }
-    public static CodePrintedStatus Printing { get; }
-    public static CodePrintedStatus Printed { get; }
+    public static CodePrintedStatus Unprinted => new(nameof(Unprinted));
+    public static CodePrintedStatus Printing => new(nameof(Printing));
+    public static CodePrintedStatus Printed => new(nameof(Printed));
 }
