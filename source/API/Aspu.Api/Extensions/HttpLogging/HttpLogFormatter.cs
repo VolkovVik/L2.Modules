@@ -5,7 +5,7 @@ using Serilog.Formatting;
 
 namespace Aspu.Api.Extensions.HttpLogging;
 
-public class HttpLogFormatter() : ITextFormatter
+public sealed class HttpLogFormatter() : ITextFormatter
 {
     private const int TimestampBufferSize = 32;
     private const int ScalarNumberBufferSize = 64;
@@ -22,23 +22,23 @@ public class HttpLogFormatter() : ITextFormatter
         output.Write(' ');
         WriteLogLevel(output, logEvent.Level);
         output.Write(' ');
-        GetProperty(output, logEvent, "Protocol");
+        WriteProperty(output, logEvent, "Protocol");
         output.Write(' ');
-        GetProperty(output, logEvent, "Method");
+        WriteProperty(output, logEvent, "Method");
         output.Write(' ');
-        GetProperty(output, logEvent, "Scheme");
+        WriteProperty(output, logEvent, "Scheme");
         output.Write("://");
-        GetProperty(output, logEvent, "Host");
-        GetProperty(output, logEvent, "RequestPath");
-        GetProperty(output, logEvent, "User", " <user=", ">");
+        WriteProperty(output, logEvent, "Host");
+        WriteProperty(output, logEvent, "RequestPath");
+        WriteProperty(output, logEvent, "User", " <user=", ">");
         output.Write(" responded ");
-        GetProperty(output, logEvent, "StatusCode");
+        WriteProperty(output, logEvent, "StatusCode");
         output.Write(" in ");
-        GetProperty(output, logEvent, "Duration");
+        WriteProperty(output, logEvent, "Duration");
         output.Write(" ms");
         output.WriteLine();
-        GetBodyProperty(output, logEvent, "RequestBody", "request - ");
-        GetBodyProperty(output, logEvent, "ResponseBody", "response - ");
+        WriteBodyProperty(output, logEvent, "RequestBody", "request - ");
+        WriteBodyProperty(output, logEvent, "ResponseBody", "response - ");
     }
 
     private static void WriteTimestamp(TextWriter output, DateTimeOffset timestamp)
@@ -78,7 +78,7 @@ public class HttpLogFormatter() : ITextFormatter
         output.Write(']');
     }
 
-    private static void GetProperty(TextWriter output, LogEvent logEvent, string name, string prefix = "", string postfix = "")
+    private static void WriteProperty(TextWriter output, LogEvent logEvent, string name, string prefix = "", string postfix = "")
     {
         if (!logEvent.Properties.TryGetValue(name, out var value))
             return;
@@ -97,7 +97,7 @@ public class HttpLogFormatter() : ITextFormatter
             output.Write(postfix);
     }
 
-    private static void GetBodyProperty(TextWriter output, LogEvent logEvent, string name, string prefix)
+    private static void WriteBodyProperty(TextWriter output, LogEvent logEvent, string name, string prefix)
     {
         if (!logEvent.Properties.TryGetValue(name, out var value))
             return;

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace Aspu.Api.Extensions.HttpLogging;
 
@@ -30,9 +30,6 @@ internal static class HttpLoggingExtensions
 
             options.RequestBodyLogLimit = 1024 * 32; // 32 KB
             options.ResponseBodyLogLimit = 1024 * 32; // 32 KB
-
-            if (builder.Environment.IsDevelopment())
-                options.LoggingFields |= HttpLoggingFields.RequestHeaders | HttpLoggingFields.ResponseHeaders;
         });
 
         builder.Services.AddHttpLoggingInterceptor<CustomLoggingInterceptor>();
