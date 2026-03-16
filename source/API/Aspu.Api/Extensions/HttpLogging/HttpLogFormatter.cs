@@ -9,7 +9,7 @@ public sealed class HttpLogFormatter() : ITextFormatter
 {
     private const int TimestampBufferSize = 32;
     private const int ScalarNumberBufferSize = 64;
-    private const string TimePattern = "yyyy-MM-dd HH:mm:ss.fff zzz";
+    private const string TimePattern = "yyyy-MM-dd HH:mm:ss.ffff zzz";
 
     private static readonly CultureInfo UsedCultureInfo = CultureInfo.InvariantCulture;
 

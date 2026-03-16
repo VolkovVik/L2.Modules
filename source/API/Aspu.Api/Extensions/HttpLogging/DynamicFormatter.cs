@@ -9,7 +9,7 @@ public sealed class DynamicFormatter() : ITextFormatter
     private const string MiddlewareName = "Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware";
 
     private static readonly ITextFormatter _specialFormatter = new HttpLogFormatter();
-    private static readonly MessageTemplateTextFormatter _defaultFormatter = new("{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}");
+    private static readonly MessageTemplateTextFormatter _defaultFormatter = new("{Timestamp:yyyy-MM-dd HH:mm:ss.ffff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}");
 
     public void Format(LogEvent logEvent, TextWriter output)
     {
