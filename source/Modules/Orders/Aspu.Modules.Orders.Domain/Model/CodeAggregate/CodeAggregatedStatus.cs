@@ -1,4 +1,4 @@
-using SourceGeneratorsLibrary;
+using Aspu.Modules.Orders.Domain.SourceGeneratorsLibrary;
 
 namespace Aspu.Modules.Orders.Domain.Model.CodeAggregate;
 
