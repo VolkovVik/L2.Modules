@@ -40,7 +40,6 @@
   <Folder Name="/source/Modules/Orders/tests/">
     <Project Path="source/Modules/Orders/tests/Aspu.Modules.Orders.UnitTests/Aspu.Modules.Orders.UnitTests.csproj" Id="e608d46b-eeda-4e68-b7c5-4ed13286ca47" />
   </Folder>
-  <Folder Name="/source/Modules/Reports/" />
   <Folder Name="/tests/" />
   <Project Path="docker-compose.dcproj">
     <Build />

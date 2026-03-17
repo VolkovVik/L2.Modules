@@ -222,7 +222,7 @@ public sealed class Code : Aggregate
     /// <param name="orderUnitId">Product type identifier</param>
     /// <param name="printedOn">Print date</param>
     /// <returns></returns>
-    public Result<object, Error> SetPrinted(Guid orderId, Guid orderUnitId, DateTime? printedOn)
+    public Result<object, Error> SetPrinted(Guid orderId, Guid orderUnitId, DateTime? printedOn = null)
     {
         printedOn ??= DateTime.UtcNow;
 
@@ -275,7 +275,7 @@ public sealed class Code : Aggregate
     /// <param name="orderUnitId">Product type identifier</param>
     /// <param name="defectedOn">Defect write-off date</param>
     /// <returns></returns>
-    public Result<object, Error> SetDefected(Guid orderId, Guid orderUnitId, DateTime? defectedOn)
+    public Result<object, Error> SetDefected(Guid orderId, Guid orderUnitId, DateTime? defectedOn = null)
     {
         defectedOn ??= DateTime.UtcNow;
 
@@ -315,7 +315,7 @@ public sealed class Code : Aggregate
     /// <param name="validatedOn">Validation date</param>
     /// <param name="isResetDefected">Flag to reset defect write-off</param>
     /// <returns></returns>
-    public Result<object, Error> SetValidated(Guid orderId, Guid orderUnitId, DateTime? validatedOn, bool isResetDefected = false)
+    public Result<object, Error> SetValidated(Guid orderId, Guid orderUnitId, DateTime? validatedOn = null, bool isResetDefected = false)
     {
         validatedOn ??= DateTime.UtcNow;
 

@@ -14,14 +14,16 @@ var scenario = Scenario.Create("http_scenario", async context =>
         .WithHeader("Content-Type", "application/json");
     /// .WithBody(new StringContent("{ some JSON }", Encoding.UTF8, "application/json"));
 
-    var response = await Http.Send(httpClient, request);
-    return response;
+    return await Http.Send(httpClient, request);
 })
 .WithWarmUpDuration(TimeSpan.FromSeconds(10))
 .WithLoadSimulations(
-    //Simulation.RampingConstant(copies: 10, during: TimeSpan.FromSeconds(30)),
-    Simulation.KeepConstant(copies: 100, during: TimeSpan.FromSeconds(30))
-//Simulation.RampingConstant(copies: 0, during: TimeSpan.FromSeconds(30))
+///Simulation.RampingConstant(copies: 100, during: TimeSpan.FromSeconds(30)),
+///Simulation.KeepConstant(copies: 100, during: TimeSpan.FromSeconds(30)),
+///Simulation.RampingConstant(copies: 0, during: TimeSpan.FromSeconds(30))
+Simulation.RampingInject(rate: 100, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30)),
+Simulation.Inject(rate: 100, interval: TimeSpan.FromMilliseconds(1), during: TimeSpan.FromSeconds(30)),
+Simulation.RampingInject(rate: 0, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30))
 );
 
 NBomberRunner
