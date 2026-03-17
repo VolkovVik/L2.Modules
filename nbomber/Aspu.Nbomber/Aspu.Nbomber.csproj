@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NBomber" />
-    <PackageReference Include="NBomber.Http" />
+	<PackageReference Include="NBomber" />
+	<PackageReference Include="NBomber.Http" />
   </ItemGroup>
 
 </Project>

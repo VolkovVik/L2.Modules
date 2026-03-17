@@ -5,4 +5,8 @@
     <ProjectReference Include="..\..\..\Common\Aspu.Common.Domain\Aspu.Common.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

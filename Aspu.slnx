@@ -10,6 +10,9 @@
   <Folder Name="/generators/">
     <Project Path="generators/SourceGeneratorsLibrary/SourceGeneratorsLibrary.csproj" Id="9385fb69-1a3f-41ea-b2d1-f68b7c47fcf0" />
   </Folder>
+  <Folder Name="/nbomber/">
+    <Project Path="nbomber/Aspu.Nbomber/Aspu.Nbomber.csproj" Id="6ab91040-30fb-4822-b425-9db1882a534b" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
@@ -34,11 +37,11 @@
     <Project Path="source/Modules/Orders/Aspu.Modules.Orders.Presentation/Aspu.Modules.Orders.Presentation.csproj" Id="c75e434d-1bb4-418d-b4ab-964b4199d292" />
     <Project Path="source/Modules/Orders/Aspu.Modules.Orders.PublicApi/Aspu.Modules.Orders.PublicApi.csproj" Id="d862f15f-6812-4bbd-a65b-f6c0a035b1e9" />
   </Folder>
-  <Folder Name="/source/Modules/Orders/tests/" />
-  <Folder Name="/tests/" />
-  <Folder Name="/tests/load/">
-    <Project Path="tests/load/Aspu.LoadTests/Aspu.LoadTests.csproj" />
+  <Folder Name="/source/Modules/Orders/tests/">
+    <Project Path="source/Modules/Orders/tests/Aspu.Modules.Orders.UnitTests/Aspu.Modules.Orders.UnitTests.csproj" Id="e608d46b-eeda-4e68-b7c5-4ed13286ca47" />
   </Folder>
+  <Folder Name="/source/Modules/Reports/" />
+  <Folder Name="/tests/" />
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
