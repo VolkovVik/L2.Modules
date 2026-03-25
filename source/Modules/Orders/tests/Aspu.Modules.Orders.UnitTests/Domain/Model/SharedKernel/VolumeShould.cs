@@ -1,44 +1,62 @@
 ﻿using Aspu.Modules.Orders.Domain.Model.SharedKernel;
-using Shouldly;
 
 namespace Aspu.Modules.Orders.UnitTests.Domain.Model.SharedKernel;
 
 internal sealed class VolumeShould
 {
+    public static IEnumerable<(int, int, string)> TestCases()
+    {
+        yield return (123, 1, "1000001");
+        yield return (123, 2, "2000012");
+        yield return (123, 3, "3000123");
+        yield return (123, 4, "4001230");
+        yield return (123, 5, "5012300");
+        yield return (123, 6, "6123000");
+        yield return (1234, 1, "1000012");
+        yield return (1234, 2, "2000123");
+        yield return (1234, 3, "3001234");
+        yield return (1234, 4, "4012340");
+        yield return (1234, 5, "5123400");
+        yield return (22700, 1, "1000227");
+        yield return (22700, 2, "2002270");
+        yield return (22700, 3, "3022700");
+        yield return (22700, 4, "4227000");
+    }
+
     [Test]
     [Arguments(1)]
     [Arguments(100)]
     [Arguments(int.MaxValue)]
-    public void BeCorrectWhenParamsAreCorrectOnCreated(int milliliters)
+    public async Task BeCorrectWhenParamsAreCorrectOnCreated(int milliliters)
     {
         //Arrange
 
         //Act
-        var volume = Volume.Create(milliliters);
+        var result = Volume.Create(milliliters);
 
         //Assert
-        volume.IsSuccess.ShouldBeTrue();
-        volume.Value.Value.ShouldBe(milliliters);
+        await Assert.That(result.IsSuccess).IsTrue();
+        await Assert.That(result.Value.Value).IsEqualTo(milliliters);
     }
 
     [Test]
     [Arguments(0)]
     [Arguments(-1)]
     [Arguments(int.MinValue)]
-    public void ReturnErrorWhenParamsAreNotCorrectOnCreated(int milliliters)
+    public async Task ReturnErrorWhenParamsAreNotCorrectOnCreated(int milliliters)
     {
         //Arrange
 
         //Act
-        var volume = Volume.Create(milliliters);
+        var result = Volume.Create(milliliters);
 
         //Assert
-        volume.IsSuccess.ShouldBeFalse();
-        volume.Error.ShouldNotBeNull();
+        await Assert.That(result.IsSuccess).IsFalse();
+        await Assert.That(result.Error).IsNotNull();
     }
 
     [Test]
-    public void BeEqualWhenAllPropertiesIsEqual()
+    public async Task BeEqualWhenAllPropertiesIsEqual()
     {
         //Arrange
         var first = Volume.Create(10).Value;
@@ -48,11 +66,11 @@ internal sealed class VolumeShould
         var result = first == second;
 
         //Assert
-        result.ShouldBeTrue();
+        await Assert.That(result).IsTrue();
     }
 
     [Test]
-    public void BeNotEqualWhenAllPropertiesIsEqual()
+    public async Task BeNotEqualWhenAllPropertiesIsEqual()
     {
         //Arrange
         var first = Volume.Create(10).Value;
@@ -62,11 +80,11 @@ internal sealed class VolumeShould
         var result = first == second;
 
         //Assert
-        result.ShouldBeFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
-    public void CanCompareMoreThen()
+    public async Task CanCompareMoreThen()
     {
         //Arrange
         var first = Volume.Create(10).Value;
@@ -76,11 +94,11 @@ internal sealed class VolumeShould
         var result = first > second;
 
         //Assert
-        result.ShouldBeTrue();
+        await Assert.That(result).IsTrue();
     }
 
     [Test]
-    public void CanCompareLessThen()
+    public async Task CanCompareLessThen()
     {
         //Arrange
         var first = Volume.Create(5).Value;
@@ -90,34 +108,20 @@ internal sealed class VolumeShould
         var result = first < second;
 
         //Assert
-        result.ShouldBeTrue();
+        await Assert.That(result).IsTrue();
     }
 
     [Test]
-    [Arguments(123, 1, "1000001")]
-    [Arguments(123, 2, "2000012")]
-    [Arguments(123, 3, "3000123")]
-    [Arguments(123, 4, "4001230")]
-    [Arguments(123, 5, "5012300")]
-    [Arguments(123, 6, "6123000")]
-    [Arguments(1234, 1, "1000012")]
-    [Arguments(1234, 2, "2000123")]
-    [Arguments(1234, 3, "3001234")]
-    [Arguments(1234, 4, "4012340")]
-    [Arguments(1234, 5, "5123400")]
-    [Arguments(22700, 1, "1000227")]
-    [Arguments(22700, 2, "2002270")]
-    [Arguments(22700, 3, "3022700")]
-    [Arguments(22700, 4, "4227000")]
-    public void GetCorrectPathValue(int grams, int decimalPlaces, string value)
+    [MethodDataSource(nameof(TestCases))]
+    public async Task GetCorrectPathValue(int milliliters, int decimalPlaces, string value)
     {
         //Arrange
-        var volume = Volume.Create(grams).Value;
+        var volume = Volume.Create(milliliters).Value;
 
         //Act
         var result = volume.GetPathValue(decimalPlaces);
 
         //Assert
-        result.ShouldBe(value);
+        await Assert.That(result).IsEqualTo(value);
     }
 }
