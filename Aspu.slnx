@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/docs/">
     <File Path="docs/articles.md" />
+    <File Path="docs/command.md" />
     <File Path="docs/commit.md" />
     <File Path="docs/dddpatterns.md" />
   </Folder>

@@ -3,9 +3,6 @@ using NBomber.Http;
 using NBomber.Http.CSharp;
 using NBomber.Plugins.Network.Ping;
 
-// dotnet build -c Release
-// dotnet run -c Release
-
 using var httpClient = Http.CreateDefaultClient();
 
 var scenario = Scenario.Create("http_scenario", async context =>

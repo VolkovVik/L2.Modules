@@ -5,9 +5,6 @@ using Serilog.Events;
 
 BenchmarkRunner.Run<LogFormatterTests>();
 
-// dotnet build -c Release
-// dotnet run -c Release
-
 [MemoryDiagnoser]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0047:Declare types in namespaces", Justification = "<Pending>")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1050:Declare types in namespaces", Justification = "<Pending>")]
