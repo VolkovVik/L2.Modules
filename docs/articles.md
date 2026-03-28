@@ -41,3 +41,7 @@ https://antondevtips.com/blog/how-to-replace-exceptions-with-result-pattern-in-d
 # TUnit testing
 
 https://trailheadtechnology.com/tunit-the-new-sheriff-in-town-for-net-testing/
+
+# ValueStringBuilder
+
+https://andrewlock.net/a-deep-dive-on-stringbuilder-part-6-vaulestringbuilder-a-stack-based-string-builder/
