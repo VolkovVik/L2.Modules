@@ -25,8 +25,10 @@ internal sealed class GradeShould
         var items = Grade.GetList();
 
         //Assert
-        await Assert.That(items).Count().IsEqualTo(AcceptableValues.Length);
-        await Assert.That(items).IsEquivalentTo(AcceptableValues);
+        await Assert.That(items)
+            .Count().IsEqualTo(AcceptableValues.Length)
+            .And
+            .IsEquivalentTo(AcceptableValues);
     }
 
     [Test]
