@@ -199,7 +199,11 @@ public static class CodesParsing
 
     private static ApplicationId? GetApplicationId(ReadOnlySpan<char> code)
     {
-        for (var i = 2; i < 5; i++)
+        if (code.Length < 3)
+            return null;
+
+        var length = code.Length < 4 ? code.Length - 1 : 4;
+        for (var i = 2; i <= length; i++)
         {
             if (int.TryParse(code[..i], CultureInfo.InvariantCulture, out var key) &&
                 _dictionary.TryGetValue(key, out var value))
