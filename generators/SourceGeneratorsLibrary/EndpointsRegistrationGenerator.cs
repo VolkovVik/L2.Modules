@@ -161,5 +161,4 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         }
         return null;
     }
-
 }
