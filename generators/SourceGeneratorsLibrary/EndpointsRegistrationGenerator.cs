@@ -20,10 +20,10 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         ///    Debugger.Launch();
 
         var classDeclarations = context.SyntaxProvider
-         .CreateSyntaxProvider(
-             predicate: static (s, _) => IsCandidate(s), // quick filter
-             transform: static (ctx, _) => GetSemanticTarget(ctx)) // get symbol
-         .Where(static m => m is not null)!;
+            .CreateSyntaxProvider(
+                predicate: static (s, _) => IsCandidate(s), // quick filter
+                transform: static (ctx, _) => GetSemanticTarget(ctx)) // get symbol
+            .Where(static m => m is not null)!;
 
         var collectedClasses = classDeclarations.Collect();
         var compilationProvider = context.CompilationProvider;
