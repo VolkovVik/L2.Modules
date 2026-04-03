@@ -77,25 +77,26 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
             .Select(x => x!.ContainingNamespace)
             .Where(x => !x.IsGlobalNamespace)
             .Select(x => x.ToDisplayString())
-            .ToList();
+            .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
+            .ToImmutableHashSet();
+        foreach (var @namespace in namespaces)
+            sb.Append("using ").Append(@namespace).Append(';').AppendLine();
+
         var interfaceSymbol = FindInterface(compilation, InterfaceName);
         var interfaceNamespace = interfaceSymbol?.ContainingNamespace.IsGlobalNamespace != false
                 ? "Aspu.Common.Presentation.Endpoints"
                 : interfaceSymbol.ContainingNamespace.ToDisplayString();
-        namespaces.AddRange([
-            interfaceNamespace,
-            "System.Globalization",
-            "Microsoft.AspNetCore.Builder",
-            "Microsoft.AspNetCore.Http",
-            "Microsoft.AspNetCore.Routing",
-        ]);
-        foreach (var @namespace in namespaces.OrderBy(x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal))
-            sb.Append("using ").Append(@namespace).Append(';').AppendLine();
+
+        sb.Append("using ").Append(interfaceNamespace).Append(';').AppendLine();
+        sb.Append("using ").Append("System.Globalization").Append(';').AppendLine();
+        sb.Append("using ").Append("Microsoft.AspNetCore.Builder").Append(';').AppendLine();
+        sb.Append("using ").Append("Microsoft.AspNetCore.Http").Append(';').AppendLine();
+        sb.Append("using ").Append("Microsoft.AspNetCore.Routing").Append(';').AppendLine();
         sb.AppendLine();
 
         sb.Append("namespace ").Append(assemblyName).Append('.').Append(Namespace).Append(';').AppendLine();
         sb.AppendLine();
-        sb.AppendLine("public static class EndpointsRegistrationGenerator");
+        sb.AppendLine("public static class EndpointsRegistration");
         sb.AppendLine("{");
         sb.AppendLine("    public static IEndpointRouteBuilder MapEndpoints(");
         sb.AppendLine("        IEndpointRouteBuilder app,");
@@ -137,7 +138,7 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         sb.AppendLine("            ? input");
         sb.AppendLine("            : $\"/{input.ToLower(CultureInfo.InvariantCulture)}\";");
         sb.AppendLine("}");
-        context.AddSource("EndpointsRegistrationGenerator.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
+        context.AddSource("EndpointsRegistration.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
     }
 
     private static INamedTypeSymbol? FindInterface(Compilation compilation, string name) =>
