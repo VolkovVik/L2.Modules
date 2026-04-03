@@ -11,6 +11,7 @@ namespace SourceGeneratorsLibrary;
 public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
 {
     private const string InterfaceName = "IEndpoint";
+    private const string IEndpointMetadataName = "Aspu.Common.Presentation.Endpoints.IEndpoint";
 
     private static string Namespace => typeof(EndpointsRegistrationGenerator).Namespace;
 
@@ -22,7 +23,7 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         var classDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (s, _) => IsCandidate(s), // quick filter
-                transform: static (ctx, _) => GetSemanticTarget(ctx)) // get symbol
+                transform: static (ctx, ct) => GetSemanticTarget(ctx, ct)) // get symbol
             .Where(static m => m is not null)!;
 
         var collectedClasses = classDeclarations.Collect();
@@ -35,10 +36,10 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
     private static bool IsCandidate(SyntaxNode node) =>
         node is ClassDeclarationSyntax cds && cds.BaseList is not null;
 
-    private static INamedTypeSymbol? GetSemanticTarget(GeneratorSyntaxContext context)
+    private static INamedTypeSymbol? GetSemanticTarget(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         var classDecl = (ClassDeclarationSyntax)context.Node;
-        if (context.SemanticModel.GetDeclaredSymbol(classDecl) is not INamedTypeSymbol symbol)
+        if (context.SemanticModel.GetDeclaredSymbol(classDecl, cancellationToken) is not INamedTypeSymbol symbol)
             return null;
 
         if (symbol.TypeKind is not TypeKind.Class)
@@ -82,7 +83,7 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         foreach (var @namespace in namespaces)
             sb.Append("using ").Append(@namespace).Append(';').AppendLine();
 
-        var interfaceSymbol = FindInterface(compilation, InterfaceName);
+        var interfaceSymbol = compilation.GetTypeByMetadataName(IEndpointMetadataName) ?? FindInterface(compilation, InterfaceName);
         var interfaceNamespace = interfaceSymbol?.ContainingNamespace.IsGlobalNamespace != false
                 ? "Aspu.Common.Presentation.Endpoints"
                 : interfaceSymbol.ContainingNamespace.ToDisplayString();
