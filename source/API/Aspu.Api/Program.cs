@@ -33,9 +33,11 @@ try
 
     builder.Services.AddObjectPool();
 
-    builder.Services.AddRequest();
+    builder.Services.AddMediatorRequest();
 
     builder.Services.AddHttpContextAccessor();
+
+    builder.Services.AddModules(builder.Configuration);
 
     var app = builder.Build();
 

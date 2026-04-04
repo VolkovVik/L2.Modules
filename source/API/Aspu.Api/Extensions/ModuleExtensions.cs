@@ -5,12 +5,14 @@ namespace Aspu.Api.Extensions;
 
 internal static class ModuleExtensions
 {
-    internal static IServiceCollection AddRequest(
+    internal static IServiceCollection AddModules(
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddApiModule();
         services.AddCommonModule();
         services.AddOrdersModule(configuration);
+
         return services;
     }
 }
