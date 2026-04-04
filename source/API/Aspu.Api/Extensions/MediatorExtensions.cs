@@ -14,6 +14,7 @@ internal static class MediatorExtensions
         });
 
         SourceGenerators.Validators.ValidatorRegistration.AddValidators(services);
+        Modules.Orders.Presentation.SourceGenerators.Validators.ValidatorRegistration.AddValidators(services);
 
         return services;
     }

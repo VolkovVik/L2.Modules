@@ -59,6 +59,7 @@ internal static class EndpointExtensions
         MapHelloEndpoint(app);
 
         SourceGenerators.Endpoints.EndpointsRegistration.MapEndpoints(app, routeGroupBuilder);
+        Modules.Orders.Presentation.SourceGenerators.Endpoints.EndpointsRegistration.MapEndpoints(app, routeGroupBuilder);
     }
 
     private static void MapHelloEndpoint(IEndpointRouteBuilder app) =>

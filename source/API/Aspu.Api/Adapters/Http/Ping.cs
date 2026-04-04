@@ -12,7 +12,9 @@ internal sealed class PingRequest : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder routes)
     {
-        routes.MapGet("/ping", static async Task<Results<Ok<Pong>, NotFound>> (IMediator mediator, CancellationToken cancellationToken) =>
+        routes.MapGet("/ping", static async Task<Results<Ok<Pong>, NotFound>> (
+            IMediator mediator,
+            CancellationToken cancellationToken) =>
         {
             var response = await mediator.Send(new Ping(Guid.NewGuid()), cancellationToken);
             return response is null
