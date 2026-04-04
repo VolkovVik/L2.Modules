@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace Aspu.Api.Extensions.HttpLogging;
 
 internal static class HttpLoggingExtensions
 {
-    ///<remarks>
+    /// <summary>
     /// HTTP logging in ASP.NET Core
     /// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/http-logging/?view=aspnetcore-9.0
     /// https://antondevtips.com/blog/logging-requests-and-responses-for-api-requests-and-httpclient-in-aspnetcore
-    ///</remarks>
-
+    ///</summary>
     internal static WebApplicationBuilder AddHttpRequestLogging(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpLogging(options =>
@@ -31,9 +30,6 @@ internal static class HttpLoggingExtensions
 
             options.RequestBodyLogLimit = 1024 * 32; // 32 KB
             options.ResponseBodyLogLimit = 1024 * 32; // 32 KB
-
-            if (builder.Environment.IsDevelopment())
-                options.LoggingFields |= HttpLoggingFields.RequestHeaders | HttpLoggingFields.ResponseHeaders;
         });
 
         builder.Services.AddHttpLoggingInterceptor<CustomLoggingInterceptor>();

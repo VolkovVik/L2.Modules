@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Aspu.Common.Application\Aspu.Common.Application.csproj" />
+    <ProjectReference Include="..\Aspu.Modules.Orders.Domain\Aspu.Modules.Orders.Domain.csproj" />
+    <ProjectReference Include="..\Aspu.Modules.Orders.IntegrationEvents\Aspu.Modules.Orders.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+</Project>

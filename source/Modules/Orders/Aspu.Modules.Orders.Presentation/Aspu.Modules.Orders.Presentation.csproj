@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Aspu.Common.Presentation\Aspu.Common.Presentation.csproj" />
+    <ProjectReference Include="..\Aspu.Modules.Orders.Application\Aspu.Modules.Orders.Application.csproj" />
+    <ProjectReference Include="..\Aspu.Modules.Orders.Infrastructure\Aspu.Modules.Orders.Infrastructure.csproj" />
+    <ProjectReference Include="..\Aspu.Modules.Orders.PublicApi\Aspu.Modules.Orders.PublicApi.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <EnableEndpointsGenerator>true</EnableEndpointsGenerator>
+    <EnableValidatorsGenerator>true</EnableValidatorsGenerator>
+  </PropertyGroup>
+
+</Project>

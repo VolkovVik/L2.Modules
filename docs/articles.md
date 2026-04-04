@@ -37,3 +37,12 @@ https://www.meziantou.net/enforcing-asynchronous-code-good-practices-using-a-ros
 https://andrewlock.net/series/working-with-the-result-pattern/
 https://www.milanjovanovic.tech/blog/functional-error-handling-in-dotnet-with-the-result-pattern
 https://antondevtips.com/blog/how-to-replace-exceptions-with-result-pattern-in-dotnet
+
+# TUnit testing
+
+https://tunit.dev/
+https://trailheadtechnology.com/tunit-the-new-sheriff-in-town-for-net-testing/
+
+# ValueStringBuilder
+
+https://andrewlock.net/a-deep-dive-on-stringbuilder-part-6-vaulestringbuilder-a-stack-based-string-builder/

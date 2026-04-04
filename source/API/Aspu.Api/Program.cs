@@ -31,6 +31,8 @@ try
 
     builder.Services.AddApiEndpoint(apiVersionOptions);
 
+    builder.Services.AddObjectPool();
+
     builder.Services.AddRequest();
 
     builder.Services.AddHttpContextAccessor();
