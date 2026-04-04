@@ -74,15 +74,14 @@ public sealed class ValidatorRegistrationGenerator : IIncrementalGenerator
             .Select(x => x!.ContainingNamespace)
             .Where(x => !x.IsGlobalNamespace)
             .Select(x => x.ToDisplayString())
-            .ToList();
-        namespaces.AddRange([
-            "Microsoft.Extensions.DependencyInjection",
-            "FluentValidation",
-        ]);
-        foreach (var @namespace in namespaces.OrderBy(x => x, StringComparer.Ordinal).Distinct(StringComparer.Ordinal))
+            .OrderBy(x => x, StringComparer.Ordinal)
+            .ToImmutableHashSet();
+        foreach (var @namespace in namespaces)
             sb.Append("using ").Append(@namespace).Append(';').AppendLine();
-        sb.AppendLine();
 
+        sb.Append("using ").Append("FluentValidation").Append(';').AppendLine();
+        sb.Append("using ").Append("Microsoft.Extensions.DependencyInjection").Append(';').AppendLine();
+        sb.AppendLine();
         sb.Append("namespace ").Append(assemblyName).Append('.').Append(Namespace).Append(';').AppendLine();
         sb.AppendLine();
         sb.AppendLine("public static class ValidatorRegistration");
@@ -113,7 +112,7 @@ public sealed class ValidatorRegistrationGenerator : IIncrementalGenerator
         return baseType is null ||
             baseClassSymbol is null ||
             !SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, baseClassSymbol)
-            ? null
-            : baseType;
+                ? null
+                : baseType;
     }
 }
