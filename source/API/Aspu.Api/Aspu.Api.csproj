@@ -22,28 +22,36 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-	<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
-	<PackageReference Include="Scalar.AspNetCore" />
-	<PackageReference Include="Serilog" />
-	<PackageReference Include="Serilog.Enrichers.Environment" />
-	<PackageReference Include="Serilog.Enrichers.Process" />
-	<PackageReference Include="Serilog.Enrichers.Thread" />
-	<PackageReference Include="Serilog.Expressions" />
-	<PackageReference Include="Serilog.Extensions.Hosting" />
-	<PackageReference Include="Serilog.Settings.Configuration" />
-	<PackageReference Include="Serilog.Sinks.Async" />
-	<PackageReference Include="Serilog.Sinks.Console" />
-	<PackageReference Include="Serilog.Sinks.Debug" />
-	<PackageReference Include="Serilog.Sinks.File" />
-	<PackageReference Include="Serilog.Sinks.Seq" />
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+	  <PackageReference Include="Scalar.AspNetCore" />
+	  <PackageReference Include="Serilog" />
+	  <PackageReference Include="Serilog.Enrichers.Environment" />
+	  <PackageReference Include="Serilog.Enrichers.Process" />
+	  <PackageReference Include="Serilog.Enrichers.Thread" />
+	  <PackageReference Include="Serilog.Expressions" />
+	  <PackageReference Include="Serilog.Extensions.Hosting" />
+	  <PackageReference Include="Serilog.Settings.Configuration" />
+	  <PackageReference Include="Serilog.Sinks.Async" />
+	  <PackageReference Include="Serilog.Sinks.Console" />
+	  <PackageReference Include="Serilog.Sinks.Debug" />
+	  <PackageReference Include="Serilog.Sinks.File" />
+	  <PackageReference Include="Serilog.Sinks.Seq" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <EnableEndpointsGenerator>true</EnableEndpointsGenerator>
+    <EnableValidatorsGenerator>true</EnableValidatorsGenerator>
+  </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="logs\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\generators\SourceGeneratorsLibrary\SourceGeneratorsLibrary.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <!--
+    <ProjectReference Include="..\..\..\generators\SourceGenerators.Endpoints\SourceGenerators.Endpoints.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\..\generators\SourceGenerators.Validators\SourceGenerators.Validators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    -->
     <ProjectReference Include="..\..\Common\Aspu.Common.Presentation\Aspu.Common.Presentation.csproj" />
     <ProjectReference Include="..\..\Modules\Orders\Aspu.Modules.Orders.Presentation\Aspu.Modules.Orders.Presentation.csproj" />
   </ItemGroup>

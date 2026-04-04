@@ -13,7 +13,7 @@ internal static class MediatorExtensions
             options.PipelineBehaviors = [typeof(ValidationBehavior<,>)];
         });
 
-        SourceGeneratorsLibrary.ValidatorRegistrationGenerator.AddValidators(services);
+        SourceGenerators.Validators.ValidatorRegistration.AddValidators(services);
 
         return services;
     }

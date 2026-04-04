@@ -4,11 +4,25 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-	<!-- Configure code analysis. -->
+	  <!-- Configure code analysis. -->
     <AnalysisLevel>latest</AnalysisLevel>
     <AnalysisMode>All</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <EndpointsGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Endpoints\SourceGenerators.Endpoints.csproj</EndpointsGeneratorPath>
+    <ValidatorsGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Validators\SourceGenerators.Validators.csproj</ValidatorsGeneratorPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(EnableEndpointsGenerator)' == 'true'">
+    <ProjectReference Include="$(EndpointsGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(EnableValidatorsGenerator)' == 'true'">
+    <ProjectReference Include="$(ValidatorsGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>
