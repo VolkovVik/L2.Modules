@@ -1,5 +1,8 @@
 ﻿using Aspu.Modules.Orders.Application;
 using Aspu.Modules.Orders.Infrastructure;
+using Aspu.Modules.Orders.Presentation.SourceGenerators.Endpoints;
+using Aspu.Modules.Orders.Presentation.SourceGenerators.Validators;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +17,17 @@ public static class OrdersConfiguration
         services.AddApplication();
         services.AddInfrastructure(configuration);
 
+        services.AddValidators();
+
         return services;
+    }
+
+    public static IEndpointRouteBuilder MapOrdersEndpoints(
+        this IEndpointRouteBuilder app,
+        RouteGroupBuilder? routeGroupBuilder = null)
+    {
+        EndpointsRegistration.MapEndpoints(app, routeGroupBuilder);
+
+        return routeGroupBuilder ?? app;
     }
 }

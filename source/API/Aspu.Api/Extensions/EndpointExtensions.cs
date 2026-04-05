@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Aspu.Api.Options;
+using Aspu.Modules.Orders.Presentation;
 
 namespace Aspu.Api.Extensions;
 
@@ -52,21 +53,14 @@ internal static class EndpointExtensions
         return app;
     }
 
+    /// <summary>
+    /// Maps local API endpoints directly and delegates module endpoints to the shared module aggregator.
+    /// </summary>
     private static void MapEndpoints(
         IEndpointRouteBuilder app,
         RouteGroupBuilder? routeGroupBuilder = null)
     {
-        MapHelloEndpoint(app);
-
-        SourceGenerators.Endpoints.EndpointsRegistration.MapEndpoints(app, routeGroupBuilder);
-        Modules.Orders.Presentation.SourceGenerators.Endpoints.EndpointsRegistration.MapEndpoints(app, routeGroupBuilder);
+        app.MapApiEndpoints(routeGroupBuilder);
+        app.MapOrdersEndpoints(routeGroupBuilder);
     }
-
-    private static void MapHelloEndpoint(IEndpointRouteBuilder app) =>
-        app.MapGet("/", () => "Hello from ASPU.API")
-            .AllowAnonymous()
-            .WithName("Hello")
-            .WithSummary("Hello")
-            .WithDescription("Return hello message")
-            .WithTags("Hello");
 }

@@ -93,7 +93,7 @@ public sealed class EndpointsRegistrationGenerator : IIncrementalGenerator
         sb.AppendLine();
         sb.Append("namespace ").Append(assemblyName).Append('.').Append(Namespace).Append(';').AppendLine();
         sb.AppendLine();
-        sb.AppendLine("public static class EndpointsRegistration");
+        sb.AppendLine("internal static class EndpointsRegistration");
         sb.AppendLine("{");
         sb.AppendLine("    public static IEndpointRouteBuilder MapEndpoints(");
         sb.AppendLine("        IEndpointRouteBuilder app,");
