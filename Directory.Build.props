@@ -17,7 +17,7 @@
     <ValidatorsGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Validators\SourceGenerators.Validators.csproj</ValidatorsGeneratorPath>
   </PropertyGroup>
 
-  <!-- Source generator runs per project only (Roslyn sees referenced projects as metadata, not source). Each host that maps routes must call that assembly's generated EndpointsRegistration. -->
+  <!-- Source generator runs per project and can aggregate public endpoints from referenced assemblies. Hosts call their own generated EndpointsRegistration; module-specific registrations remain available for self-hosted scenarios. -->
   <ItemGroup Condition="'$(EnableEndpointsGenerator)' == 'true'">
     <ProjectReference Include="$(EndpointsGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>

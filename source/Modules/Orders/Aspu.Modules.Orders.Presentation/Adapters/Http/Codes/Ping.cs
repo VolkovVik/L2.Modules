@@ -9,7 +9,7 @@ using Serilog;
 
 namespace Aspu.Modules.Orders.Presentation.Adapters.Http.Codes;
 
-internal sealed class CodeRequest : IEndpoint
+public sealed class CodeRequest : IEndpoint
 {
     public string Tags => "Code";
 

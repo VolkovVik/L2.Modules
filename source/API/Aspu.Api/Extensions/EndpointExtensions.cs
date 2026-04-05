@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using Aspu.Api.Options;
-using Aspu.Modules.Orders.Presentation;
 
 namespace Aspu.Api.Extensions;
 
@@ -54,13 +53,11 @@ internal static class EndpointExtensions
     }
 
     /// <summary>
-    /// Maps local API endpoints directly and delegates module endpoints to the shared module aggregator.
+    /// The API assembly generator now aggregates public endpoints from referenced presentation assemblies,
+    /// so the host only needs to invoke its own generated registration once.
     /// </summary>
     private static void MapEndpoints(
         IEndpointRouteBuilder app,
-        RouteGroupBuilder? routeGroupBuilder = null)
-    {
+        RouteGroupBuilder? routeGroupBuilder = null) =>
         app.MapApiEndpoints(routeGroupBuilder);
-        app.MapOrdersEndpoints(routeGroupBuilder);
-    }
 }

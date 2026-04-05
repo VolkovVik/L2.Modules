@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Aspu.Api.Adapters.Http;
 
-internal sealed class InfoEndpoints : IEndpoint
+public sealed class InfoEndpoints : IEndpoint
 {
     public string Tags => "Info";
 
