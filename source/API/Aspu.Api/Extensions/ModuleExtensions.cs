@@ -10,7 +10,7 @@ internal static class ModuleExtensions
         IConfiguration configuration)
     {
         services.AddApiModule();
-        services.AddCommonModule();
+        services.AddCommonModule(configuration);
         services.AddOrdersModule(configuration);
 
         return services;
