@@ -42,10 +42,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="logs\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <!--
     <ProjectReference Include="..\..\..\generators\SourceGenerators.Endpoints\SourceGenerators.Endpoints.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\..\generators\SourceGenerators.Validators\SourceGenerators.Validators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />

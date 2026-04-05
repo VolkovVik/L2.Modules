@@ -6,4 +6,12 @@
     <ProjectReference Include="..\Aspu.Modules.Orders.IntegrationEvents\Aspu.Modules.Orders.IntegrationEvents.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Ports\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <EnableValidatorsGenerator>true</EnableValidatorsGenerator>
+  </PropertyGroup>
+
 </Project>

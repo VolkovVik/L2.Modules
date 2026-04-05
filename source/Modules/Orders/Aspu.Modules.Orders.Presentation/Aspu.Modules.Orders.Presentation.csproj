@@ -9,7 +9,6 @@
 
   <PropertyGroup>
     <EnableEndpointsGenerator>true</EnableEndpointsGenerator>
-    <EnableValidatorsGenerator>true</EnableValidatorsGenerator>
   </PropertyGroup>
 
 </Project>
