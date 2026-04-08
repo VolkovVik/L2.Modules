@@ -3,7 +3,6 @@ using System.Security.Authentication;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using Serilog;
-using Serilog.Events;
 
 namespace Aspu.Common.Infrastructure.Mqtt;
 
@@ -78,17 +77,17 @@ internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options)
 
     private MqttClientSubscribeOptions? BuildSubscribeOptions()
     {
-        var count = 0;
+        var isEnabled = false;
         var subscribeBuilder = ClientFactory.CreateSubscribeOptionsBuilder();
 
         foreach (var topic in _options.SubscribeTopics
             .Where(x => !string.IsNullOrWhiteSpace(x)))
         {
-            count++;
-            subscribeBuilder.WithTopicFilter(topic, _options.QualityOfServiceLevel);
+            isEnabled = true;
+            subscribeBuilder.WithTopicFilter(topic.Trim(), _options.QualityOfServiceLevel);
         }
 
-        return count == 0 ? null : subscribeBuilder.Build();
+        return !isEnabled ? null : subscribeBuilder.Build();
     }
 
     private MqttClientOptions BuildClientOptions()
@@ -128,48 +127,42 @@ internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options)
             Log.Warning(e.Exception, "MQTT disconnected with error");
 
         if (!string.IsNullOrWhiteSpace(e.ReasonString))
-            Log.Debug("MQTT disconnected with reason {@Reason}", e.ReasonString);
+            Log.Warning("MQTT disconnected with reason {@Reason}", e.ReasonString);
 
         _disconnectCompletion.TrySetResult();
         return Task.CompletedTask;
     }
 
-    private Task OnApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e) =>
-        ProcessMessageAsync(e.ApplicationMessage, _sessionCancellationToken);
-
-    private static Task ProcessMessageAsync(MqttApplicationMessage message, CancellationToken cancellationToken)
+    private Task OnApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var topic = message.Topic;
-        var sequence = message.Payload;
-
-        if (!Log.IsEnabled(LogEventLevel.Debug))
-            return Task.CompletedTask;
-
-        long payloadLength;
-#pragma warning disable IDE0045 // Convert to conditional expression
-        if (sequence.IsEmpty)
-            payloadLength = 0;
-        else if (sequence.IsSingleSegment)
-            payloadLength = sequence.First.Length;
-        else
-            payloadLength = sequence.Length;
-#pragma warning restore IDE0045 // Convert to conditional expression
-
-        Log.Debug("MQTT message on {Topic}, payload length {Length}", topic, payloadLength);
+        _ = Task.Run(async () => await ProcessMessageAsync(e.ApplicationMessage, _sessionCancellationToken), _sessionCancellationToken);
         return Task.CompletedTask;
     }
 
-#pragma warning disable RCS1213 // Remove unused member declaration
+#pragma warning disable S1172 // Unused method parameters should be removed
+#pragma warning disable RCS1163 // Unused parameter
+#pragma warning disable IDE0060 // Remove unused parameter
+    private static Task ProcessMessageAsync(MqttApplicationMessage message, CancellationToken cancellationToken)
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore RCS1163 // Unused parameter
+#pragma warning restore S1172 // Unused method parameters should be removed
+    {
+        var topic = message.Topic;
+        var sequence = PayloadToMemory(message);
+
+        Log.Debug("MQTT message on {Topic}, payload length {Length}", topic, sequence.Length);
+        return Task.CompletedTask;
+    }
+
     private static ReadOnlyMemory<byte> PayloadToMemory(MqttApplicationMessage message)
-#pragma warning restore RCS1213 // Remove unused member declaration
     {
         var sequence = message.Payload;
         if (sequence.IsEmpty)
             return ReadOnlyMemory<byte>.Empty;
+
         if (sequence.IsSingleSegment)
             return sequence.First;
+
         var buffer = new byte[sequence.Length];
         sequence.CopyTo(buffer);
         return buffer;
