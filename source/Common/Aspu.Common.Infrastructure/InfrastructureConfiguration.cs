@@ -16,12 +16,13 @@ public static class InfrastructureConfiguration
     {
         services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        var mqttSection = configuration.GetSection(MqttSubscriberOptions.SectionName);
-        var mqttOptions = mqttSection.Get<MqttSubscriberOptions>();
+        var mqttSection = configuration.GetSection(MqttOptions.SectionName);
+        var mqttOptions = mqttSection.Get<MqttOptions>();
         if (mqttOptions?.Enabled == true)
         {
-            services.Configure<MqttSubscriberOptions>(mqttSection);
+            services.Configure<MqttOptions>(mqttSection);
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IMqttMessageHandler, LoggingMqttMessageHandler>());
+            services.AddSingleton<MqttSubscriberClient>();
             services.AddHostedService<MqttSubscriberHostedService>();
         }
 
