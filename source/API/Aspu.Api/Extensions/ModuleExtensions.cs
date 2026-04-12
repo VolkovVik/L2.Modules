@@ -9,8 +9,8 @@ internal static class ModuleExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddApiModule();
-        services.AddCommonModule(configuration);
+        services.AddApiModule(configuration);
+        services.AddCommonModule();
         services.AddOrdersModule(configuration);
 
         return services;

@@ -1,6 +1,5 @@
 ﻿using Aspu.Common.Application;
 using Aspu.Common.Infrastructure;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aspu.Common.Presentation;
@@ -8,11 +7,10 @@ namespace Aspu.Common.Presentation;
 public static class CommonConfiguration
 {
     public static IServiceCollection AddCommonModule(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
         services.AddApplication();
-        services.AddInfrastructure(configuration);
+        services.AddInfrastructure();
         return services;
     }
 }

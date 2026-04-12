@@ -1,6 +1,6 @@
 using MQTTnet.Protocol;
 
-namespace Aspu.Common.Infrastructure.Mqtt;
+namespace Aspu.Api.Options;
 
 public sealed class MqttOptions
 {
@@ -33,5 +33,15 @@ public sealed class MqttOptions
 
     public MqttQualityOfServiceLevel QualityOfServiceLevel { get; set; } = MqttQualityOfServiceLevel.AtLeastOnce;
 
-    public IReadOnlyList<string> SubscribeTopics { get; init; } = [];
+    public IReadOnlyList<string> SubscribeTopics { get; init; } = ["/test/topic"];
+
+    /// <summary>
+    /// Max concurrent MQTT inbound message handlers (each message still gets its own DI scope). Minimum effective value is 1.
+    /// </summary>
+    public int InboundProcessorMaxDegreeOfParallelism { get; init; } = 16;
+
+    /// <summary>
+    /// Bounded channel capacity between MQTT receive and the inbound processor. Minimum effective value is 1.
+    /// </summary>
+    public int InboundProcessorQueueCapacity { get; init; } = 1024;
 }

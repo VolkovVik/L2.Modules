@@ -50,4 +50,8 @@
     <ProjectReference Include="..\..\Modules\Orders\Aspu.Modules.Orders.Presentation\Aspu.Modules.Orders.Presentation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="logs\" />
+  </ItemGroup>
+
 </Project>

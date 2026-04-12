@@ -1,21 +1,21 @@
 using System.Buffers;
 using System.Security.Authentication;
+using Aspu.Api.Options;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using Serilog;
 
-namespace Aspu.Common.Infrastructure.Mqtt;
+namespace Aspu.Api.Adapters.Mqtt;
 
 /// <summary>
 /// MQTTnet-based subscriber: one connect/subscribe session until disconnect.
 /// </summary>
-internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options)
+internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options, MqttInboundMessageQueue InboundQueue)
 {
     private static readonly MqttClientFactory ClientFactory = new();
 
     private readonly MqttOptions _options = Options.Value;
 
-    private CancellationToken _sessionCancellationToken;
     private TaskCompletionSource _disconnectCompletion;
 
     /// <summary>
@@ -23,7 +23,6 @@ internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options)
     /// </summary>
     public async Task RunSessionAsync(CancellationToken cancellationToken)
     {
-        _sessionCancellationToken = cancellationToken;
         _disconnectCompletion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var client = ClientFactory.CreateMqttClient();
@@ -130,41 +129,36 @@ internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options)
             Log.Warning("MQTT disconnected with reason {@Reason}", e.ReasonString);
 
         _disconnectCompletion.TrySetResult();
+
         return Task.CompletedTask;
     }
 
     private Task OnApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
     {
-        _ = Task.Run(async () => await ProcessMessageAsync(e.ApplicationMessage, _sessionCancellationToken), _sessionCancellationToken);
-        return Task.CompletedTask;
-    }
-
-#pragma warning disable S1172 // Unused method parameters should be removed
-#pragma warning disable RCS1163 // Unused parameter
-#pragma warning disable IDE0060 // Remove unused parameter
-    private static Task ProcessMessageAsync(MqttApplicationMessage message, CancellationToken cancellationToken)
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore RCS1163 // Unused parameter
-#pragma warning restore S1172 // Unused method parameters should be removed
-    {
+        var message = e.ApplicationMessage;
         var topic = message.Topic;
-        var sequence = PayloadToMemory(message);
+        var payload = PayloadToOwnedBuffer(message);
 
-        Log.Debug("MQTT message on {Topic}, payload length {Length}", topic, sequence.Length);
+        Log.Information("MQTT received message on {Topic}", topic);
+
+        var inbound = new MqttInboundMessage { Topic = topic, Payload = payload };
+        if (!InboundQueue.TryEnqueue(inbound))
+            Log.Warning("MQTT inbound queue rejected message on {Topic}", topic);
+
         return Task.CompletedTask;
     }
 
-    private static ReadOnlyMemory<byte> PayloadToMemory(MqttApplicationMessage message)
+    private static byte[] PayloadToOwnedBuffer(MqttApplicationMessage message)
     {
         var sequence = message.Payload;
         if (sequence.IsEmpty)
-            return ReadOnlyMemory<byte>.Empty;
+            return [];
 
         if (sequence.IsSingleSegment)
-            return sequence.First;
+            return sequence.First.ToArray();
 
         var buffer = new byte[sequence.Length];
-        sequence.CopyTo(buffer);
+        sequence.CopyTo(buffer.AsSpan());
         return buffer;
     }
 }
