@@ -10,18 +10,20 @@ namespace Aspu.Api.Adapters.Mqtt;
 /// <summary>
 /// MQTTnet-based subscriber: one connect/subscribe session until disconnect.
 /// </summary>
-internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options, MqttInboundMessageQueue InboundQueue)
+internal sealed class MqttSubscriberClient(
+    IOptions<MqttOptions> options,
+    MqttInboundMessageQueue inboundQueue)
 {
     private static readonly MqttClientFactory ClientFactory = new();
 
-    private readonly MqttOptions _options = Options.Value;
+    private readonly MqttOptions _options = options.Value;
 
     private TaskCompletionSource _disconnectCompletion;
 
     /// <summary>
     /// Runs a single broker session
     /// </summary>
-    public async Task RunSessionAsync(CancellationToken cancellationToken)
+    public async Task RunSessionAsync(List<string> subscriptions, CancellationToken cancellationToken)
     {
         _disconnectCompletion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -29,7 +31,7 @@ internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options, MqttIn
         try
         {
             var clientOptions = BuildClientOptions();
-            var subscribeOptions = BuildSubscribeOptions();
+            var subscribeOptions = BuildSubscribeOptions(subscriptions);
 
             client.DisconnectedAsync += OnClientDisconnectedAsync;
             client.ApplicationMessageReceivedAsync += OnApplicationMessageReceivedAsync;
@@ -74,19 +76,16 @@ internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options, MqttIn
         }
     }
 
-    private MqttClientSubscribeOptions? BuildSubscribeOptions()
+    private MqttClientSubscribeOptions? BuildSubscribeOptions(List<string> subscriptions)
     {
-        var isEnabled = false;
+        if (!subscriptions.Any())
+            return null;
+
         var subscribeBuilder = ClientFactory.CreateSubscribeOptionsBuilder();
+        foreach (var topic in subscriptions)
+            subscribeBuilder.WithTopicFilter(topic, _options.QualityOfServiceLevel);
 
-        foreach (var topic in _options.SubscribeTopics
-            .Where(x => !string.IsNullOrWhiteSpace(x)))
-        {
-            isEnabled = true;
-            subscribeBuilder.WithTopicFilter(topic.Trim(), _options.QualityOfServiceLevel);
-        }
-
-        return !isEnabled ? null : subscribeBuilder.Build();
+        return subscribeBuilder.Build();
     }
 
     private MqttClientOptions BuildClientOptions()
@@ -142,7 +141,7 @@ internal sealed class MqttSubscriberClient(IOptions<MqttOptions> Options, MqttIn
         Log.Information("MQTT received message on {Topic}", topic);
 
         var inbound = new MqttInboundMessage { Topic = topic, Payload = payload };
-        if (!InboundQueue.TryEnqueue(inbound))
+        if (!inboundQueue.TryEnqueue(inbound))
             Log.Warning("MQTT inbound queue rejected message on {Topic}", topic);
 
         return Task.CompletedTask;

@@ -19,7 +19,7 @@ public static class ApiConfiguration
             services.AddSingleton<MqttInboundMessageQueue>();
             services.AddSingleton<MqttSubscriberClient>();
             // Processor stops after subscriber (reverse registration): subscriber completes the channel writer on exit.
-            services.AddHostedService<MqttMessageProcessorHostedService>();
+            services.AddHostedService<MqttInboundMessageHostedService>();
             services.AddHostedService<MqttSubscriberHostedService>();
         }
 

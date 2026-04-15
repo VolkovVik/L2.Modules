@@ -33,8 +33,6 @@ public sealed class MqttOptions
 
     public MqttQualityOfServiceLevel QualityOfServiceLevel { get; set; } = MqttQualityOfServiceLevel.AtLeastOnce;
 
-    public IReadOnlyList<string> SubscribeTopics { get; init; } = ["/test/topic"];
-
     /// <summary>
     /// Max concurrent MQTT inbound message handlers (each message still gets its own DI scope). Minimum effective value is 1.
     /// </summary>
