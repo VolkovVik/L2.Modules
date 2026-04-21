@@ -13,6 +13,7 @@ namespace Aspu.Api.Adapters.Mqtt;
 internal sealed class MqttInboundMessageHostedService(
     MqttInboundMessageQueue queue,
     IServiceScopeFactory scopeFactory,
+    MqttMessageHandlerTopicRegistry handlerTopics,
     IOptions<MqttOptions> mqttOptions,
     ILogger<MqttInboundMessageHostedService> logger)
     : BackgroundService
@@ -43,27 +44,28 @@ internal sealed class MqttInboundMessageHostedService(
             throw new InvalidOperationException("MQTT inbound processor failed.", ex);
         }
     }
-    private async Task ProcessOneAsync(MqttInboundMessage item, CancellationToken cancellationToken)
+    internal async Task ProcessOneAsync(MqttInboundMessage item, CancellationToken cancellationToken)
     {
         var payload = item.Payload.AsMemory();
-        if (string.IsNullOrWhiteSpace(item.Topic) || payload.IsEmpty)
+        if (payload.IsEmpty || string.IsNullOrWhiteSpace(item.Topic))
             return;
 
-        if (logger.IsEnabled(LogLevel.Debug))
+        if (!handlerTopics.IsTopicEnabled(item.Topic))
         {
-            var payloadStr = payload.Length <= 100 ? Encoding.UTF8.GetString(payload.Span) : $"[payload length {payload.Length}]";
-            logger.LogDebug("Processing MQTT message on topic {Topic} with payload {Payload}", item.Topic, payloadStr);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning("MQTT handler for topic {Topic} isn't found", item.Topic);
+            return;
         }
+
+        var startTime = Stopwatch.GetTimestamp();
 
         await using var scope = scopeFactory.CreateAsyncScope();
         var sp = scope.ServiceProvider;
-
         var handlers = sp.GetServices<IMqttMessageHandler>();
+
         var handler = handlers.FirstOrDefault(x => string.Equals(x.Topic, item.Topic, StringComparison.OrdinalIgnoreCase));
         if (handler is null)
             return;
-
-        var startTime = Stopwatch.GetTimestamp();
 
         try
         {
@@ -71,18 +73,14 @@ internal sealed class MqttInboundMessageHostedService(
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {
-            logger.LogError(ex, "MQTT handler failed for topic {Topic}", item.Topic);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "MQTT handler cancelled for topic {Topic}", item.Topic);
+            logger.LogError(ex, "MQTT handler for topic {Topic} failed", item.Topic);
         }
         finally
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
                 var deltaTime = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
-                logger.LogInformation("Mqtt publication on {@Topic} {@Total} ms", item.Topic, deltaTime);
+                logger.LogInformation("MQTT publication on {@Topic} {@Payload} {@Total} ms", item.Topic, Encoding.UTF8.GetString(payload.Span), deltaTime);
             }
         }
     }

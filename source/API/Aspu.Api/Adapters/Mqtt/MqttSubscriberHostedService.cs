@@ -1,5 +1,4 @@
 using Aspu.Api.Options;
-using Aspu.Common.Presentation.Abstractions.Mqtt;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -11,13 +10,16 @@ namespace Aspu.Api.Adapters.Mqtt;
 internal sealed class MqttSubscriberHostedService(
     IOptions<MqttOptions> Options,
     MqttSubscriberClient MqttClient,
-    IServiceScopeFactory scopeFactory,
+    MqttMessageHandlerTopicRegistry handlerTopics,
     MqttInboundMessageQueue InboundQueue)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var subscriptions = GetSubscriptions();
+        var subscriptions = handlerTopics.SubscriptionTopics();
+        if (subscriptions.Count == 0)
+            Log.Warning("MQTT subscriber has no valid topic to subscribe");
+
         var reconnectDelay = Options.Value.ReconnectDelaySeconds;
 
         try
@@ -46,20 +48,5 @@ internal sealed class MqttSubscriberHostedService(
         {
             InboundQueue.CompleteWriter();
         }
-    }
-
-    private List<string> GetSubscriptions()
-    {
-        using var scope = scopeFactory.CreateScope();
-        var sp = scope.ServiceProvider;
-        var handlers = sp.GetServices<IMqttMessageHandler>();
-
-        var topics = handlers
-            .Select(h => h.Topic.Trim())
-            .Where(t => !string.IsNullOrWhiteSpace(t))
-            .ToList();
-        if (topics.Count == 0)
-            Log.Warning("MQTT subscriber has no valid topic to subscribe");
-        return topics;
     }
 }

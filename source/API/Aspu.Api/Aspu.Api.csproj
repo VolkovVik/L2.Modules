@@ -51,7 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="logs\" />
+    <InternalsVisibleTo Include="Aspu.Benchmarks" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,16 @@
+---
+description: Структура решения Aspu (слои, модули, общие проекты)
+alwaysApply: true
+---
+
+# Архитектура решения
+
+- **Платформа:** .NET (`TargetFramework` задаётся в `Directory.Build.props`, сейчас `net10.0`). Включены nullable, implicit usings, анализаторы; предупреждения трактуются как ошибки — новый код не должен добавлять предупреждений.
+- **Корень:** `Aspu.slnx`; общие настройки — `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`.
+- **API:** `source/API/Aspu.Api` — хост, регистрация модулей, адаптеры (в т.ч. MQTT).
+- **Общие библиотеки:** `source/Common/Aspu.Common.{Application|Domain|Infrastructure|Presentation}` — переносимые абстракции (`IAppCommand`, `IAppQuery`, `Result`, MQTT и т.д.).
+- **Функциональные модули:** `source/Modules/<Имя>/Aspu.Modules.<Имя>.{Application|Domain|Infrastructure|Presentation|IntegrationEvents|PublicApi}` — изоляция по bounded context; зависимости направлены к Domain/Application, не наоборот.
+- **Генераторы:** `generators/*` подключаются как анализаторы из `Directory.Build.props` (`EnableEndpointsGenerator`, `EnableValidatorsGenerator` и пути к проектам генераторов).
+- **Тесты и нагрузка:** `source/Modules/*/tests`, при необходимости `benchmarks/`, `nbomber/`.
+
+При добавлении фичи выбирай слой: доменная модель и инварианты — в `*.Domain`, сценарии и валидация — в `*.Application`, интеграции — в `*.Infrastructure`, HTTP/MQTT — в `*.Presentation`.

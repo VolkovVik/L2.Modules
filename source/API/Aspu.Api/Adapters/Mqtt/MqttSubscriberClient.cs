@@ -23,7 +23,7 @@ internal sealed class MqttSubscriberClient(
     /// <summary>
     /// Runs a single broker session
     /// </summary>
-    public async Task RunSessionAsync(List<string> subscriptions, CancellationToken cancellationToken)
+    public async Task RunSessionAsync(IReadOnlyList<string> subscriptions, CancellationToken cancellationToken)
     {
         _disconnectCompletion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -76,7 +76,7 @@ internal sealed class MqttSubscriberClient(
         }
     }
 
-    private MqttClientSubscribeOptions? BuildSubscribeOptions(List<string> subscriptions)
+    private MqttClientSubscribeOptions? BuildSubscribeOptions(IReadOnlyList<string> subscriptions)
     {
         if (!subscriptions.Any())
             return null;
@@ -136,9 +136,8 @@ internal sealed class MqttSubscriberClient(
     {
         var message = e.ApplicationMessage;
         var topic = message.Topic;
-        var payload = PayloadToOwnedBuffer(message);
-
         Log.Information("MQTT received message on {Topic}", topic);
+        var payload = PayloadToOwnedBuffer(message);
 
         var inbound = new MqttInboundMessage { Topic = topic, Payload = payload };
         if (!inboundQueue.TryEnqueue(inbound))

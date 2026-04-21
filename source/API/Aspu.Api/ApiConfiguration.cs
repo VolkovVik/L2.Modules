@@ -15,13 +15,20 @@ public static class ApiConfiguration
 
         var mqttOptions = configuration.GetSection(MqttOptions.SectionName).Get<MqttOptions>();
         if (mqttOptions?.Enabled == true)
-        {
-            services.AddSingleton<MqttInboundMessageQueue>();
-            services.AddSingleton<MqttSubscriberClient>();
-            // Processor stops after subscriber (reverse registration): subscriber completes the channel writer on exit.
-            services.AddHostedService<MqttInboundMessageHostedService>();
-            services.AddHostedService<MqttSubscriberHostedService>();
-        }
+            services.AddMqttSubscriber();
+
+        return services;
+    }
+
+    private static IServiceCollection AddMqttSubscriber(
+        this IServiceCollection services)
+    {
+        services.AddSingleton<MqttMessageHandlerTopicRegistry>();
+        services.AddSingleton<MqttInboundMessageQueue>();
+        services.AddSingleton<MqttSubscriberClient>();
+        // Processor stops after subscriber (reverse registration): subscriber completes the channel writer on exit.
+        services.AddHostedService<MqttInboundMessageHostedService>();
+        services.AddHostedService<MqttSubscriberHostedService>();
 
         return services;
     }
