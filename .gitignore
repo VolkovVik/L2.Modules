@@ -400,5 +400,58 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.idea/
 
 .containers
+
+# ============================================================================
+# Angular / Node.js (planned frontend workspace)
+# ----------------------------------------------------------------------------
+# node_modules/ already declared above (line ~290).
+# ============================================================================
+
+# Angular build outputs
+dist/
+tmp/
+out-tsc/
+bazel-out/
+
+# Angular CLI cache / Nx cache
+.angular/
+.nx/
+
+# Testing / coverage
+coverage/
+libpeerconnection.log
+.karma-coverage/
+*.lcov
+
+# NPM / Yarn / PNPM logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+
+# Optional npm cache directory
+.npm
+
+# ESLint / Prettier / TypeScript caches
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Environment files (secrets)
+# `.env.*.local` covers .env.development.local / .env.test.local / .env.production.local
+.env
+.env.local
+.env.*.local
+
+# IDE — TypeScript / Angular
+*.js.map
+*.d.ts.map
+
+# OS / misc
+.DS_Store
+Thumbs.db

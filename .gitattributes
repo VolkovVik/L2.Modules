@@ -1,0 +1,265 @@
+# ============================================================================
+# .gitattributes for Aspu (.NET 9, C#, Source Generators, Docker, MQTT)
+# ----------------------------------------------------------------------------
+# Goals:
+#   1. Deterministic line endings across Windows / Linux / macOS / CI.
+#   2. Sensible diff/merge behavior for project files and generated code.
+#   3. Correct handling of binary assets.
+#   4. Clean GitHub language statistics (Linguist).
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# Default behavior: auto-detect text and normalize to LF in the repository.
+# Working copy will use the platform-native EOL on checkout (core.autocrlf).
+# ----------------------------------------------------------------------------
+* text=auto eol=lf
+
+
+# ============================================================================
+# C# / .NET source code
+# ============================================================================
+*.cs        text diff=csharp
+*.cshtml    text diff=html
+*.razor     text diff=html
+*.vb        text diff=vb
+*.fs        text diff=fsharp
+*.fsx       text diff=fsharp
+
+# XML-based .NET project & build files — treat as XML for diffs,
+# keep them as text so merges are readable.
+*.sln       text eol=crlf merge=union
+*.slnx      text              merge=union
+*.csproj    text              merge=union diff=xml
+*.vbproj    text              merge=union diff=xml
+*.fsproj    text              merge=union diff=xml
+*.dbproj    text              merge=union diff=xml
+*.props     text              merge=union diff=xml
+*.targets   text              merge=union diff=xml
+*.nuspec    text                            diff=xml
+*.config    text                            diff=xml
+*.xaml      text                            diff=xml
+*.resx      text              merge=union   diff=xml
+*.ruleset   text                            diff=xml
+*.editorconfig text
+
+# EditorConfig/DotSettings
+*.DotSettings   text diff=xml
+
+
+# ============================================================================
+# Web / frontend (JSON, JS, CSS, HTML) — LF everywhere
+# ============================================================================
+*.json       text eol=lf       diff=json
+*.json5      text eol=lf
+*.jsonc      text eol=lf
+*.js         text eol=lf
+*.mjs        text eol=lf
+*.cjs        text eol=lf
+*.ts         text eol=lf       diff=typescript
+*.tsx        text eol=lf       diff=typescript
+*.jsx        text eol=lf
+*.vue        text eol=lf
+*.css        text eol=lf       diff=css
+*.scss       text eol=lf       diff=css
+*.sass       text eol=lf       diff=css
+*.less       text eol=lf       diff=css
+*.html       text eol=lf       diff=html
+*.htm        text eol=lf       diff=html
+*.svg        text eol=lf       diff=xml  linguist-detectable=false
+
+
+# ============================================================================
+# Angular / Node workspace (planned)
+# ============================================================================
+# Angular workspace & TS configs
+angular.json        text eol=lf diff=json
+nx.json             text eol=lf diff=json
+project.json        text eol=lf diff=json
+tsconfig*.json      text eol=lf diff=json
+.browserslistrc     text eol=lf
+.nvmrc              text eol=lf
+.npmrc              text eol=lf
+.prettierrc         text eol=lf diff=json
+.prettierrc.json    text eol=lf diff=json
+.eslintrc           text eol=lf diff=json
+.eslintrc.json      text eol=lf diff=json
+.eslintrc.js        text eol=lf
+karma.conf.js       text eol=lf
+jest.config.*       text eol=lf
+proxy.conf.json     text eol=lf diff=json
+
+# Node / pnpm / yarn lock files — generated artifacts.
+# merge=binary: lockfiles must be regenerated, never hand-merged.
+package-lock.json   text eol=lf merge=binary linguist-generated=true
+yarn.lock           text eol=lf merge=binary linguist-generated=true
+pnpm-lock.yaml      text eol=lf merge=binary linguist-generated=true
+npm-shrinkwrap.json text eol=lf merge=binary linguist-generated=true
+
+# Don't ship node/Angular build artifacts in git archives (belt-and-braces
+# next to .gitignore).
+node_modules/   export-ignore
+dist/           export-ignore
+.angular/       export-ignore
+coverage/       export-ignore
+.nx/            export-ignore
+
+
+# ============================================================================
+# Docker, Compose, Kubernetes, CI/CD
+# ============================================================================
+Dockerfile         text eol=lf
+Dockerfile.*       text eol=lf
+*.dockerfile       text eol=lf
+.dockerignore      text eol=lf
+docker-compose*.yml  text eol=lf
+docker-compose*.yaml text eol=lf
+*.yml              text eol=lf
+*.yaml             text eol=lf
+
+
+# ============================================================================
+# Shell / scripts — force correct EOL (critical!)
+# LF: anything executed inside Linux containers or by bash.
+# CRLF: Windows-native scripts.
+# ============================================================================
+*.sh         text eol=lf
+*.bash       text eol=lf
+*.zsh        text eol=lf
+*.fish       text eol=lf
+
+*.ps1        text eol=crlf
+*.psm1       text eol=crlf
+*.psd1       text eol=crlf
+*.cmd        text eol=crlf
+*.bat        text eol=crlf
+
+
+# ============================================================================
+# Documentation & configuration
+# ============================================================================
+*.md         text              diff=markdown
+*.mdc        text              diff=markdown
+*.mdx        text              diff=markdown
+*.txt        text
+*.rst        text
+*.ini        text
+*.toml       text
+*.conf       text
+*.properties text
+
+# Mosquitto / MQTT broker config (used in /mosquitto)
+*.acl        text eol=lf
+passwd       text eol=lf
+mosquitto*.conf text eol=lf
+
+
+# ============================================================================
+# Source Generators — output is regenerated on build, hide from Linguist stats.
+# Note: no path patterns marking *.g.cs as generated via attribute here because
+# real generators emit in obj/ (already in .gitignore). The linguist-generated
+# hints below cover committed generated fallbacks, if any.
+# ============================================================================
+*.g.cs            linguist-generated=true
+*.Generated.cs    linguist-generated=true
+*.designer.cs     linguist-generated=true
+*.Designer.cs     linguist-generated=true
+
+
+# ============================================================================
+# Documentation / benchmarks / tests are vendor-like for language stats
+# ============================================================================
+docs/**          linguist-documentation=true
+benchmarks/**    linguist-vendored=false
+TestResults/**   linguist-generated=true export-ignore
+
+
+# ============================================================================
+# Binary assets — never try to diff/merge these.
+# ============================================================================
+# Images
+*.png        binary
+*.jpg        binary
+*.jpeg       binary
+*.gif        binary
+*.ico        binary
+*.bmp        binary
+*.tif        binary
+*.tiff       binary
+*.webp       binary
+
+# Fonts
+*.eot        binary
+*.ttf        binary
+*.otf        binary
+*.woff       binary
+*.woff2      binary
+
+# Archives
+*.zip        binary
+*.7z         binary
+*.rar        binary
+*.tar        binary
+*.gz         binary
+*.tgz        binary
+*.bz2        binary
+*.xz         binary
+
+# .NET / native binaries
+*.dll        binary
+*.exe        binary
+*.pdb        binary
+*.lib        binary
+*.so         binary
+*.dylib      binary
+*.nupkg      binary
+*.snupkg     binary
+
+# Signing keys / certificates — binary, never diff, never in archives
+*.snk        binary export-ignore
+*.pfx        binary export-ignore
+*.p12        binary export-ignore
+*.cer        binary
+*.crt        binary
+*.key        binary export-ignore
+
+# Media / misc
+*.mp3        binary
+*.mp4        binary
+*.pdf        binary
+*.doc        binary
+*.docx       binary
+*.xls        binary
+*.xlsx       binary
+*.ppt        binary
+*.pptx       binary
+
+
+# ============================================================================
+# Paths excluded from `git archive` (release tarballs / GitHub source zips).
+# ============================================================================
+.gitattributes       export-ignore
+.gitignore           export-ignore
+.editorconfig        export-ignore
+.cursor/             export-ignore
+.github/             export-ignore
+.vscode/             export-ignore
+.idea/               export-ignore
+tests/               export-ignore
+benchmarks/          export-ignore
+nbomber/             export-ignore
+TestResults/         export-ignore
+docs/                export-ignore
+tools/               export-ignore
+mosquitto/           export-ignore
+docker-compose*.yml  export-ignore
+Dockerfile           export-ignore
+README.md            export-ignore
+
+
+# ============================================================================
+# Linux line-ending safety net for files typically required as LF in Docker
+# ============================================================================
+/source/API/Aspu.Api/Dockerfile   text eol=lf
+/docker-compose.yml               text eol=lf
+/docker-compose.override.yml      text eol=lf
+/.dockerignore                    text eol=lf
