@@ -62,7 +62,7 @@ public sealed class MqttHandlersRegistrationGenerator : BaseRegistrationGenerato
         sb.AppendLine("    public static IServiceCollection AddMqttHandlers(");
         sb.AppendLine("        this IServiceCollection services)");
         sb.AppendLine("    {");
-        foreach (var item in items)
+        foreach (var item in items.OrderBy(x => x, StringComparer.Ordinal))
             sb.Append("        services.TryAddEnumerable(ServiceDescriptor.Scoped<").Append(InterfaceName).Append(", ").Append(item).AppendLine(">());");
         sb.AppendLine();
         sb.AppendLine("        return services;");

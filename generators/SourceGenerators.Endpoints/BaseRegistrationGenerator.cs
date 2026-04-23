@@ -38,16 +38,14 @@ public abstract class BaseRegistrationGenerator
         [.. classSymbols
             .Where(x => x is not null)
             .Select(x => x!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .OrderBy(x => x, StringComparer.Ordinal)];
+            .Where(x => !string.IsNullOrWhiteSpace(x))];
 
     protected static ImmutableHashSet<string> GetSymbolNamespaces(ImmutableArray<INamedTypeSymbol?> classSymbols) =>
         [.. classSymbols
             .Where(x => x is not null)
             .Select(x => x!.ContainingNamespace)
             .Where(x => !x.IsGlobalNamespace)
-            .Select(x => x.ToDisplayString())
-            .OrderBy(x => x, StringComparer.Ordinal)];
+            .Select(x => x.ToDisplayString())];
 #pragma warning restore MA0007 // Add a comma after the last value
 
     protected static string GetNamespace(Compilation compilation, string namespaceName, string interfaceName, string metadataName)

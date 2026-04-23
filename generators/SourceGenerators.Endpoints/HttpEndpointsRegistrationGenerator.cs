@@ -69,7 +69,7 @@ public sealed class HttpEndpointsRegistrationGenerator : BaseRegistrationGenerat
         sb.AppendLine("    {");
         sb.AppendLine("        var builder = routeGroupBuilder ?? app;");
         sb.AppendLine();
-        foreach (var item in items)
+        foreach (var item in items.OrderBy(x => x, StringComparer.Ordinal))
             sb.Append("        MapEndpoints(new ").Append(item).AppendLine("(), builder);");
         sb.AppendLine();
         sb.AppendLine("        return builder;");
