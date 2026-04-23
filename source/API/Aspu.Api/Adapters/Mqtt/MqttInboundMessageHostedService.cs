@@ -1,19 +1,19 @@
 using System.Diagnostics;
 using System.Text;
 using Aspu.Api.Options;
-using Aspu.Common.Presentation.Abstractions.Mqtt;
+using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Adapters.Mqtt;
 
 /// <summary>
-/// Reads MQTT messages from the inbound channel and runs <see cref="IMqttMessageHandler"/> per message in a new DI scope.
+/// Reads MQTT messages from the inbound channel and runs <see cref="IMqttHandler"/> per message in a new DI scope.
 /// Processing uses <c>Parallel.ForEachAsync</c> with <see cref="MqttOptions.InboundProcessorMaxDegreeOfParallelism"/>.
 /// </summary>
 internal sealed class MqttInboundMessageHostedService(
     MqttInboundMessageQueue queue,
     IServiceScopeFactory scopeFactory,
-    MqttMessageHandlerTopicRegistry handlerTopics,
+    MqttHandlerTopicRegistry handlerTopics,
     IOptions<MqttOptions> mqttOptions,
     ILogger<MqttInboundMessageHostedService> logger)
     : BackgroundService
@@ -61,7 +61,7 @@ internal sealed class MqttInboundMessageHostedService(
 
         await using var scope = scopeFactory.CreateAsyncScope();
         var sp = scope.ServiceProvider;
-        var handlers = sp.GetServices<IMqttMessageHandler>();
+        var handlers = sp.GetServices<IMqttHandler>();
 
         var handler = handlers.FirstOrDefault(x => string.Equals(x.Topic, item.Topic, StringComparison.OrdinalIgnoreCase));
         if (handler is null)

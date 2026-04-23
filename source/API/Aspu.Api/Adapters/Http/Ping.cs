@@ -1,4 +1,4 @@
-using Aspu.Common.Presentation.Endpoints;
+using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -6,7 +6,7 @@ using Serilog;
 
 namespace Aspu.Api.Adapters.Http;
 
-internal sealed class PingRequest : IEndpoint
+internal sealed class PingRequest : IHttpEndpoint
 {
     public string Tags => "Ping";
 

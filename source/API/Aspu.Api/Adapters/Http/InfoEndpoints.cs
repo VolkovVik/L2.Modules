@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
-using Aspu.Common.Presentation.Endpoints;
+using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Aspu.Api.Adapters.Http;
 
-internal sealed class InfoEndpoints : IEndpoint
+internal sealed class InfoEndpoints : IHttpEndpoint
 {
     public string Tags => "Info";
 

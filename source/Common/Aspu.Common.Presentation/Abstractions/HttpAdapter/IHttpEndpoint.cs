@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Routing;
 
-namespace Aspu.Common.Presentation.Endpoints;
+namespace Aspu.Common.Presentation.Abstractions.HttpAdapter;
 
-public interface IEndpoint
+public interface IHttpEndpoint
 {
     string Tags { get; }
     void MapEndpoint(IEndpointRouteBuilder routes);

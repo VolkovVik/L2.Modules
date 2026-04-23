@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
-using Aspu.Common.Presentation.Abstractions.Mqtt;
+using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.AddCode;
 using Mediator;
 
 namespace Aspu.Modules.Orders.Presentation.Adapters.Mqtt;
 
-public class MqttAddCodeHandler(IMediator mediator) : IMqttMessageHandler
+internal sealed class MqttAddCodeHandler(IMediator mediator) : IMqttHandler
 {
     public string Topic => "/test/topic";
 
@@ -19,7 +19,7 @@ public class MqttAddCodeHandler(IMediator mediator) : IMqttMessageHandler
     }
 }
 
-public class OrdersAddCodeHandler1(IMediator mediator) : IMqttMessageHandler
+internal sealed class OrdersAddCodeHandler1(IMediator mediator) : IMqttHandler
 {
     public string Topic => "/test/topic1";
 
@@ -27,7 +27,7 @@ public class OrdersAddCodeHandler1(IMediator mediator) : IMqttMessageHandler
         await mediator.Send(new AddCodeCommand(Guid.NewGuid(), Guid.NewGuid(), "test"), cancellationToken);
 }
 
-public class OrdersAddCodeHandler2(IMediator mediator) : IMqttMessageHandler
+internal sealed class OrdersAddCodeHandler2(IMediator mediator) : IMqttHandler
 {
     public string Topic => "/test/topic1";
 

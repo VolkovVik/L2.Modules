@@ -1,6 +1,6 @@
 using Aspu.Api.Adapters.Mqtt;
 using Aspu.Api.Options;
-using Aspu.Common.Presentation.Abstractions.Mqtt;
+using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -24,8 +24,8 @@ public class ProcessOneAsyncBenchmarks
         var queue = new MqttInboundMessageQueue(mqttOptions);
 
         var services = new ServiceCollection();
-        services.AddSingleton<IMqttMessageHandler, BenchmarkMqttHandler>();
-        services.AddSingleton<MqttMessageHandlerTopicRegistry>();
+        services.AddSingleton<IMqttHandler, BenchmarkMqttHandler>();
+        services.AddSingleton<MqttHandlerTopicRegistry>();
         var rootServices = services.BuildServiceProvider();
 
         s_ctx = new Context
@@ -34,7 +34,7 @@ public class ProcessOneAsyncBenchmarks
             Service = new MqttInboundMessageHostedService(
                 queue,
                 rootServices.GetRequiredService<IServiceScopeFactory>(),
-                rootServices.GetRequiredService<MqttMessageHandlerTopicRegistry>(),
+                rootServices.GetRequiredService<MqttHandlerTopicRegistry>(),
                 mqttOptions,
                 NullLogger<MqttInboundMessageHostedService>.Instance),
             MatchedTopic = new MqttInboundMessage
@@ -58,7 +58,7 @@ public class ProcessOneAsyncBenchmarks
         public required MqttInboundMessage MatchedTopic { get; init; }
     }
 
-    private sealed class BenchmarkMqttHandler : IMqttMessageHandler
+    private sealed class BenchmarkMqttHandler : IMqttHandler
     {
         public string Topic => TopicName;
 

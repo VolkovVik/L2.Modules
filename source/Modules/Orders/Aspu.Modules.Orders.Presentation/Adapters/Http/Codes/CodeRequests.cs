@@ -1,4 +1,4 @@
-using Aspu.Common.Presentation.Endpoints;
+using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.AddCode;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.GetCode;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.GetCodeById;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Aspu.Modules.Orders.Presentation.Adapters.Http.Codes;
 
-internal sealed class CodeRequests : IEndpoint
+internal sealed class CodeRequests : IHttpEndpoint
 {
     public string Tags => "Code";
 

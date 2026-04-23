@@ -10,7 +10,7 @@ namespace Aspu.Api.Adapters.Mqtt;
 internal sealed class MqttSubscriberHostedService(
     IOptions<MqttOptions> Options,
     MqttSubscriberClient MqttClient,
-    MqttMessageHandlerTopicRegistry handlerTopics,
+    MqttHandlerTopicRegistry handlerTopics,
     MqttInboundMessageQueue InboundQueue)
     : BackgroundService
 {

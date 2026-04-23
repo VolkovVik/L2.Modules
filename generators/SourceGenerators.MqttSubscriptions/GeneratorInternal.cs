@@ -176,7 +176,6 @@ public class GeneratorInternal
             ? IsMqttSubscriptionAttributeName(ctor.ContainingType?.Name)
             : IsMqttSubscriptionAttributeName(GetAttributeSimpleName(attr.Name));
 
-
     private static string? GetAttributeSimpleName(NameSyntax name) =>
         name switch
         {

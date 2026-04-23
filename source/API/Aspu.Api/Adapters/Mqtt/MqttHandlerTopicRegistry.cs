@@ -1,19 +1,19 @@
-using Aspu.Common.Presentation.Abstractions.Mqtt;
+using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 
 namespace Aspu.Api.Adapters.Mqtt;
 
 /// <summary>
-/// Snapshot of MQTT handler topics from DI, built once at startup (single <see cref="IMqttMessageHandler"/> enumeration).
+/// Snapshot of MQTT handler topics from DI, built once at startup (single <see cref="IMqttHandler"/> enumeration).
 /// Shared by the subscriber (subscription list) and the inbound processor (fast reject of unknown topics).
 /// </summary>
-internal sealed class MqttMessageHandlerTopicRegistry
+internal sealed class MqttHandlerTopicRegistry
 {
     private readonly HashSet<string> _topics;
 
-    public MqttMessageHandlerTopicRegistry(IServiceScopeFactory scopeFactory)
+    public MqttHandlerTopicRegistry(IServiceScopeFactory scopeFactory)
     {
         using var scope = scopeFactory.CreateScope();
-        var handlers = scope.ServiceProvider.GetServices<IMqttMessageHandler>();
+        var handlers = scope.ServiceProvider.GetServices<IMqttHandler>();
         _topics = handlers
             .Select(h => h.Topic.Trim())
             .Where(t => !string.IsNullOrWhiteSpace(t))
