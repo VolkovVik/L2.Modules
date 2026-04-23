@@ -1,0 +1,13 @@
+---
+description: MQTT-адаптеры в Presentation (IMqttMessageHandler, регистрация DI)
+globs: "**/Adapters/Mqtt/**/*.cs"
+alwaysApply: false
+---
+
+# MQTT в Presentation
+
+- Реализуй `IMqttMessageHandler` из `Aspu.Common.Presentation.Abstractions.Mqtt`: свойство `Topic`, метод `HandleAsync`.
+- В обработчике обычно десериализуешь payload в command/query и вызываешь `IMediator.Send(...)` (см. существующие классы в `*.Presentation.Adapters.Mqtt`).
+- Регистрация: `services.TryAddEnumerable(ServiceDescriptor.Scoped<IMqttMessageHandler, ТвойHandler>());` в `*Configuration.cs` модуля (метод `AddPresentation` или аналог).
+
+Топики должны быть согласованы с подпиской на стороне API (`MqttSubscriber*` / реестр обработчиков). Не дублируй один и тот же `Topic` разными обработчиками без явной необходимости.

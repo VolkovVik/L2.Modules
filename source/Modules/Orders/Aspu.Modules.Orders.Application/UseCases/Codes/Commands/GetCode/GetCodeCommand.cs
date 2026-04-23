@@ -1,0 +1,45 @@
+﻿using Aspu.Common.Application.Abstractions.Messaging;
+using Aspu.Common.Application.Extensions;
+using Aspu.Common.Domain.Results;
+using Aspu.Modules.Orders.Domain.Model.CodeAggregate;
+using FluentValidation;
+using Mediator;
+using Serilog;
+
+namespace Aspu.Modules.Orders.Application.UseCases.Codes.Commands.GetCode;
+
+public sealed record GetCodeCommand(string Value)
+    : IAppCommand<Guid>;
+
+internal sealed class GetCodeCommandValidator : AbstractValidator<GetCodeCommand>
+{
+    public GetCodeCommandValidator() =>
+        RuleFor(c => c.Value)
+            .StringMustBeNotWhiteSpace();
+}
+
+public sealed class GetCodeCommandHandler(IMediator _mediator)
+    : IAppCommandHandler<GetCodeCommand, Guid>
+{
+    public async ValueTask<Result<Guid>> Handle(GetCodeCommand request, CancellationToken cancellationToken)
+    {
+        var code = Code.Create(Guid.NewGuid(), Guid.NewGuid(), request.Value);
+        if (code.IsFailure)
+            return code.Error;
+
+        await _mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
+
+        return code.Value.Id;
+    }
+}
+
+public sealed record CodeNotification(Guid Id) : IAppNotification;
+
+public sealed class CodeNotificationHandler : IAppNotificationHandler<CodeNotification>
+{
+    public ValueTask Handle(CodeNotification notification, CancellationToken cancellationToken)
+    {
+        Log.Debug("Get code: {@Id}", notification.Id);
+        return ValueTask.CompletedTask;
+    }
+}

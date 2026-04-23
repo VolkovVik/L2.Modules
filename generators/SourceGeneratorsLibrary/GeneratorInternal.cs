@@ -12,6 +12,8 @@ public class GeneratorInternal<TGenerator>
     private static string Namespace => Type.Namespace;
     private static string AttributeName => Type.Name.Replace("Generator", "Attribute");
 
+    protected GeneratorInternal() { }
+
     protected static void CreateAttribute(IncrementalGeneratorInitializationContext context)
     {
         var projectNamespaceProvider = context.AnalyzerConfigOptionsProvider

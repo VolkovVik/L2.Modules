@@ -10,6 +10,7 @@
   </Folder>
   <Folder Name="/generators/">
     <Project Path="generators/SourceGenerators.Endpoints/SourceGenerators.Endpoints.csproj" Id="dd85a44a-6fbb-4998-b393-d12a4f28f478" />
+    <Project Path="generators/SourceGenerators.MqttSubscriptions/SourceGenerators.MqttSubscriptions.csproj" Id="5cfa2442-f507-4dda-b367-756800d73d55" />
     <Project Path="generators/SourceGenerators.Validators/SourceGenerators.Validators.csproj" Id="9190cda4-5c58-4046-8f5c-40a3334db2eb" />
     <Project Path="generators/SourceGeneratorsLibrary/SourceGeneratorsLibrary.csproj" Id="9385fb69-1a3f-41ea-b2d1-f68b7c47fcf0" />
   </Folder>

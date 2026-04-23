@@ -1,0 +1,21 @@
+---
+description: Команды MediatR в Application (папка, файл, record, validator, handler)
+globs: "**/Aspu.Modules.*.Application/**/*.cs"
+alwaysApply: true
+---
+
+# Команды (`IAppCommand` / `IAppCommand<TResponse>`)
+
+Используется пакет **Mediator** (не MediatR). Ответы сценариев — `Result` / `Result<T>` из `Aspu.Common.Domain.Results`.
+
+При создании **новой команды** в модуле:
+
+1. Папка: `UseCases/<Область>/Commands/<ИмяКоманды>/` (имя папки совпадает с «коротким» именем сценария, например `AddCode`).
+2. Файл: `<ИмяКоманды>Command.cs` (имя файла должно совпадать с типом record, например `AddCodeCommand` → `AddCodeCommand.cs`).
+3. `public sealed record <Имя>Command(...) : IAppCommand<Guid>` (или `IAppCommand` без типа, если ответ не нужен) — интерфейсы из `Aspu.Common.Application.Abstractions.Messaging`.
+4. `internal sealed class <Имя>CommandValidator : AbstractValidator<<Имя>Command>` — FluentValidation; для строк предпочитай расширения из `Aspu.Common.Application.Extensions` (например `StringMustBeNotWhiteSpace()`), где это уместно.
+5. `public sealed class <Имя>CommandHandler(IMediator _mediator) : IAppCommandHandler<<Имя>Command, ...>` — `Handle` возвращает `ValueTask<Result<T>>`.
+
+Пространство имён: `Aspu.Modules.<Модуль>.Application.UseCases.<Область>.Commands.<ИмяКоманды>`.
+
+В проекте Application при необходимости вызывай сгенерированную регистрацию валидаторов: `services.AddValidators()` (см. `ApplicationConfiguration` модуля).

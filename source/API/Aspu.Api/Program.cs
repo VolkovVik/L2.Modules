@@ -18,8 +18,8 @@ try
 
     builder.Services.AddOptions(builder.Configuration);
 
-    var apiVersionOptions = builder.Configuration.GetSection(ApiVersionOptions.SectionName).Get<ApiVersionOptions>()
-        ?? new ApiVersionOptions();
+    var apiVersionOptions = builder.Configuration.GetSection(ApiVersionOptions.SectionName)
+        .Get<ApiVersionOptions>() ?? new ApiVersionOptions();
 
     builder.Services.AddLogging(builder.Configuration);
 
