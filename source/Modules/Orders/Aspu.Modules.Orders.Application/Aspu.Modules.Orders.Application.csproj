@@ -10,8 +10,4 @@
     <Folder Include="Ports\" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <EnableValidatorsGenerator>true</EnableValidatorsGenerator>
-  </PropertyGroup>
-
 </Project>

@@ -1,4 +1,4 @@
-﻿using Aspu.Modules.Orders.Presentation.SourceGenerators.Endpoints;
+﻿using Aspu.Modules.Orders.SourceGenerators.Presentation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aspu.Modules.Orders.Presentation;

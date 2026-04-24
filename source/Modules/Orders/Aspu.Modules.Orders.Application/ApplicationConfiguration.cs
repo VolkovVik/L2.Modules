@@ -1,4 +1,4 @@
-﻿using Aspu.Modules.Orders.Application.SourceGenerators.Validators;
+﻿using Aspu.Modules.Orders.SourceGenerators.Application;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aspu.Modules.Orders.Application;

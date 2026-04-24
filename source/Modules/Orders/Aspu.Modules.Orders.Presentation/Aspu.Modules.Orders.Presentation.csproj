@@ -7,8 +7,4 @@
     <ProjectReference Include="..\Aspu.Modules.Orders.PublicApi\Aspu.Modules.Orders.PublicApi.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <EnableEndpointsGenerator>true</EnableEndpointsGenerator>
-  </PropertyGroup>
-
 </Project>

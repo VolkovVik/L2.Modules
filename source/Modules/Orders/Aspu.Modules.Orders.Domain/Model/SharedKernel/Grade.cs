@@ -1,4 +1,4 @@
-using Aspu.Modules.Orders.Domain.SourceGeneratorsLibrary;
+using Aspu.Modules.Orders.SourceGenerators.Domain;
 
 namespace Aspu.Modules.Orders.Domain.Model.SharedKernel;
 

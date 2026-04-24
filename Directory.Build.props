@@ -13,17 +13,22 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <EndpointsGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Endpoints\SourceGenerators.Endpoints.csproj</EndpointsGeneratorPath>
-    <ValidatorsGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Validators\SourceGenerators.Validators.csproj</ValidatorsGeneratorPath>
+    <DomainGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Domain\SourceGenerators.Domain.csproj</DomainGeneratorPath>
+    <ApplicationGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Application\SourceGenerators.Application.csproj</ApplicationGeneratorPath>
+    <PresentationGeneratorPath>$(MSBuildThisFileDirectory)generators\SourceGenerators.Presentation\SourceGenerators.Presentation.csproj</PresentationGeneratorPath>
   </PropertyGroup>
 
-  <!-- Source generator runs per project only (Roslyn sees referenced projects as metadata, not source). Each host that maps routes must call that assembly's generated EndpointsRegistration. -->
-  <ItemGroup Condition="'$(EnableEndpointsGenerator)' == 'true'">
-    <ProjectReference Include="$(EndpointsGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  <!-- Source generators run per project only (Roslyn sees referenced projects as metadata, not source). Module Presentation/Application get analyzers by name; hosts (e.g. Api) set Enable*Generator. -->
+  <ItemGroup Condition="'$(EnablePresentationGenerator)' == 'true' Or ($([System.String]::Copy('$(MSBuildProjectName)').StartsWith('Aspu.Modules.')) And $([System.String]::Copy('$(MSBuildProjectName)').EndsWith('.Presentation')))">
+    <ProjectReference Include="$(PresentationGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(EnableValidatorsGenerator)' == 'true'">
-    <ProjectReference Include="$(ValidatorsGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  <ItemGroup Condition="'$(EnableApplicationGenerator)' == 'true' Or ($([System.String]::Copy('$(MSBuildProjectName)').StartsWith('Aspu.Modules.')) And $([System.String]::Copy('$(MSBuildProjectName)').EndsWith('.Application')))">
+    <ProjectReference Include="$(ApplicationGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(EnableDomainGenerator)' == 'true' Or ($([System.String]::Copy('$(MSBuildProjectName)').StartsWith('Aspu.Modules.')) And $([System.String]::Copy('$(MSBuildProjectName)').EndsWith('.Domain')))">
+    <ProjectReference Include="$(DomainGeneratorPath)" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

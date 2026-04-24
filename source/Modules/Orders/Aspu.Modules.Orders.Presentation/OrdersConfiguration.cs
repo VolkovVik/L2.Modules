@@ -1,6 +1,6 @@
 ﻿using Aspu.Modules.Orders.Application;
 using Aspu.Modules.Orders.Infrastructure;
-using Aspu.Modules.Orders.Presentation.SourceGenerators.Endpoints;
+using Aspu.Modules.Orders.SourceGenerators.Presentation;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

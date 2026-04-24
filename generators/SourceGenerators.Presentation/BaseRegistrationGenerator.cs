@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace SourceGenerators.Endpoints;
+namespace SourceGenerators.Presentation;
 
 public abstract class BaseRegistrationGenerator
 {

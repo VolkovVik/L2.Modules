@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-	  <ProjectReference Include="..\..\..\..\generators\SourceGeneratorsLibrary\SourceGeneratorsLibrary.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\..\Common\Aspu.Common.Domain\Aspu.Common.Domain.csproj" />
   </ItemGroup>
 
