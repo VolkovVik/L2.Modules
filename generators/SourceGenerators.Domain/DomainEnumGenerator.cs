@@ -1,8 +1,9 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using SourceGenerators.Domain;
 
-namespace SourceGeneratorsLibrary;
+namespace SourceGenerators.Domain;
 
 [Generator]
 public sealed class DomainEnumGenerator : GeneratorInternal<DomainEnumGenerator>, IIncrementalGenerator

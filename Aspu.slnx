@@ -9,10 +9,10 @@
     <File Path="docs/dddpatterns.md" />
   </Folder>
   <Folder Name="/generators/">
-    <Project Path="generators/SourceGenerators.Endpoints/SourceGenerators.Endpoints.csproj" Id="dd85a44a-6fbb-4998-b393-d12a4f28f478" />
+    <Project Path="generators/SourceGenerators.Application/SourceGenerators.Application.csproj" Id="2041fd9f-77fb-4bf6-a6c4-78a5d9c59d83" />
+    <Project Path="generators/SourceGenerators.Domain/SourceGenerators.Domain.csproj" Id="0efcf7db-47a2-4f73-bc3f-41630c2d8d96" />
     <Project Path="generators/SourceGenerators.MqttSubscriptions/SourceGenerators.MqttSubscriptions.csproj" Id="5cfa2442-f507-4dda-b367-756800d73d55" />
-    <Project Path="generators/SourceGenerators.Validators/SourceGenerators.Validators.csproj" Id="9190cda4-5c58-4046-8f5c-40a3334db2eb" />
-    <Project Path="generators/SourceGeneratorsLibrary/SourceGeneratorsLibrary.csproj" Id="9385fb69-1a3f-41ea-b2d1-f68b7c47fcf0" />
+    <Project Path="generators/SourceGenerators.Presentation/SourceGenerators.Presentation.csproj" Id="5a252b3b-5484-479e-ad75-0f4ec11336aa" />
   </Folder>
   <Folder Name="/nbomber/">
     <Project Path="nbomber/Aspu.Nbomber/Aspu.Nbomber.csproj" Id="6ab91040-30fb-4822-b425-9db1882a534b" />

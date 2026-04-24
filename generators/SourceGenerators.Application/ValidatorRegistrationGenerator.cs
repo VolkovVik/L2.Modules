@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace SourceGenerators.Validators;
+namespace SourceGenerators.Application;
 
 [Generator]
 public sealed class ValidatorRegistrationGenerator : IIncrementalGenerator
@@ -62,7 +62,7 @@ public sealed class ValidatorRegistrationGenerator : IIncrementalGenerator
         if (classSymbols.IsDefaultOrEmpty)
             return;
 
-        var assemblyName = compilation.AssemblyName;
+        var assemblyName = compilation.AssemblyName!.Replace(".Application", string.Empty);
         var abstractValidatorSymbol = compilation.GetTypeByMetadataName(BaseClassName);
 
         var sb = new StringBuilder(4096)

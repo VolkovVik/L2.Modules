@@ -1,7 +1,7 @@
 ﻿using Aspu.Api.Adapters.Mqtt;
 using Aspu.Api.Options;
-using Aspu.Api.SourceGenerators.Endpoints;
-using Aspu.Api.SourceGenerators.Validators;
+using Aspu.Api.SourceGenerators.Application;
+using Aspu.Api.SourceGenerators.Presentation;
 
 namespace Aspu.Api;
 

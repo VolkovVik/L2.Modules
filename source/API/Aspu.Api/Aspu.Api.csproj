@@ -37,8 +37,8 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <EnableEndpointsGenerator>true</EnableEndpointsGenerator>
-    <EnableValidatorsGenerator>true</EnableValidatorsGenerator>
+    <EnablePresentationGenerator>true</EnablePresentationGenerator>
+    <EnableApplicationGenerator>true</EnableApplicationGenerator>
   </PropertyGroup>
 
   <ItemGroup>
