@@ -10,7 +10,7 @@ alwaysApply: true
 - **API:** `source/API/Aspu.Api` — хост, регистрация модулей, адаптеры (в т.ч. MQTT).
 - **Общие библиотеки:** `source/Common/Aspu.Common.{Application|Domain|Infrastructure|Presentation}` — переносимые абстракции (`IAppCommand`, `IAppQuery`, `Result`, MQTT и т.д.).
 - **Функциональные модули:** `source/Modules/<Имя>/Aspu.Modules.<Имя>.{Application|Domain|Infrastructure|Presentation|IntegrationEvents|PublicApi}` — изоляция по bounded context; зависимости направлены к Domain/Application, не наоборот.
-- **Генераторы:** `generators/*` подключаются как анализаторы из `Directory.Build.props` (`EnableEndpointsGenerator`, `EnableValidatorsGenerator` и пути к проектам генераторов).
+- **Генераторы:** `generators/*` как анализаторы из `Directory.Build.props` (пути `*Path`): endpoints — если `EnableEndpointsGenerator` или проект `Aspu.Modules.*.Presentation`; validators — если `EnableValidatorsGenerator` или `Aspu.Modules.*.Application`; library — если `EnableSourceGeneratorsLibrary` или `Aspu.Modules.*.Domain`.
 - **Тесты и нагрузка:** `source/Modules/*/tests`, при необходимости `benchmarks/`, `nbomber/`.
 
 При добавлении фичи выбирай слой: доменная модель и инварианты — в `*.Domain`, сценарии и валидация — в `*.Application`, интеграции — в `*.Infrastructure`, HTTP/MQTT — в `*.Presentation`.
