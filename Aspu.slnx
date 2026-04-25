@@ -42,6 +42,7 @@
     <Project Path="source/Modules/Orders/Aspu.Modules.Orders.PublicApi/Aspu.Modules.Orders.PublicApi.csproj" Id="d862f15f-6812-4bbd-a65b-f6c0a035b1e9" />
   </Folder>
   <Folder Name="/source/Modules/Orders/tests/">
+    <Project Path="source/Modules/Orders/tests/Aspu.Modules.Orders.IntegrationTests/Aspu.Modules.Orders.IntegrationTests.csproj" Id="53d236ab-d4d9-44db-b58c-6559d6949e3c" />
     <Project Path="source/Modules/Orders/tests/Aspu.Modules.Orders.UnitTests/Aspu.Modules.Orders.UnitTests.csproj" Id="e608d46b-eeda-4e68-b7c5-4ed13286ca47" />
   </Folder>
   <Folder Name="/tests/" />

@@ -50,4 +50,8 @@
     <InternalsVisibleTo Include="Aspu.Benchmarks" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="logs\" />
+  </ItemGroup>
+
 </Project>

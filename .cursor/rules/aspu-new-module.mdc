@@ -1,0 +1,53 @@
+---
+description: Создание нового функционального модуля по образцу Orders
+alwaysApply: true
+---
+
+# Новый модуль
+
+При создании модуля используй `source/Modules/Orders` как эталон структуры и замени `Orders` на имя нового bounded context.
+
+## Проекты
+
+Создай каталог `source/Modules/<Имя>/` и проекты:
+
+- `Aspu.Modules.<Имя>.Domain`
+- `Aspu.Modules.<Имя>.Application`
+- `Aspu.Modules.<Имя>.Infrastructure`
+- `Aspu.Modules.<Имя>.Presentation`
+- `Aspu.Modules.<Имя>.IntegrationEvents`
+- `Aspu.Modules.<Имя>.PublicApi`
+- `tests/Aspu.Modules.<Имя>.UnitTests`
+- `tests/Aspu.Modules.<Имя>.IntegrationTests`
+
+Добавь проекты в `Aspu.slnx`. Для пустых обязательных каталогов используй `.gitkeep`, как в `Orders`.
+
+## Зависимости
+
+Сохраняй направление зависимостей:
+
+- `Domain` -> `Common.Domain`
+- `IntegrationEvents` -> `Common.Application`
+- `Application` -> `Common.Application`, `Domain`, `IntegrationEvents`
+- `Infrastructure` -> `Common.Infrastructure`, `Application`
+- `Presentation` -> `Common.Presentation`, `Application`, `Infrastructure`, `PublicApi`
+- `UnitTests` -> тестовые пакеты (`TUnit`, `Shouldly`, `NSubstitute`, coverage) и тестируемый слой, обычно `Application`
+- `IntegrationTests` -> тестовые пакеты (`TUnit`, `Shouldly`, `NSubstitute`, coverage), `Testcontainers`, профильные контейнеры (`Testcontainers.PostgreSql` и т.п.), `Application`, `Infrastructure`
+
+Не добавляй ссылки из `Domain` на Application/Infrastructure/Presentation и не протаскивай инфраструктурные зависимости в доменную модель.
+
+## Конфигурация
+
+Добавь extension-классы по образцу `Orders`:
+
+- `ApplicationConfiguration.AddApplication()` вызывает сгенерированное `services.AddValidators()`, если есть валидаторы.
+- `InfrastructureConfiguration.AddInfrastructure(IConfiguration configuration)` регистрирует адаптеры и настройки инфраструктуры.
+- `PresentationConfiguration.AddPresentation()` регистрирует HTTP/MQTT/другие presentation-адаптеры, включая сгенерированные регистрации.
+- `<Имя>Configuration.Add<Имя>Module(...)` вызывает `AddApplication`, `AddPresentation`, `AddInfrastructure`.
+- `<Имя>Configuration.Map<Имя>Endpoints(...)` вызывает сгенерированный `HttpEndpointsRegistration.MapHttpEndpoints(...)`, если есть endpoints.
+
+После этого подключи модуль в API: `ModuleExtensions` для DI и `EndpointExtensions` для HTTP endpoints.
+
+## Нейминг и слои
+
+Пространства имён должны начинаться с `Aspu.Modules.<Имя>`. Размещай доменную модель и инварианты в `*.Domain`, сценарии/валидацию в `*.Application`, внешние интеграции в `*.Infrastructure`, HTTP/MQTT/transport adapters в `*.Presentation`, публичные контракты в `*.PublicApi`, integration events в `*.IntegrationEvents`.
