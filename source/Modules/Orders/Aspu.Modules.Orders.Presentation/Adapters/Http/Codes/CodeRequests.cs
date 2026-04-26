@@ -1,4 +1,5 @@
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
+using Aspu.Common.Presentation.Results;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.AddCode;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.GetCode;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.GetCodeById;
@@ -17,20 +18,20 @@ internal sealed class CodeRequests : IHttpEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder routes)
     {
-        routes.MapGet("/{id}", static async Task<Results<Ok<Guid>, NotFound>> (
+        routes.MapGet("/{id}", static async (
             Guid id,
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var response = await mediator.Send(new GetCodeByIdCommand(id), cancellationToken);
-            return response?.IsSuccess is not true
-                ? TypedResults.NotFound()
-                : TypedResults.Ok(response.Value);
+            return response!.Match(Results.Ok, ApiResults.Problem);
         })
         .WithName("GetCodesById")
         .WithSummary("Get codes by ID")
-        .WithDescription("Returns dto")
-        .MapToApiVersion(1);
+        .WithDescription("Returns code")
+        .MapToApiVersion(1)
+        .Produces<Guid>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest);
 
         routes.MapGet("/code/{value}", static async Task<Results<Ok<Guid>, NotFound>> (
             string value,
@@ -44,7 +45,7 @@ internal sealed class CodeRequests : IHttpEndpoint
         })
         .WithName("GetCodesByValue")
         .WithSummary("Get codes by value")
-        .WithDescription("Returns dto")
+        .WithDescription("Returns code")
         .MapToApiVersion(1);
 
         routes.MapPost("/add", static async Task<Results<Ok<Guid>, NotFound>> (
