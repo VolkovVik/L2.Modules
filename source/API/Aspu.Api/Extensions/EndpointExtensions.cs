@@ -1,16 +1,15 @@
 using Asp.Versioning;
-using Aspu.Api.Options;
+using Asp.Versioning.Conventions;
 using Aspu.Modules.Orders.Presentation;
 
 namespace Aspu.Api.Extensions;
 
 internal static class EndpointExtensions
 {
-    internal static IServiceCollection AddEndpointExtension(this IServiceCollection services, ApiVersionOptions apiVersionOptions)
-    {
+    internal static IApiVersioningBuilder AddEndpointExtension(this IServiceCollection services) =>
         services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = new ApiVersion(apiVersionOptions.DefaultVersion);
+            options.DefaultApiVersion = new ApiVersion(1.0);
             options.ReportApiVersions = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ApiVersionReader = ApiVersionReader.Combine(
@@ -20,21 +19,17 @@ internal static class EndpointExtensions
         })
         .AddApiExplorer(options =>
         {
-            options.GroupNameFormat = "'v'V";
+            options.GroupNameFormat = "'v'VVV";
             options.SubstituteApiVersionInUrl = true;
         });
-        return services;
-    }
 
-    internal static IApplicationBuilder UseEndpointExtension(this WebApplication app, ApiVersionOptions apiVersionOptions)
+    internal static IApplicationBuilder UseEndpointExtension(this WebApplication app)
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        var apiVersionSetBuilder = app.NewApiVersionSet();
-        foreach (var version in apiVersionOptions.Versions)
-            apiVersionSetBuilder.HasApiVersion(new ApiVersion(version));
-
-        var apiVersionSet = apiVersionSetBuilder
+        var apiVersionSet = app.NewApiVersionSet()
+            .HasApiVersion(1.0)
+            .HasApiVersion(2.0)
             .ReportApiVersions()
             .Build();
 
