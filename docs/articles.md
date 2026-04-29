@@ -11,6 +11,7 @@ https://www.milanjovanovic.tech/blog/central-package-management-in-net-simplify-
 # Versioning API
 
 https://www.milanjovanovic.tech/blog/api-versioning-in-aspnetcore
+https://devblogs.microsoft.com/dotnet/api-versioning-in-dotnet-10-applications
 
 # Global exceptions
 

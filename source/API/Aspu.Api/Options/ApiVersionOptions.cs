@@ -11,7 +11,7 @@ public sealed class ApiVersionOptions
     /// <summary>
     /// Available API versions (e.g. 1, 2).
     /// </summary>
-    public int[] Versions { get; set; } = [1, 2];
+    public int[] Versions { get; set; } = [1];
 
     /// <summary>
     /// Default API version when not specified in the request.

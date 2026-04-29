@@ -4,7 +4,7 @@ namespace Aspu.Api.Extensions;
 
 internal static class MediatorExtensions
 {
-    internal static IServiceCollection AddMediatorRequest(this IServiceCollection services)
+    internal static IServiceCollection AddMediatorExtension(this IServiceCollection services)
     {
         services.AddMediator(options =>
         {
