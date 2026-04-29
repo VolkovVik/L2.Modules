@@ -5,7 +5,7 @@ namespace Aspu.Api.Extensions;
 
 internal static class ObjectPoolExtensions
 {
-    internal static IServiceCollection AddObjectPool(
+    internal static IServiceCollection AddObjectPoolExtension(
         this IServiceCollection services)
     {
         /// services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
