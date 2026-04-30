@@ -4,7 +4,8 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "aspu.api": "StartDebugging"
+        "aspu.api": "StartDebugging",
+        "aspu.gateway": "StartDebugging"
       }
     }
   }
