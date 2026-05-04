@@ -47,7 +47,7 @@ try
         app.MapScalarExtension();
     }
 
-    app.UseHttpsRedirection();
+    /// app.UseHttpsRedirection();
 
     app.UseEndpointExtension();
 

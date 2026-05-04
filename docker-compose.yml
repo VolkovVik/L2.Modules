@@ -11,6 +11,16 @@ services:
     depends_on:
       - mosquitto
 
+  aspu.gateway:
+    image: ${DOCKER_REGISTRY-}aspugateway
+    container_name: aspu.gateway
+    build:
+      context: .
+      dockerfile: source/API/Aspu.Gateway/Dockerfile
+    ports:
+      - 3000:8080
+      - 3001:8081
+
   mosquitto:
     image: eclipse-mosquitto
     container_name: mosquitto
