@@ -7,6 +7,7 @@
     <File Path="docs/command.md" />
     <File Path="docs/commit.md" />
     <File Path="docs/dddpatterns.md" />
+    <File Path="docs/issues.md" />
   </Folder>
   <Folder Name="/generators/">
     <Project Path="generators/SourceGenerators.Application/SourceGenerators.Application.csproj" Id="2041fd9f-77fb-4bf6-a6c4-78a5d9c59d83" />

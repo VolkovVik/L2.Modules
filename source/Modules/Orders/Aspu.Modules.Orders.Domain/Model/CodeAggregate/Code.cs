@@ -168,8 +168,6 @@ public sealed class Code : Aggregate
     /// <returns></returns>
     public static Result<Code, Error> Create(Guid orderId, Guid orderUnitId, string value)
     {
-        var id = Guid.NewGuid();
-
         if (orderId == Guid.Empty)
             return Error.ValueIsInvalid(nameof(orderId));
         if (orderUnitId == Guid.Empty)
@@ -177,6 +175,7 @@ public sealed class Code : Aggregate
         if (string.IsNullOrWhiteSpace(value))
             return Error.ValueIsInvalid(nameof(value));
 
+        var id = Guid.CreateVersion7();
         var code = new Code(id, orderId, orderUnitId, value);
 
         ///code.RaiseDomainEvent(new CodeCreatedDomainEvent(id, orderId, orderUnitId, value));
