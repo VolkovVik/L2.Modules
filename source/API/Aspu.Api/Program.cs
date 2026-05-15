@@ -1,4 +1,5 @@
 using System.Reflection;
+using Aspu.Api.Adapters.SignaR;
 using Aspu.Api.Extensions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
@@ -22,8 +23,13 @@ try
 
     builder.Services.AddExceptionHandlers();
 
+    builder.Services.AddSignalR();
+    builder.Services.AddSingleton<SignalrMessageChannel>();
+    builder.Services.AddHostedService<SignalrMessageWorker>();
+    builder.Services.AddScoped<INotificationPublisher, SignalRNotificationPublisher>();
+
     builder.Services.AddEndpointExtension()
-        .AddOpenApiExtension();
+       .AddOpenApiExtension();
 
     builder.Services.AddObjectPoolExtension();
 
@@ -50,6 +56,8 @@ try
     /// app.UseHttpsRedirection();
 
     app.UseEndpointExtension();
+
+    app.MapHub<NotificationsHub>("/notifications-hub");
 
     var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
     Log.Information("Running ASPU API application: {@Version}", version);
