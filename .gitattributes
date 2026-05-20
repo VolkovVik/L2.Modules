@@ -18,7 +18,7 @@
 # ============================================================================
 # C# / .NET source code
 # ============================================================================
-*.cs        text diff=csharp
+*.cs        text eol=crlf diff=csharp
 *.cshtml    text diff=html
 *.razor     text diff=html
 *.vb        text diff=vb

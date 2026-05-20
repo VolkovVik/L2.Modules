@@ -4,7 +4,7 @@ namespace Aspu.Api.Extensions.Exceptions;
 
 internal sealed class ValidationExceptionHandler(
     IProblemDetailsService problemDetailsService,
-    ILogger<ValidationException> logger) :
+    ILogger<ValidationExceptionHandler> logger) :
     GenericExceptionHandler<ValidationException>(problemDetailsService, logger)
 {
     protected override string? ProblemDetailTitle { get; set; } = "Invalid validation request";

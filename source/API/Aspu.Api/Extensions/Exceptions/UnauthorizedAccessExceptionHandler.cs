@@ -2,7 +2,7 @@
 
 internal sealed class UnauthorizedAccessExceptionHandler(
     IProblemDetailsService problemDetailsService,
-    ILogger<UnauthorizedAccessException> logger) :
+    ILogger<UnauthorizedAccessExceptionHandler> logger) :
     GenericExceptionHandler<UnauthorizedAccessException>(problemDetailsService, logger)
 {
     protected override string? ProblemDetailTitle { get; set; } = "Unauthorized access";
