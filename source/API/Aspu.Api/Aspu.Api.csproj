@@ -21,6 +21,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+	  <PackageReference Include="NATS.Extensions.Microsoft.DependencyInjection" />
+	  <PackageReference Include="NATS.Net" />
 	  <PackageReference Include="Scalar.AspNetCore" />
 	  <PackageReference Include="Serilog" />
 	  <PackageReference Include="Serilog.Enrichers.Environment" />
