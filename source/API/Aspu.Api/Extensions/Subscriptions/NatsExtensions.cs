@@ -13,8 +13,8 @@ internal static class NatsExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var natsOptions = configuration.GetSection(NatsOptions.SectionName).Get<NatsOptions>();
-        if (natsOptions?.Enabled != true)
+        var options = configuration.GetSection(NatsOptions.SectionName).Get<NatsOptions>();
+        if (options?.Enabled != true)
             return services;
 
         services.AddConfiguredNatsClient();

@@ -12,16 +12,21 @@ internal sealed class NatsSubscriptionsHostedService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (var msg in client.SubscribeAsync<byte[]>(
-            subject: ">",
-            cancellationToken: stoppingToken))
+        try
         {
-            if (msg.Data is null)
-                continue;
+            await foreach (var msg in client.SubscribeAsync<byte[]>(subject: ">", cancellationToken: stoppingToken))
+            {
+                if (msg.Data is null || string.IsNullOrWhiteSpace(msg.Subject))
+                    continue;
 
-            var message = new InboundProcessorMessage { Topic = msg.Subject, Payload = msg.Data };
-            if (!channel.TryEnqueue(message))
-                Log.Warning("NATS inbound queue rejected message on {Topic}", msg.Subject);
+                var message = new InboundProcessorMessage { Type = "Nats", Topic = msg.Subject, Payload = msg.Data };
+                if (!channel.TryEnqueue(message))
+                    Log.Warning("NATS inbound queue rejected message on {Topic}", msg.Subject);
+            }
+        }
+        finally
+        {
+            channel.CompleteWriter();
         }
     }
 }
