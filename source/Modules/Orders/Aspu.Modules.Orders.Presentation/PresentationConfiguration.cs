@@ -9,6 +9,7 @@ public static class PresentationConfiguration
         this IServiceCollection services)
     {
         services.AddMqttHandlers();
+        services.AddNatsHandlers();
 
         return services;
     }

@@ -1,4 +1,6 @@
 using Aspu.Api.Options;
+using Aspu.Common.Presentation.Abstractions.InboundProcessor;
+using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -7,20 +9,20 @@ namespace Aspu.Api.Adapters.Mqtt;
 /// <summary>
 /// Host loop: runs MQTT subscriber sessions with reconnect delay between failures.
 /// </summary>
-internal sealed class MqttSubscriberHostedService(
-    IOptions<MqttOptions> Options,
-    MqttSubscriberClient MqttClient,
-    MqttHandlerTopicRegistry handlerTopics,
-    MqttInboundMessageQueue InboundQueue)
+internal sealed class MqttSubscriptionsHostedService(
+    IOptions<MqttOptions> options,
+    MqttSubscriptionsClient mqttClient,
+    InboundProcessorHandlerRegistry<IMqttHandler> handlerTopics,
+    InboundProcessorChannel<MqttOptions> channel)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var subscriptions = handlerTopics.SubscriptionTopics();
+        var subscriptions = handlerTopics.GetSubscriptions();
         if (subscriptions.Count == 0)
             Log.Warning("MQTT subscriber has no valid topic to subscribe");
 
-        var reconnectDelay = Options.Value.ReconnectDelaySeconds;
+        var reconnectDelay = options.Value.ReconnectDelaySeconds;
 
         try
         {
@@ -28,7 +30,7 @@ internal sealed class MqttSubscriberHostedService(
             {
                 try
                 {
-                    await MqttClient.RunSessionAsync(subscriptions, stoppingToken).ConfigureAwait(false);
+                    await mqttClient.RunSessionAsync(subscriptions, stoppingToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {
@@ -46,7 +48,7 @@ internal sealed class MqttSubscriberHostedService(
         }
         finally
         {
-            InboundQueue.CompleteWriter();
+            channel.CompleteWriter();
         }
     }
 }

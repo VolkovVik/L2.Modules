@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Security.Authentication;
 using Aspu.Api.Options;
+using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using Serilog;
@@ -10,9 +11,9 @@ namespace Aspu.Api.Adapters.Mqtt;
 /// <summary>
 /// MQTTnet-based subscriber: one connect/subscribe session until disconnect.
 /// </summary>
-internal sealed class MqttSubscriberClient(
+internal sealed class MqttSubscriptionsClient(
     IOptions<MqttOptions> options,
-    MqttInboundMessageQueue inboundQueue)
+    InboundProcessorChannel<MqttOptions> channel)
 {
     private static readonly MqttClientFactory ClientFactory = new();
 
@@ -135,13 +136,10 @@ internal sealed class MqttSubscriberClient(
     private Task OnApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
     {
         var message = e.ApplicationMessage;
-        var topic = message.Topic;
-        Log.Information("MQTT received message on {Topic}", topic);
         var payload = PayloadToOwnedBuffer(message);
-
-        var inbound = new MqttInboundMessage { Topic = topic, Payload = payload };
-        if (!inboundQueue.TryEnqueue(inbound))
-            Log.Warning("MQTT inbound queue rejected message on {Topic}", topic);
+        var inbound = new InboundProcessorMessage { Type = "Mqtt", Topic = message.Topic, Payload = payload };
+        if (!channel.TryEnqueue(inbound))
+            Log.Warning("MQTT inbound queue rejected message on {Topic}", message.Topic);
 
         return Task.CompletedTask;
     }
