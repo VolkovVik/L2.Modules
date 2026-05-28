@@ -4,12 +4,18 @@ using Aspu.Common.Domain.Results;
 using Aspu.Modules.Orders.Domain.Model.CodeAggregate;
 using FluentValidation;
 using Mediator;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Aspu.Modules.Orders.Application.UseCases.Codes.Commands.AddCode;
 
 public sealed record AddCodeCommand(Guid? OrderId, Guid? OrderUnitId, string Value)
     : IAppCommand<Guid>;
+
+public static partial class AddCodeLogger
+{
+    [LoggerMessage(EventId = 13, Level = LogLevel.Critical, Message = "Add code {Value}")]
+    public static partial void Log(ILogger logger, string value);
+}
 
 internal sealed class AddCodeCommandValidator : AbstractValidator<AddCodeCommand>
 {
@@ -24,7 +30,9 @@ internal sealed class AddCodeCommandValidator : AbstractValidator<AddCodeCommand
     }
 }
 
-public sealed class AddCodeCommandHandler(IMediator _mediator)
+public sealed class AddCodeCommandHandler(
+    IMediator _mediator,
+    ILogger<AddCodeCommandHandler> _logger)
     : IAppCommandHandler<AddCodeCommand, Guid>
 {
     public async ValueTask<Result<Guid>> Handle(AddCodeCommand request, CancellationToken cancellationToken)
@@ -34,6 +42,8 @@ public sealed class AddCodeCommandHandler(IMediator _mediator)
             return code.Error;
 
         await _mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
+
+        AddCodeLogger.Log(_logger, code.Value.Value);
 
         return code.Value.Id;
     }
@@ -45,7 +55,7 @@ public sealed class CodeNotificationHandler : IAppNotificationHandler<CodeNotifi
 {
     public ValueTask Handle(CodeNotification notification, CancellationToken cancellationToken)
     {
-        Log.Debug("Add code: {@Id}", notification.Id);
+        Serilog.Log.Debug("Add code: {@Id}", notification.Id);
         return ValueTask.CompletedTask;
     }
 }

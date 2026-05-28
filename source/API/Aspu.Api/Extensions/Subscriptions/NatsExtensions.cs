@@ -1,9 +1,11 @@
 using Aspu.Api.Adapters.Nats;
 using Aspu.Api.Options;
+using Aspu.Common.Presentation.Abstractions.InboundProcessor;
+using Aspu.Common.Presentation.Abstractions.NatsAdapter;
 using Microsoft.Extensions.Options;
 using NATS.Extensions.Microsoft.DependencyInjection;
 
-namespace Aspu.Api.Extensions;
+namespace Aspu.Api.Extensions.Subscriptions;
 
 internal static class NatsExtensions
 {
@@ -16,14 +18,8 @@ internal static class NatsExtensions
             return services;
 
         services.AddConfiguredNatsClient();
-
-        services.AddHostedService<SoilAnalyticsWorker>();
-        services.AddHostedService<SoilAnalyticsWorker1>();
-        services.AddHostedService<SoilAnalyticsWorker2>();
-        services.AddHostedService<SoilAnalyticsWorker3>();
-        services.AddHostedService<SoilAnalyticsWorker4>();
-        services.AddHostedService<IrrigationDeviceWorker>();
-        services.AddHostedService<IrrigationControllerWorker>();
+        services.AddInboundProcessor<NatsOptions, INatsHandler>();
+        services.AddHostedService<NatsSubscriptionsHostedService>();
 
         return services;
     }

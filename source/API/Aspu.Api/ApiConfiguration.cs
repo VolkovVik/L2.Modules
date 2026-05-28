@@ -1,5 +1,5 @@
 ﻿using Aspu.Api.Adapters.Mqtt;
-using Aspu.Api.Extensions;
+using Aspu.Api.Extensions.Subscriptions;
 using Aspu.Api.Options;
 using Aspu.Api.SourceGenerators.Application;
 using Aspu.Api.SourceGenerators.Presentation;

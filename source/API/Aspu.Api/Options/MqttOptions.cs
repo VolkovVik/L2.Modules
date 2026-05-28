@@ -34,12 +34,12 @@ public sealed class MqttOptions
     public MqttQualityOfServiceLevel QualityOfServiceLevel { get; set; } = MqttQualityOfServiceLevel.AtLeastOnce;
 
     /// <summary>
-    /// Max concurrent MQTT inbound message handlers (each message still gets its own DI scope). Minimum effective value is 1.
-    /// </summary>
-    public int InboundProcessorMaxDegreeOfParallelism { get; init; } = 16;
-
-    /// <summary>
     /// Bounded channel capacity between MQTT receive and the inbound processor. Minimum effective value is 1.
     /// </summary>
     public int InboundProcessorQueueCapacity { get; init; } = 1024;
+
+    /// <summary>
+    /// Max concurrent MQTT inbound message handlers (each message still gets its own DI scope). Minimum effective value is 1.
+    /// </summary>
+    public int InboundProcessorMaxDegreeOfParallelism { get; init; } = 16;
 }

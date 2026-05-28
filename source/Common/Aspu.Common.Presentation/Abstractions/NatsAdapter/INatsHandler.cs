@@ -1,7 +1,5 @@
-﻿namespace Aspu.Common.Presentation.Abstractions.NatsAdapter;
+﻿using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 
-public interface INatsHandler
-{
-    string Topic { get; }
-    Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken);
-}
+namespace Aspu.Common.Presentation.Abstractions.NatsAdapter;
+
+public interface INatsHandler : IInboundProcessorHandler { }
