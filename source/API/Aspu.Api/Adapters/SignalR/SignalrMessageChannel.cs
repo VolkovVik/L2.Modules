@@ -6,14 +6,14 @@ namespace Aspu.Api.Adapters.SignalR;
 
 internal sealed class SignalrMessageChannel
 {
-    private readonly Channel<SignalrMessageValue> _queue;
+    private readonly Channel<SignalrMessage> _queue;
 
     public SignalrMessageChannel(IOptions<SignalROptions> signalrOptions)
     {
         var options = signalrOptions.Value;
         var capacity = Math.Max(1, options.ChannelCapacity);
 
-        _queue = Channel.CreateBounded<SignalrMessageValue>(
+        _queue = Channel.CreateBounded<SignalrMessage>(
             new BoundedChannelOptions(capacity)
             {
                 SingleReader = options.SingleReader,
@@ -22,7 +22,7 @@ internal sealed class SignalrMessageChannel
             });
     }
 
-    public ChannelReader<SignalrMessageValue> Reader => _queue.Reader;
+    public ChannelReader<SignalrMessage> Reader => _queue.Reader;
 
-    public ChannelWriter<SignalrMessageValue> Writer => _queue.Writer;
+    public ChannelWriter<SignalrMessage> Writer => _queue.Writer;
 }

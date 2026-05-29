@@ -29,7 +29,7 @@ internal sealed class SignalREndpoints : IHttpEndpoint
             CancellationToken cancellationToken) =>
         {
             var str = DateTime.UtcNow.ToString(System.Globalization.CultureInfo.CurrentCulture);
-            await channel.Writer.WriteAsync(new SignalrMessageValue("ReceiveNotification", str, DateTime.UtcNow), cancellationToken);
+            await channel.Writer.WriteAsync(new SignalrMessage("ReceiveNotification", str, DateTime.UtcNow), cancellationToken);
             return str;
         })
             .WithName("GetChannelTest")

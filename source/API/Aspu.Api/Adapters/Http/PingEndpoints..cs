@@ -6,7 +6,7 @@ using Serilog;
 
 namespace Aspu.Api.Adapters.Http;
 
-internal sealed class PingRequest : IHttpEndpoint
+internal sealed class PingEndpoints : IHttpEndpoint
 {
     public string Tags => "Ping";
 

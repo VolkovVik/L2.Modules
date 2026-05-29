@@ -5,8 +5,6 @@ namespace Aspu.Api.Adapters.SignalR;
 public interface INotificationsClient
 {
     Task ReceiveNotification(string method, object payload);
-
-    Task ReceiveDataPoints(IReadOnlyList<SignalrMessageValue> batch);
 }
 
 public sealed class NotificationsHub(ILogger<NotificationsHub> logger) : Hub<INotificationsClient>
