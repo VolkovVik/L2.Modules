@@ -1,26 +1,27 @@
-using Microsoft.AspNetCore.RateLimiting;
+using Aspu.Gateway.Extensions;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRateLimiter(rateLimiterOptions =>
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    rateLimiterOptions.AddFixedWindowLimiter("fixed", options =>
-    {
-        options.Window = TimeSpan.FromSeconds(10);
-        options.PermitLimit = 5;
-    });
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor
+        | ForwardedHeaders.XForwardedProto
+        | ForwardedHeaders.XForwardedHost;
+
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
 });
 
-builder.Services
-    .AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+builder.Services.AddGatewayReverseProxy(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+app.UseForwardedHeaders();
 
-app.UseRateLimiter();
+/// app.UseHttpsRedirection();
 
-app.MapReverseProxy();
+app.UseGatewayReverseProxy();
 
 await app.RunAsync();

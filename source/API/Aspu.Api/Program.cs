@@ -3,6 +3,7 @@ using Aspu.Api.Extensions;
 using Aspu.Api.Extensions.Subscriptions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 
 SerilogExtensions.AddDefaultLogging();
@@ -12,6 +13,17 @@ Log.Information("Starting ASPU API application");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor
+            | ForwardedHeaders.XForwardedProto
+            | ForwardedHeaders.XForwardedHost;
+
+        options.KnownIPNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
 
     builder.Configuration.AddModuleConfiguration([]);
 
@@ -35,6 +47,8 @@ try
     builder.Services.AddModules(builder.Configuration);
 
     var app = builder.Build();
+
+    app.UseForwardedHeaders();
 
     app.UseHttpLogging();
 
