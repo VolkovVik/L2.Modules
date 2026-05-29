@@ -8,6 +8,7 @@ internal static class OptionsExtensions
     {
         services.Configure<MqttOptions>(configuration.GetSection(MqttOptions.SectionName));
         services.Configure<NatsOptions>(configuration.GetSection(NatsOptions.SectionName));
+        services.Configure<SignalROptions>(configuration.GetSection(SignalROptions.SectionName));
 
         return services;
     }

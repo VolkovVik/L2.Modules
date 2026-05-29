@@ -12,7 +12,7 @@ internal static class MqttExtensions
         IConfiguration configuration)
     {
         var options = configuration.GetSection(MqttOptions.SectionName).Get<MqttOptions>();
-        if (options?.Enabled != true)
+        if (options?.Enabled is not true)
             return services;
 
         services.AddSingleton<MqttSubscriptionsClient>();

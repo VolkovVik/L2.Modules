@@ -1,4 +1,4 @@
-﻿using Aspu.Api.Adapters.SignaR;
+﻿using Aspu.Api.Adapters.SignalR;
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 
 namespace Aspu.Api.Adapters.Http;

@@ -1,6 +1,6 @@
 using System.Reflection;
-using Aspu.Api.Adapters.SignaR;
 using Aspu.Api.Extensions;
+using Aspu.Api.Extensions.Subscriptions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
 using Serilog;
@@ -52,7 +52,7 @@ try
 
     app.UseEndpointExtension();
 
-    app.MapHub<NotificationsHub>("/notifications-hub");
+    app.MapSignalRHub();
 
     var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
     Log.Information("Running ASPU API application: {@Version}", version);
