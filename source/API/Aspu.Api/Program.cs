@@ -23,11 +23,6 @@ try
 
     builder.Services.AddExceptionHandlers();
 
-    builder.Services.AddSignalR();
-    builder.Services.AddSingleton<SignalrMessageChannel>();
-    builder.Services.AddHostedService<SignalrMessageWorker>();
-    builder.Services.AddScoped<INotificationPublisher, SignalRNotificationPublisher>();
-
     builder.Services.AddEndpointExtension()
        .AddOpenApiExtension();
 
@@ -74,8 +69,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-#pragma warning disable S1118
-#pragma warning disable ASP0027 // Unnecessary public Program class declaration
+#pragma warning disable S1118, ASP0027 // Unnecessary public Program class declaration
 public partial class Program;
-#pragma warning restore ASP0027 // Unnecessary public Program class declaration
-#pragma warning restore S1118
+#pragma warning restore S1118, ASP0027 // Unnecessary public Program class declaration

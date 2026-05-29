@@ -21,8 +21,8 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.7.0" />
-    <PackageVersion Include="NATS.Extensions.Microsoft.DependencyInjection" Version="2.8.0" />
-    <PackageVersion Include="NATS.Net" Version="2.8.0" />
+    <PackageVersion Include="NATS.Extensions.Microsoft.DependencyInjection" Version="2.8.1" />
+    <PackageVersion Include="NATS.Net" Version="2.8.1" />
     <PackageVersion Include="NBomber" Version="6.4.1" />
     <PackageVersion Include="NBomber.Http" Version="6.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
@@ -45,7 +45,7 @@
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="Testcontainers" Version="4.12.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.12.0" />
-    <PackageVersion Include="TUnit" Version="1.45.29" />
+    <PackageVersion Include="TUnit" Version="1.47.0" />
     <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
@@ -53,7 +53,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </GlobalPackageReference>
-    <GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.94">
+    <GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.98">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </GlobalPackageReference>

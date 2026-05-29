@@ -48,7 +48,7 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
         }
     }
 
-    internal async Task ProcessOneAsync(InboundProcessorMessage item, CancellationToken cancellationToken)
+    public async Task ProcessOneAsync(InboundProcessorMessage item, CancellationToken cancellationToken)
     {
         var startTime = Stopwatch.GetTimestamp();
 

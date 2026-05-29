@@ -1,5 +1,5 @@
-using Aspu.Api.Adapters.Mqtt;
 using Aspu.Api.Options;
+using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1050:Declare types in namespaces", Justification = "<Pending>")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S3903:Types should be defined in named namespaces", Justification = "<Pending>")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1110:Declare type inside namespace", Justification = "<Pending>")]
-public class ProcessOneAsyncBenchmarks
+public class MqttProcessBenchmarks
 {
     private static Context s_ctx = null!;
 
@@ -21,24 +21,25 @@ public class ProcessOneAsyncBenchmarks
     public static void Setup()
     {
         var mqttOptions = Options.Create(new MqttOptions());
-        var queue = new MqttInboundMessageQueue(mqttOptions);
+        var queue = new InboundProcessorChannel<MqttOptions>(mqttOptions);
 
         var services = new ServiceCollection();
         services.AddSingleton<IMqttHandler, BenchmarkMqttHandler>();
-        services.AddSingleton<MqttHandlerTopicRegistry>();
+        services.AddSingleton<InboundProcessorHandlerRegistry<IMqttHandler>>();
         var rootServices = services.BuildServiceProvider();
 
         s_ctx = new Context
         {
             RootServices = rootServices,
-            Service = new MqttInboundMessageHostedService(
-                queue,
-                rootServices.GetRequiredService<IServiceScopeFactory>(),
-                rootServices.GetRequiredService<MqttHandlerTopicRegistry>(),
+            Service = new InboundProcessorHostedService<MqttOptions, IMqttHandler>(
                 mqttOptions,
-                NullLogger<MqttInboundMessageHostedService>.Instance),
-            MatchedTopic = new MqttInboundMessage
+                rootServices.GetRequiredService<IServiceScopeFactory>(),
+                queue,
+                rootServices.GetRequiredService<InboundProcessorHandlerRegistry<IMqttHandler>>(),
+                NullLogger<InboundProcessorHostedService<MqttOptions, IMqttHandler>>.Instance),
+            MatchedTopic = new InboundProcessorMessage
             {
+                Type = "Mqtt",
                 Topic = TopicName,
                 Payload = new byte[128],
             },
@@ -52,10 +53,9 @@ public class ProcessOneAsyncBenchmarks
     private sealed class Context
     {
         public required ServiceProvider RootServices { get; init; }
+        public required InboundProcessorMessage MatchedTopic { get; init; }
+        public required InboundProcessorHostedService<MqttOptions, IMqttHandler> Service { get; init; }
 
-        public required MqttInboundMessageHostedService Service { get; init; }
-
-        public required MqttInboundMessage MatchedTopic { get; init; }
     }
 
     private sealed class BenchmarkMqttHandler : IMqttHandler

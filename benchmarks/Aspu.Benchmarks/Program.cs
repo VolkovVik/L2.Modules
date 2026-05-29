@@ -1,7 +1,9 @@
 using System.Reflection;
 using BenchmarkDotNet.Running;
 
-/// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *ProcessOneAsyncBenchmarks*
+/// <summary>
+/// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *MqttProcessBenchmarks*
+/// </summary>
 
 if (args.Length > 0)
 {
