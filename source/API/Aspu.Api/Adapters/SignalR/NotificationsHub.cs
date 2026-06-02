@@ -2,11 +2,6 @@
 
 namespace Aspu.Api.Adapters.SignalR;
 
-public interface INotificationsClient
-{
-    Task ReceiveNotification(SignalrMessage payload);
-}
-
 public sealed class NotificationsHub(ILogger<NotificationsHub> logger) :
     Hub<INotificationsClient>
 {

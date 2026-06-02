@@ -1,5 +1,6 @@
 ﻿using Aspu.Api.Adapters.SignalR;
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
+using Aspu.Common.Presentation.Abstractions.SignalR;
 
 namespace Aspu.Api.Adapters.Http;
 
@@ -13,8 +14,8 @@ internal sealed class SignalREndpoints : IHttpEndpoint
             INotificationPublisher publisher,
             CancellationToken cancellationToken) =>
         {
-            var payload = new Test1SignalrMessage("Test description", DateTime.UtcNow);
-            await publisher.PublishAsync(payload, cancellationToken);
+            var notification = new Test1Notification("Test description", DateTime.UtcNow);
+            await publisher.PublishAsync(notification, cancellationToken);
         })
             .WithName("GetSignalRTest")
             .WithSummary("Get signalr test")
@@ -24,11 +25,11 @@ internal sealed class SignalREndpoints : IHttpEndpoint
             .Produces(StatusCodes.Status404NotFound);
 
         routes.MapGet("/channel", static async (
-            SignalrMessageChannel channel,
+            ISignalrNotificationChannel channel,
             CancellationToken cancellationToken) =>
         {
-            var payload = new Test2SignalrMessage("Error description", 100, DateTime.UtcNow);
-            await channel.Writer.WriteAsync(payload, cancellationToken);
+            var notification = new Test2Notification("Error description", 100, DateTime.UtcNow);
+            await channel.WriteAsync(notification, cancellationToken);
         })
             .WithName("GetChannelTest")
             .WithSummary("Get channel test")

@@ -1,5 +1,6 @@
 using Aspu.Api.Adapters.SignalR;
 using Aspu.Api.Options;
+using Aspu.Common.Presentation.Abstractions.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Extensions.Subscriptions;
@@ -14,8 +15,17 @@ internal static class SignalRExtensions
         if (options?.Enabled is not true)
             return services;
 
-        services.AddSignalR();
-        services.AddSingleton<SignalrMessageChannel>();
+        services
+            .AddSignalR()
+            .AddJsonProtocol(jsonProtocolOptions =>
+            {
+                jsonProtocolOptions.PayloadSerializerOptions.TypeInfoResolverChain.Insert(
+                    0,
+                    SignalRJsonContext.Default);
+            });
+
+        services.AddSingleton<SignalrNotificationChannel>();
+        services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         services.AddHostedService<SignalrMessageWorker>();
         services.AddSingleton<INotificationPublisher, SignalRNotificationPublisher>();
 
