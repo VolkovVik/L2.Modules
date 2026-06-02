@@ -4,10 +4,11 @@ namespace Aspu.Api.Adapters.SignalR;
 
 public interface INotificationsClient
 {
-    Task ReceiveNotification(string method, object payload);
+    Task ReceiveNotification(SignalrMessage payload);
 }
 
-public sealed class NotificationsHub(ILogger<NotificationsHub> logger) : Hub<INotificationsClient>
+public sealed class NotificationsHub(ILogger<NotificationsHub> logger) :
+    Hub<INotificationsClient>
 {
     public override Task OnConnectedAsync()
     {

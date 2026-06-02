@@ -13,30 +13,28 @@ internal sealed class SignalREndpoints : IHttpEndpoint
             INotificationPublisher publisher,
             CancellationToken cancellationToken) =>
         {
-            var str = DateTime.UtcNow.ToString(System.Globalization.CultureInfo.CurrentCulture);
-            await publisher.PublishAsync("ReceiveNotification", str, cancellationToken);
-            return str;
+            var payload = new Test1SignalrMessage("Test description", DateTime.UtcNow);
+            await publisher.PublishAsync(payload, cancellationToken);
         })
             .WithName("GetSignalRTest")
             .WithSummary("Get signalr test")
             .WithDescription("Returns SignalR publish")
             .MapToApiVersion(1)
-            .Produces<string>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
         routes.MapGet("/channel", static async (
             SignalrMessageChannel channel,
             CancellationToken cancellationToken) =>
         {
-            var str = DateTime.UtcNow.ToString(System.Globalization.CultureInfo.CurrentCulture);
-            await channel.Writer.WriteAsync(new SignalrMessage("ReceiveNotification", str, DateTime.UtcNow), cancellationToken);
-            return str;
+            var payload = new Test2SignalrMessage("Error description", 100, DateTime.UtcNow);
+            await channel.Writer.WriteAsync(payload, cancellationToken);
         })
             .WithName("GetChannelTest")
             .WithSummary("Get channel test")
             .WithDescription("Returns channel publish")
             .MapToApiVersion(1)
-            .Produces<string>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
     }
 }

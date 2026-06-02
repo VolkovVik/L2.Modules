@@ -8,6 +8,6 @@ internal sealed class SignalrMessageWorker(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await foreach (var message in channel.Reader.ReadAllAsync(stoppingToken))
-            await notificationPublisher.PublishAsync(message.Method, message.Payload, stoppingToken);
+            await notificationPublisher.PublishAsync(message, stoppingToken);
     }
 }
