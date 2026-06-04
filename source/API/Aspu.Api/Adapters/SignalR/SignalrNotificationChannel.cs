@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 using Aspu.Api.Options;
-using Aspu.Common.Presentation.Abstractions.SignalR;
+using Aspu.Common.Application.Ports.SignalrPort;
 using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Adapters.SignalR;

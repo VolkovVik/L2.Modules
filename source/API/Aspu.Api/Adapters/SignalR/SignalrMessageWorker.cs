@@ -1,6 +1,4 @@
-﻿using Aspu.Common.Presentation.Abstractions.SignalR;
-
-namespace Aspu.Api.Adapters.SignalR;
+﻿namespace Aspu.Api.Adapters.SignalR;
 
 internal sealed class SignalrMessageWorker(
     SignalrNotificationChannel channel,

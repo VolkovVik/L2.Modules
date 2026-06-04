@@ -1,4 +1,4 @@
-namespace Aspu.Common.Presentation.Abstractions.SignalR;
+namespace Aspu.Common.Application.Ports.SignalrPort;
 
 public interface ISignalrNotificationChannel
 {

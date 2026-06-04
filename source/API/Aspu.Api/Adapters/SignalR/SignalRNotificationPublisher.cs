@@ -1,4 +1,4 @@
-﻿using Aspu.Common.Presentation.Abstractions.SignalR;
+﻿using Aspu.Common.Application.Ports.SignalrPort;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Aspu.Api.Adapters.SignalR;

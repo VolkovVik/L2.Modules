@@ -1,6 +1,6 @@
 ﻿using Aspu.Api.Adapters.SignalR;
+using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
-using Aspu.Common.Presentation.Abstractions.SignalR;
 
 namespace Aspu.Api.Adapters.Http;
 
