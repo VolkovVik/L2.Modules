@@ -1,5 +1,4 @@
-﻿using Aspu.Api.Adapters.SignalR;
-using Aspu.Common.Application.Ports.SignalrPort;
+﻿using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 
 namespace Aspu.Api.Adapters.Http;
@@ -11,7 +10,7 @@ internal sealed class SignalREndpoints : IHttpEndpoint
     public void MapEndpoint(IEndpointRouteBuilder routes)
     {
         routes.MapGet("/signalr", static async (
-            INotificationPublisher publisher,
+            ISignalrNotificationPublisher publisher,
             CancellationToken cancellationToken) =>
         {
             var notification = new Test1Notification("Test description", DateTime.UtcNow);

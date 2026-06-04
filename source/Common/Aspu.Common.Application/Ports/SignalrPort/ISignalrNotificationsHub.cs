@@ -1,8 +1,6 @@
-using Aspu.Common.Application.Ports.SignalrPort;
+namespace Aspu.Common.Application.Ports.SignalrPort;
 
-namespace Aspu.Api.Adapters.SignalR;
-
-public interface INotificationsClient
+public interface ISignalrNotificationsHub
 {
     Task Test1Notification(Test1Notification notification);
 

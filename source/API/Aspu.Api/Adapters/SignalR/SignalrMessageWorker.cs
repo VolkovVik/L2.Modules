@@ -1,8 +1,10 @@
-﻿namespace Aspu.Api.Adapters.SignalR;
+﻿using Aspu.Common.Application.Ports.SignalrPort;
+
+namespace Aspu.Api.Adapters.SignalR;
 
 internal sealed class SignalrMessageWorker(
     SignalrNotificationChannel channel,
-    INotificationPublisher notificationPublisher)
+    ISignalrNotificationPublisher notificationPublisher)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Aspu.Common.Application.Ports.SignalrPort;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Aspu.Api.Adapters.SignalR;
 
-public sealed class NotificationsHub(ILogger<NotificationsHub> logger) :
-    Hub<INotificationsClient>
+public sealed class SignalrNotificationsHub(
+    ILogger<SignalrNotificationsHub> logger) :
+    Hub<ISignalrNotificationsHub>
 {
     public override Task OnConnectedAsync()
     {

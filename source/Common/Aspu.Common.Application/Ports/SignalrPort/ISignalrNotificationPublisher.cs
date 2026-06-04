@@ -1,8 +1,6 @@
-using Aspu.Common.Application.Ports.SignalrPort;
+namespace Aspu.Common.Application.Ports.SignalrPort;
 
-namespace Aspu.Api.Adapters.SignalR;
-
-public interface INotificationPublisher
+public interface ISignalrNotificationPublisher
 {
     Task PublishAsync(Test1Notification notification, CancellationToken cancellationToken = default);
 

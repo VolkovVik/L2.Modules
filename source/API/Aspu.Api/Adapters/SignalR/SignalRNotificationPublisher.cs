@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.SignalR;
 namespace Aspu.Api.Adapters.SignalR;
 
 public sealed class SignalRNotificationPublisher(
-    IHubContext<NotificationsHub, INotificationsClient> hubContext)
-    : INotificationPublisher
+    IHubContext<SignalrNotificationsHub, ISignalrNotificationsHub> hubContext)
+    : ISignalrNotificationPublisher
 {
     public Task PublishAsync(Test1Notification notification, CancellationToken cancellationToken = default) =>
         hubContext.Clients.All.Test1Notification(notification);

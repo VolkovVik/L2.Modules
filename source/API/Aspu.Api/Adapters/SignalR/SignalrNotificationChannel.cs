@@ -9,7 +9,8 @@ internal sealed class SignalrNotificationChannel : ISignalrNotificationChannel
 {
     private readonly Channel<ISignalrNotification> _queue;
 
-    public SignalrNotificationChannel(IOptions<SignalROptions> signalrOptions)
+    public SignalrNotificationChannel(
+        IOptions<SignalROptions> signalrOptions)
     {
         var options = signalrOptions.Value;
         var capacity = Math.Max(1, options.ChannelCapacity);

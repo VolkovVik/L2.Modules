@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Extensions.Subscriptions;
 
-internal static class SignalRExtensions
+internal static class SignalrExtensions
 {
     internal static IServiceCollection AddSignalRSubscriber(
         this IServiceCollection services,
@@ -20,13 +20,13 @@ internal static class SignalRExtensions
             .AddJsonProtocol(options =>
             {
                 options.PayloadSerializerOptions.TypeInfoResolverChain
-                    .Insert(0, SignalRJsonContext.Default);
+                    .Insert(0, SignalrJsonContext.Default);
             });
 
         services.AddSingleton<SignalrNotificationChannel>();
         services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         services.AddHostedService<SignalrMessageWorker>();
-        services.AddSingleton<INotificationPublisher, SignalRNotificationPublisher>();
+        services.AddSingleton<ISignalrNotificationPublisher, SignalRNotificationPublisher>();
 
         return services;
     }
@@ -37,7 +37,7 @@ internal static class SignalRExtensions
         if (options?.Enabled is not true)
             return app;
 
-        app.MapHub<NotificationsHub>(options.HubPath);
+        app.MapHub<SignalrNotificationsHub>(options.HubPath);
         return app;
     }
 }
