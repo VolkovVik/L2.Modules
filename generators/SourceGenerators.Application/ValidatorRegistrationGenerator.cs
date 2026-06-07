@@ -1,13 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace SourceGenerators.Application;
 
 [Generator]
-public sealed class ValidatorRegistrationGenerator : IIncrementalGenerator
+public sealed class ValidatorRegistrationGenerator : BaseRegistrationGenerator, IIncrementalGenerator
 {
     private const string InterfaceName = "IValidator";
     private const string BaseClassName = "FluentValidation.AbstractValidator`1";
@@ -22,7 +21,7 @@ public sealed class ValidatorRegistrationGenerator : IIncrementalGenerator
         var classDeclarations = context.SyntaxProvider
          .CreateSyntaxProvider(
              predicate: static (s, _) => IsCandidate(s), // quick filter
-             transform: static (ctx, _) => GetSemanticTarget(ctx)) // get symbol
+             transform: static (ctx, ct) => GetSemanticTarget(ctx, InterfaceName, ct)) // get symbol
          .Where(static m => m is not null)!;
 
         var collectedClasses = classDeclarations.Collect();
@@ -30,29 +29,6 @@ public sealed class ValidatorRegistrationGenerator : IIncrementalGenerator
         var combined = compilationProvider.Combine(collectedClasses);
 
         context.RegisterSourceOutput(combined, static (spc, classSymbols) => Generate(spc, classSymbols!));
-    }
-
-    private static bool IsCandidate(SyntaxNode node) =>
-        node is ClassDeclarationSyntax cds && cds.BaseList is not null;
-
-    private static INamedTypeSymbol? GetSemanticTarget(GeneratorSyntaxContext context)
-    {
-        var classDecl = (ClassDeclarationSyntax)context.Node;
-        if (context.SemanticModel.GetDeclaredSymbol(classDecl) is not INamedTypeSymbol symbol)
-            return null;
-
-        if (symbol.TypeKind is not TypeKind.Class)
-            return null;
-
-        if (symbol.DeclaredAccessibility is not Accessibility.Internal)
-            return null;
-
-        if (!symbol.IsSealed)
-            return null;
-
-        return symbol.AllInterfaces.Any(a =>
-            string.Equals(a.Name, InterfaceName, StringComparison.Ordinal))
-                ? symbol : null;
     }
 
     private static void Generate(SourceProductionContext context, (Compilation compilation, ImmutableArray<INamedTypeSymbol?> classes) data)

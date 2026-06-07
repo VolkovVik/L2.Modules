@@ -1,6 +1,7 @@
 using Aspu.Api.Adapters.SignalR;
 using Aspu.Api.Options;
 using Aspu.Common.Application.Ports.SignalrPort;
+using Aspu.Common.SourceGenerators.Application;
 using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Extensions.Subscriptions;

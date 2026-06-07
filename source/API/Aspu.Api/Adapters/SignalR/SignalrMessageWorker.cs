@@ -1,4 +1,4 @@
-﻿using Aspu.Common.Application.Ports.SignalrPort;
+﻿using Aspu.Common.SourceGenerators.Application;
 
 namespace Aspu.Api.Adapters.SignalR;
 
