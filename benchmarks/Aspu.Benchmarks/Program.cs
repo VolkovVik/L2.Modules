@@ -3,6 +3,7 @@ using BenchmarkDotNet.Running;
 
 /// <summary>
 /// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *MqttProcessBenchmarks*
+/// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *SignalrNotificationBenchmarks*
 /// </summary>
 
 if (args.Length > 0)
