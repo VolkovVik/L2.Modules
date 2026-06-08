@@ -13,4 +13,8 @@
     <EnableApplicationGenerator>true</EnableApplicationGenerator>
   </PropertyGroup>
 
+  <Target Name="GenerateSignalrJsonContext" BeforeTargets="BeforeCompile">
+    <Exec Command="pwsh -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\..\build\Generate-SignalrJsonContext.ps1&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
+  </Target>
+
 </Project>

@@ -3,6 +3,7 @@ using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
 using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -48,7 +49,11 @@ public class SignalrNotificationBenchmarks
         builder.Services.AddSingleton<SignalrNotificationChannel>();
         builder.Services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         builder.Services.AddHostedService<SignalrMessageWorker>();
-        builder.Services.AddSingleton<ISignalrNotificationPublisher, SignalRNotificationPublisher>();
+        builder.Services.AddSingleton<ISignalrNotificationPublisher>(sp =>
+        {
+            var hubContext = sp.GetRequiredService<IHubContext<SignalrNotificationsHub, ISignalrNotificationsHub>>();
+            return SignalrNotificationPublisherRegistration.Create(() => hubContext.Clients.All);
+        });
 
         var app = builder.Build();
         app.MapHub<SignalrNotificationsHub>(HubPath);

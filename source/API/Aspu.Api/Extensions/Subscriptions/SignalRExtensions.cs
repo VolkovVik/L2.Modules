@@ -2,6 +2,7 @@ using Aspu.Api.Adapters.SignalR;
 using Aspu.Api.Options;
 using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Extensions.Subscriptions;
@@ -27,7 +28,11 @@ internal static class SignalrExtensions
         services.AddSingleton<SignalrNotificationChannel>();
         services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         services.AddHostedService<SignalrMessageWorker>();
-        services.AddSingleton<ISignalrNotificationPublisher, SignalRNotificationPublisher>();
+        services.AddSingleton<ISignalrNotificationPublisher>(sp =>
+        {
+            var hubContext = sp.GetRequiredService<IHubContext<SignalrNotificationsHub, ISignalrNotificationsHub>>();
+            return SignalrNotificationPublisherRegistration.Create(() => hubContext.Clients.All);
+        });
 
         return services;
     }
