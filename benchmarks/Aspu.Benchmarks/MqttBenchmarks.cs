@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1050:Declare types in namespaces", Justification = "<Pending>")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S3903:Types should be defined in named namespaces", Justification = "<Pending>")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1110:Declare type inside namespace", Justification = "<Pending>")]
-public class MqttProcessBenchmarks
+public class MqttBenchmarks
 {
     private static Context s_ctx = null!;
 

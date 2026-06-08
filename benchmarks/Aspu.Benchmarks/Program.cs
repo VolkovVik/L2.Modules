@@ -2,8 +2,8 @@ using System.Reflection;
 using BenchmarkDotNet.Running;
 
 /// <summary>
-/// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *MqttProcessBenchmarks*
-/// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *SignalrNotificationBenchmarks*
+/// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *MqttBenchmarks*
+/// dotnet run -c Release --project benchmarks/Aspu.Benchmarks/Aspu.Benchmarks.csproj -- --filter *SignalrBenchmarks*
 /// </summary>
 
 if (args.Length > 0)
