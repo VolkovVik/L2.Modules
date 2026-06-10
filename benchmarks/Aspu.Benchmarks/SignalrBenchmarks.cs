@@ -1,4 +1,4 @@
-using Aspu.Api.Adapters.SignalR;
+using Aspu.Api.Ports.SignalR;
 using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
 using BenchmarkDotNet.Attributes;

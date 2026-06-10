@@ -2,7 +2,7 @@
 using Aspu.Common.SourceGenerators.Application;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Aspu.Api.Adapters.SignalR;
+namespace Aspu.Api.Ports.SignalR;
 
 public sealed class SignalrNotificationsHub(
     ILogger<SignalrNotificationsHub> logger) :

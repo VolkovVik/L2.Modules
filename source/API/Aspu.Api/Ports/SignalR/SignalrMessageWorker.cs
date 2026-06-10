@@ -1,6 +1,6 @@
 ﻿using Aspu.Common.SourceGenerators.Application;
 
-namespace Aspu.Api.Adapters.SignalR;
+namespace Aspu.Api.Ports.SignalR;
 
 internal sealed class SignalrMessageWorker(
     SignalrNotificationChannel channel,
