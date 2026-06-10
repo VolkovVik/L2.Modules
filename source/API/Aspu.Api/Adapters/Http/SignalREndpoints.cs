@@ -4,7 +4,7 @@ using Aspu.Common.SourceGenerators.Application;
 
 namespace Aspu.Api.Adapters.Http;
 
-internal sealed class SignalREndpoints : IHttpEndpoint
+internal sealed class SignalrEndpoints : IHttpEndpoint
 {
     public string Tags => "SignalR";
 
@@ -14,7 +14,7 @@ internal sealed class SignalREndpoints : IHttpEndpoint
             ISignalrNotificationPublisher publisher,
             CancellationToken cancellationToken) =>
         {
-            var notification = new Test1Notification("Test description", DateTime.UtcNow);
+            var notification = new Test1Notification("Test description");
             await publisher.PublishAsync(notification, cancellationToken);
         })
             .WithName("GetSignalRTest")
@@ -28,7 +28,7 @@ internal sealed class SignalREndpoints : IHttpEndpoint
             ISignalrNotificationChannel channel,
             CancellationToken cancellationToken) =>
         {
-            var notification = new Test2Notification("Error description", 100, DateTime.UtcNow);
+            var notification = new Test2Notification("Error description", 100);
             await channel.WriteAsync(notification, cancellationToken);
         })
             .WithName("GetChannelTest")

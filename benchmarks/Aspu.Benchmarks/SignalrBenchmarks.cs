@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,10 +25,12 @@ public class SignalrBenchmarks
     private static Context s_ctx = null!;
 
     public static readonly Test1Notification Notification =
-        new("Test description", new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        new("Test description");
 
     [GlobalSetup]
+#pragma warning disable MA0051 // Method is too long
     public static async Task SetupAsync()
+#pragma warning restore MA0051 // Method is too long
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
@@ -48,7 +51,14 @@ public class SignalrBenchmarks
         builder.Services.AddSingleton<SignalrNotificationChannel>();
         builder.Services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         builder.Services.AddHostedService<SignalrMessageWorker>();
-        builder.Services.AddSingleton<ISignalrNotificationPublisher, SignalRNotificationPublisher>();
+        builder.Services.AddSingleton<ISignalrNotificationPublisher>(sp =>
+        {
+            var hubContext = sp.GetRequiredService<IHubContext<SignalrNotificationsHub, ISignalrNotificationsHub>>();
+            return SignalrNotificationPublisherRegistration.Create(
+                static (host) => SignalrNotificationsHub.GetConnectionId(host),
+                () => hubContext.Clients.All,
+                (connectionId) => hubContext.Clients.Client(connectionId!));
+        });
 
         var app = builder.Build();
         app.MapHub<SignalrNotificationsHub>(HubPath);

@@ -1,7 +1,9 @@
+using System.Text.Json.Serialization;
 using Aspu.Api.Adapters.SignalR;
 using Aspu.Api.Options;
 using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Extensions.Subscriptions;
@@ -20,14 +22,21 @@ internal static class SignalrExtensions
             .AddSignalR()
             .AddJsonProtocol(options =>
             {
-                options.PayloadSerializerOptions.TypeInfoResolverChain
-                    .Insert(0, SignalrJsonContext.Default);
+                options.PayloadSerializerOptions.TypeInfoResolverChain.Insert(0, SignalrJsonContext.Default);
+                options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 
         services.AddSingleton<SignalrNotificationChannel>();
         services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         services.AddHostedService<SignalrMessageWorker>();
-        services.AddSingleton<ISignalrNotificationPublisher, SignalRNotificationPublisher>();
+        services.AddSingleton<ISignalrNotificationPublisher>(sp =>
+        {
+            var hubContext = sp.GetRequiredService<IHubContext<SignalrNotificationsHub, ISignalrNotificationsHub>>();
+            return SignalrNotificationPublisherRegistration.Create(
+                static (host) => SignalrNotificationsHub.GetConnectionId(host),
+                () => hubContext.Clients.All,
+                (connectionId) => hubContext.Clients.Client(connectionId!));
+        });
 
         return services;
     }
