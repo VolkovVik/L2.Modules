@@ -33,4 +33,6 @@ internal sealed class SignalrNotificationChannel : ISignalrNotificationChannel
     public ValueTask WriteAsync(ISignalrNotification notification, CancellationToken cancellationToken = default) =>
         _queue.Writer.WriteAsync(notification, cancellationToken);
 
+    public bool CompleteWriter(Exception? error = null) =>
+        _queue.Writer.TryComplete(error);
 }

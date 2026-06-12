@@ -10,7 +10,7 @@ public sealed class SignalrNotificationsHub(
 {
     private static readonly ConcurrentDictionary<string, string> _connectionMap = new(StringComparer.Ordinal);
 
-    public override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
         var clientIp = GetClientIp();
         if (logger.IsEnabled(LogLevel.Debug))
@@ -18,13 +18,17 @@ public sealed class SignalrNotificationsHub(
             logger.LogDebug("SignalR client connected: {ConnectionId} {ClientIp}", Context.ConnectionId, clientIp);
         }
 
+        var audience = GetAudience();
+        if (!string.IsNullOrWhiteSpace(audience))
+            await Groups.AddToGroupAsync(Context.ConnectionId, audience, Context.ConnectionAborted);
+
         if (!string.IsNullOrWhiteSpace(clientIp))
             _connectionMap.AddOrUpdate(clientIp, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
 
-        return base.OnConnectedAsync();
+        await base.OnConnectedAsync();
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var clientIp = GetClientIp();
         if (exception is null)
@@ -37,14 +41,21 @@ public sealed class SignalrNotificationsHub(
             logger.LogWarning(exception, "SignalR client disconnected with error: {ConnectionId} {ClientIp}", Context.ConnectionId, clientIp);
         }
 
+        var audience = GetAudience();
+        if (!string.IsNullOrWhiteSpace(audience))
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, audience, Context.ConnectionAborted);
+
         if (!string.IsNullOrWhiteSpace(clientIp))
             _connectionMap.TryRemove(clientIp, out _);
 
-        return base.OnDisconnectedAsync(exception);
+        await base.OnDisconnectedAsync(exception);
     }
 
     private string? GetClientIp() =>
         Context.GetHttpContext()?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+
+    private string? GetAudience() =>
+        Context.GetHttpContext()?.Request.Query["audience"].FirstOrDefault() ?? string.Empty;
 
     public static string GetConnectionId(string? clientIp) =>
         !string.IsNullOrWhiteSpace(clientIp) &&

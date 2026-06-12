@@ -69,7 +69,7 @@ public sealed class SignalrNotificationRegistrationGenerator : BaseRegistrationG
         sb.AppendLine("public interface ISignalrNotificationsHub");
         sb.AppendLine("{");
         foreach (var item in items)
-            sb.Append("    Task ").Append(item!.Key).Append('(').Append(item.Value).AppendLine(" notification);").AppendLine();
+            sb.Append("    Task ").Append(item!.Key).Append('(').Append(item.Value).AppendLine(" notification, CancellationToken cancellationToken = default);").AppendLine();
         sb.AppendLine("}");
         sb.AppendLine();
 
@@ -87,14 +87,16 @@ public sealed class SignalrNotificationRegistrationGenerator : BaseRegistrationG
         sb.AppendLine("    public static ISignalrNotificationPublisher Create(");
         sb.AppendLine("        Func<string?, string?> getHost,");
         sb.AppendLine("        Func<ISignalrNotificationsHub> getClients,");
-        sb.AppendLine("        Func<string?, ISignalrNotificationsHub> getClient) =>");
-        sb.AppendLine("        new SignalrNotificationPublisherImpl(getHost, getClients, getClient);");
+        sb.AppendLine("        Func<string?, ISignalrNotificationsHub> getClient,");
+        sb.AppendLine("        Func<string?, ISignalrNotificationsHub> getAudience) =>");
+        sb.AppendLine("        new SignalrNotificationPublisherImpl(getHost, getClients, getClient, getAudience);");
         sb.AppendLine("}");
         sb.AppendLine();
         sb.AppendLine("internal sealed class SignalrNotificationPublisherImpl(");
         sb.AppendLine("    Func<string?, string?> getHost,");
         sb.AppendLine("    Func<ISignalrNotificationsHub> getClients,");
-        sb.AppendLine("    Func<string?, ISignalrNotificationsHub> getClient)");
+        sb.AppendLine("    Func<string?, ISignalrNotificationsHub> getClient,");
+        sb.AppendLine("    Func<string?, ISignalrNotificationsHub> getAudience)");
         sb.AppendLine("    : ISignalrNotificationPublisher");
         sb.AppendLine("{");
 
@@ -102,10 +104,13 @@ public sealed class SignalrNotificationRegistrationGenerator : BaseRegistrationG
         {
             sb.Append("    public Task PublishAsync(").Append(item!.Value).AppendLine(" notification, CancellationToken cancellationToken = default)");
             sb.AppendLine("    {");
+            sb.AppendLine("        if (!string.IsNullOrWhiteSpace(notification.Audience))");
+            sb.Append("            return getAudience(notification.Audience).").Append(item.Key).AppendLine("(notification, cancellationToken);");
+            sb.AppendLine();
             sb.AppendLine("        var connectionId = getHost(notification.Host);");
             sb.AppendLine("        return string.IsNullOrWhiteSpace(connectionId)");
-            sb.Append("            ? getClients().").Append(item.Key).AppendLine("(notification)");
-            sb.Append("            : getClient(connectionId).").Append(item.Key).AppendLine("(notification);");
+            sb.Append("            ? getClients().").Append(item.Key).AppendLine("(notification, cancellationToken)");
+            sb.Append("            : getClient(connectionId).").Append(item.Key).AppendLine("(notification, cancellationToken);");
             sb.AppendLine("    }");
             sb.AppendLine();
         }

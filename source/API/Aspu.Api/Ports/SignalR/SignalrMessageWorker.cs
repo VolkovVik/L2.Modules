@@ -9,9 +9,30 @@ internal sealed class SignalrMessageWorker(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (var notification in channel.Reader.ReadAllAsync(stoppingToken))
+        try
         {
-            await notificationPublisher.PublishAsync(notification, stoppingToken);
+            await foreach (var notification in channel.Reader.ReadAllAsync(stoppingToken))
+            {
+                await notificationPublisher.PublishAsync(notification, stoppingToken);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            await DrainRemainingAsync(CancellationToken.None);
+        }
+    }
+
+    public override Task StopAsync(CancellationToken cancellationToken)
+    {
+        channel.CompleteWriter();
+        return base.StopAsync(cancellationToken);
+    }
+
+    private async Task DrainRemainingAsync(CancellationToken cancellationToken)
+    {
+        await foreach (var notification in channel.Reader.ReadAllAsync(cancellationToken))
+        {
+            await notificationPublisher.PublishAsync(notification, cancellationToken);
         }
     }
 }

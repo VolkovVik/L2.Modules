@@ -57,7 +57,8 @@ public class SignalrBenchmarks
             return SignalrNotificationPublisherRegistration.Create(
                 static (host) => SignalrNotificationsHub.GetConnectionId(host),
                 () => hubContext.Clients.All,
-                (connectionId) => hubContext.Clients.Client(connectionId!));
+                (connectionId) => hubContext.Clients.Client(connectionId!),
+                (audience) => hubContext.Clients.Group(audience!));
         });
 
         var app = builder.Build();
