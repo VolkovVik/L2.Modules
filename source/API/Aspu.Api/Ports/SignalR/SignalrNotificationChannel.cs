@@ -3,7 +3,7 @@ using Aspu.Api.Options;
 using Aspu.Common.Application.Ports.SignalrPort;
 using Microsoft.Extensions.Options;
 
-namespace Aspu.Api.Ports.SignalR;
+namespace Aspu.Api.Ports.Signalr;
 
 internal sealed class SignalrNotificationChannel : ISignalrNotificationChannel
 {
