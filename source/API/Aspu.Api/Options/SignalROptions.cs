@@ -1,6 +1,8 @@
+using System.Threading.Channels;
+
 namespace Aspu.Api.Options;
 
-public sealed class SignalROptions
+public sealed class SignalrOptions
 {
     public const string SectionName = "SignalR";
 
@@ -17,4 +19,8 @@ public sealed class SignalROptions
     public bool SingleReader { get; init; } = true;
 
     public bool SingleWriter { get; init; }
+
+    public bool AllowSynchronousContinuations { get; init; }
+
+    public BoundedChannelFullMode FullMode { get; init; } = BoundedChannelFullMode.DropWrite;
 }

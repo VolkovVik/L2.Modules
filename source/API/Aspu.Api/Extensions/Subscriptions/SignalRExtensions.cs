@@ -14,7 +14,7 @@ internal static class SignalrExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var options = configuration.GetSection(SignalROptions.SectionName).Get<SignalROptions>();
+        var options = configuration.GetSection(SignalrOptions.SectionName).Get<SignalrOptions>();
         if (options?.Enabled is not true)
             return services;
 
@@ -43,7 +43,7 @@ internal static class SignalrExtensions
 
     internal static WebApplication MapSignalRHub(this WebApplication app)
     {
-        var options = app.Services.GetRequiredService<IOptions<SignalROptions>>().Value;
+        var options = app.Services.GetRequiredService<IOptions<SignalrOptions>>().Value;
         if (options?.Enabled is not true)
             return app;
 

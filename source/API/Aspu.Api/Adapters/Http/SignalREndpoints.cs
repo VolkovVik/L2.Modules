@@ -29,7 +29,7 @@ internal sealed class SignalrEndpoints : IHttpEndpoint
             CancellationToken cancellationToken) =>
         {
             var notification = new Test2Notification("Error description", 100);
-            await channel.WriteAsync(notification, cancellationToken);
+            channel.TryWrite(notification);
         })
             .WithName("GetChannelTest")
             .WithSummary("Get channel test")

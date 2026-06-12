@@ -10,7 +10,7 @@ internal sealed class SignalrNotificationChannel : ISignalrNotificationChannel
     private readonly Channel<ISignalrNotification> _queue;
 
     public SignalrNotificationChannel(
-        IOptions<SignalROptions> signalrOptions)
+        IOptions<SignalrOptions> signalrOptions)
     {
         var options = signalrOptions.Value;
         var capacity = Math.Max(1, options.ChannelCapacity);
@@ -18,14 +18,19 @@ internal sealed class SignalrNotificationChannel : ISignalrNotificationChannel
         _queue = Channel.CreateBounded<ISignalrNotification>(
             new BoundedChannelOptions(capacity)
             {
+                FullMode = options.FullMode,
                 SingleReader = options.SingleReader,
                 SingleWriter = options.SingleWriter,
-                FullMode = BoundedChannelFullMode.Wait,
+                AllowSynchronousContinuations = options.AllowSynchronousContinuations,
             });
     }
 
     public ChannelReader<ISignalrNotification> Reader => _queue.Reader;
 
+    public bool TryWrite(ISignalrNotification notification) =>
+        _queue.Writer.TryWrite(notification);
+
     public ValueTask WriteAsync(ISignalrNotification notification, CancellationToken cancellationToken = default) =>
         _queue.Writer.WriteAsync(notification, cancellationToken);
+
 }
