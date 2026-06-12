@@ -10,6 +10,7 @@ services:
       - 5001:8081
     depends_on:
       - mosquitto
+      - nats
 
   aspu.gateway:
     image: ${DOCKER_REGISTRY-}aspugateway
@@ -20,6 +21,8 @@ services:
     ports:
       - 3000:8080
       - 3001:8081
+    depends_on:
+      - aspu.api
 
   mosquitto:
     image: eclipse-mosquitto
@@ -30,3 +33,10 @@ services:
       - ./mosquitto/config:/mosquitto/config:ro
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+
+  nats:
+    image: nats:latest
+    container_name: nats
+    ports:
+      - 4222:4222
+      - 8222:8222

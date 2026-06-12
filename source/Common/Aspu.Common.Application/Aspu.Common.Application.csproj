@@ -9,4 +9,8 @@
     <ProjectReference Include="..\Aspu.Common.Domain\Aspu.Common.Domain.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <EnableApplicationGenerator>true</EnableApplicationGenerator>
+  </PropertyGroup>
+
 </Project>

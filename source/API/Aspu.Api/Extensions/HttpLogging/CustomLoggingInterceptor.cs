@@ -32,8 +32,10 @@ public sealed class CustomLoggingInterceptor : IHttpLoggingInterceptor
 
     public ValueTask OnResponseAsync(HttpLoggingInterceptorContext logContext)
     {
-        logContext.HttpContext.Response.Headers.Remove("Set-Cookie");
+        /// logContext.HttpContext.Response.Headers.Remove("Set-Cookie");
 
+#pragma warning disable IDE0022 // Use expression body for method
         return ValueTask.CompletedTask;
+#pragma warning restore IDE0022 // Use expression body for method
     }
 }

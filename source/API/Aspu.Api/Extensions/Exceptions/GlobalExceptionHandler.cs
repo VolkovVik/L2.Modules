@@ -2,7 +2,7 @@
 
 internal sealed class GlobalExceptionHandler(
     IProblemDetailsService problemDetailsService,
-    ILogger<Exception> logger) :
+    ILogger<GlobalExceptionHandler> logger) :
     GenericExceptionHandler<Exception>(problemDetailsService, logger)
 {
     protected override string? ProblemDetailTitle { get; set; } = "Internal server error";

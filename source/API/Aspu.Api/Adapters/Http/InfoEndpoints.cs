@@ -17,21 +17,21 @@ internal sealed class InfoEndpoints : IHttpEndpoint
                 ? TypedResults.NotFound()
                 : TypedResults.Ok(version);
         })
-        .WithName("GetVersion1")
-        .WithSummary("Get version")
-        .WithDescription("Returns API version")
-        .MapToApiVersion(1);
+            .WithName("GetVersion1")
+            .WithSummary("Get version")
+            .WithDescription("Returns API version")
+            .MapToApiVersion(1);
 
         routes.MapGet("/version", () =>
         {
             var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
             return $"API version: {version}";
         })
-        .WithName("GetVersion2")
-        .WithSummary("Get version")
-        .WithDescription("Returns API version")
-        .MapToApiVersion(2)
-        .Produces<string>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound);
+            .WithName("GetVersion2")
+            .WithSummary("Get version")
+            .WithDescription("Returns API version")
+            .MapToApiVersion(2)
+            .Produces<string>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
     }
 }

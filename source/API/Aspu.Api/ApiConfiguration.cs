@@ -1,5 +1,4 @@
-﻿using Aspu.Api.Adapters.Mqtt;
-using Aspu.Api.Options;
+﻿using Aspu.Api.Extensions.Subscriptions;
 using Aspu.Api.SourceGenerators.Application;
 using Aspu.Api.SourceGenerators.Presentation;
 
@@ -12,23 +11,9 @@ public static class ApiConfiguration
         IConfiguration configuration)
     {
         services.AddValidators();
-
-        var mqttOptions = configuration.GetSection(MqttOptions.SectionName).Get<MqttOptions>();
-        if (mqttOptions?.Enabled == true)
-            services.AddMqttSubscriber();
-
-        return services;
-    }
-
-    private static IServiceCollection AddMqttSubscriber(
-        this IServiceCollection services)
-    {
-        services.AddSingleton<MqttHandlerTopicRegistry>();
-        services.AddSingleton<MqttInboundMessageQueue>();
-        services.AddSingleton<MqttSubscriberClient>();
-        // Processor stops after subscriber (reverse registration): subscriber completes the channel writer on exit.
-        services.AddHostedService<MqttInboundMessageHostedService>();
-        services.AddHostedService<MqttSubscriberHostedService>();
+        services.AddMqttSubscriber(configuration);
+        services.AddNatsSubscriber(configuration);
+        services.AddSignalRSubscriber(configuration);
 
         return services;
     }

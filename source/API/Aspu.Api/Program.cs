@@ -1,5 +1,6 @@
 using System.Reflection;
 using Aspu.Api.Extensions;
+using Aspu.Api.Extensions.Subscriptions;
 using Aspu.Api.Extensions.Exceptions;
 using Aspu.Api.Extensions.HttpLogging;
 using Serilog;
@@ -23,7 +24,7 @@ try
     builder.Services.AddExceptionHandlers();
 
     builder.Services.AddEndpointExtension()
-        .AddOpenApiExtension();
+       .AddOpenApiExtension();
 
     builder.Services.AddObjectPoolExtension();
 
@@ -51,6 +52,8 @@ try
 
     app.UseEndpointExtension();
 
+    app.MapSignalRHub();
+
     var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
     Log.Information("Running ASPU API application: {@Version}", version);
 
@@ -66,8 +69,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-#pragma warning disable S1118
-#pragma warning disable ASP0027 // Unnecessary public Program class declaration
+#pragma warning disable S1118, ASP0027 // Unnecessary public Program class declaration
 public partial class Program;
-#pragma warning restore ASP0027 // Unnecessary public Program class declaration
-#pragma warning restore S1118
+#pragma warning restore S1118, ASP0027 // Unnecessary public Program class declaration

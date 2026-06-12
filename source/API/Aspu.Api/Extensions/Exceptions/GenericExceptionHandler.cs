@@ -6,7 +6,7 @@ namespace Aspu.Api.Extensions.Exceptions;
 #pragma warning disable CA1852
 internal abstract class GenericExceptionHandler<TException>(
     IProblemDetailsService problemDetailsService,
-    ILogger<TException> logger) :
+    ILogger logger) :
     IExceptionHandler where TException : Exception
 #pragma warning restore CA1852
 {
