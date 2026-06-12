@@ -4,11 +4,14 @@ namespace Aspu.Api.Ports.Signalr;
 
 internal sealed class SignalrMessageWorker(
     SignalrNotificationChannel channel,
-    ISignalrNotificationPublisher notificationPublisher)
+    ISignalrNotificationPublisher notificationPublisher,
+    SignalrMessageWorkerState workerState)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        workerState.ClearFault();
+
         try
         {
             await foreach (var notification in channel.Reader.ReadAllAsync(stoppingToken))
@@ -19,6 +22,11 @@ internal sealed class SignalrMessageWorker(
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {
             await DrainRemainingAsync(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            workerState.SetFault(ex);
+            throw;
         }
     }
 

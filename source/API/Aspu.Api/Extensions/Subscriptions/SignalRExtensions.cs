@@ -3,7 +3,9 @@ using Aspu.Api.Options;
 using Aspu.Api.Ports.Signalr;
 using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
 namespace Aspu.Api.Extensions.Subscriptions;
@@ -27,9 +29,16 @@ internal static class SignalrExtensions
                 options.PayloadSerializerOptions = new JsonSerializerOptions(SignalrJsonContext.Default.Options);
             });
 
+        services.AddSingleton<SignalrMetrics>();
+        services.AddSingleton<SignalrMessageWorkerState>();
         services.AddSingleton<SignalrNotificationChannel>();
         services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         services.AddHostedService<SignalrMessageWorker>();
+        services.AddHealthChecks()
+            .AddCheck<SignalrMessageWorkerHealthCheck>(
+                SignalrMessageWorkerHealthCheck.Name,
+                HealthStatus.Unhealthy,
+                ["signalr"]);
         services.AddSingleton<ISignalrNotificationPublisher>(sp =>
         {
             var hubContext = sp.GetRequiredService<IHubContext<SignalrNotificationsHub, ISignalrNotificationsHub>>();
@@ -50,6 +59,13 @@ internal static class SignalrExtensions
             return app;
 
         app.MapHub<SignalrNotificationsHub>(options.HubPath);
+        app.MapHealthChecks(
+            $"{options.HubPath}/health",
+            new HealthCheckOptions
+            {
+                Predicate = static registration =>
+                    string.Equals(registration.Name, SignalrMessageWorkerHealthCheck.Name, StringComparison.Ordinal),
+            });
         return app;
     }
 }

@@ -46,6 +46,8 @@ public class SignalrBenchmarks
             .AddJsonProtocol(options =>
                 options.PayloadSerializerOptions = new JsonSerializerOptions(SignalrJsonContext.Default.Options));
 
+        builder.Services.AddSingleton<SignalrMetrics>();
+        builder.Services.AddSingleton<SignalrMessageWorkerState>();
         builder.Services.AddSingleton<SignalrNotificationChannel>();
         builder.Services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());
         builder.Services.AddHostedService<SignalrMessageWorker>();

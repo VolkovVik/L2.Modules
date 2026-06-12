@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.SignalR;
 namespace Aspu.Api.Ports.Signalr;
 
 public sealed class SignalrNotificationsHub(
-    ILogger<SignalrNotificationsHub> logger) :
+    ILogger<SignalrNotificationsHub> logger,
+    SignalrMetrics metrics) :
     Hub<ISignalrNotificationsHub>
 {
     private static readonly ConcurrentDictionary<string, string> _connectionMap = new(StringComparer.Ordinal);
@@ -24,6 +25,8 @@ public sealed class SignalrNotificationsHub(
 
         if (!string.IsNullOrWhiteSpace(clientIp))
             _connectionMap.AddOrUpdate(clientIp, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
+
+        metrics.ClientConnected();
 
         await base.OnConnectedAsync();
     }
@@ -47,6 +50,8 @@ public sealed class SignalrNotificationsHub(
 
         if (!string.IsNullOrWhiteSpace(clientIp))
             _connectionMap.TryRemove(clientIp, out _);
+
+        metrics.ClientDisconnected();
 
         await base.OnDisconnectedAsync(exception);
     }
