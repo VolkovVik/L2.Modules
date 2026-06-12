@@ -3,6 +3,7 @@ using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
 using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Builder;
+using System.Text.Json;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR;
@@ -43,10 +44,7 @@ public class SignalrBenchmarks
         builder.Services
             .AddSignalR()
             .AddJsonProtocol(options =>
-            {
-                options.PayloadSerializerOptions.TypeInfoResolverChain
-                    .Insert(0, SignalrJsonContext.Default);
-            });
+                options.PayloadSerializerOptions = new JsonSerializerOptions(SignalrJsonContext.Default.Options));
 
         builder.Services.AddSingleton<SignalrNotificationChannel>();
         builder.Services.AddSingleton<ISignalrNotificationChannel>(sp => sp.GetRequiredService<SignalrNotificationChannel>());

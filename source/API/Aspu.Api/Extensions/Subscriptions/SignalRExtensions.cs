@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using System.Text.Json;
 using Aspu.Api.Options;
 using Aspu.Api.Ports.Signalr;
 using Aspu.Common.Application.Ports.SignalrPort;
@@ -22,8 +22,9 @@ internal static class SignalrExtensions
             .AddSignalR()
             .AddJsonProtocol(options =>
             {
-                options.PayloadSerializerOptions.TypeInfoResolverChain.Insert(0, SignalrJsonContext.Default);
-                options.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                // SignalR serializes via Type + resolver chain; JsonSourceGenerationOptions apply only
+                // when PayloadSerializerOptions is aligned with the source-generated context options.
+                options.PayloadSerializerOptions = new JsonSerializerOptions(SignalrJsonContext.Default.Options);
             });
 
         services.AddSingleton<SignalrNotificationChannel>();
