@@ -1,9 +1,9 @@
-using Aspu.Api.Ports.Signalr;
+using System.Text.Json;
+using Aspu.Api.Adapters.Signalr;
 using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
 using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Builder;
-using System.Text.Json;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR;

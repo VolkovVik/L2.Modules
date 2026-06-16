@@ -1,6 +1,6 @@
 using System.Text.Json;
+using Aspu.Api.Adapters.Signalr;
 using Aspu.Api.Options;
-using Aspu.Api.Ports.Signalr;
 using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
 using Microsoft.AspNetCore.SignalR;
