@@ -1,5 +1,5 @@
 ﻿using Aspu.Common.Application.Ports.MessageBus;
-using Aspu.Modules.Orders.Infrastructure.Adapters.Postgres;
+using Aspu.Modules.Orders.Infrastructure.Adapters.InMemory;
 using Aspu.Modules.Orders.Infrastructure.Adapters.Rebus;
 using Aspu.Modules.Orders.Infrastructure.Options;
 using Microsoft.Extensions.Configuration;
@@ -15,11 +15,7 @@ public static class InfrastructureConfiguration
     {
         services
             .AddOptions<OrdersMessagingOptions>()
-            .Bind(configuration.GetSection(OrdersMessagingOptions.SectionName))
-            .Validate(
-                options => !options.Enabled || !string.IsNullOrWhiteSpace(options.ConnectionString),
-                "Orders:Messaging:ConnectionString is required when messaging is enabled.")
-            .ValidateOnStart();
+            .Bind(configuration.GetSection(OrdersMessagingOptions.SectionName));
 
         var messagingOptions = configuration
             .GetSection(OrdersMessagingOptions.SectionName)
@@ -31,11 +27,11 @@ public static class InfrastructureConfiguration
             return services;
         }
 
+        services.AddSingleton<InMemoryOutboxChannel>();
         services.AddOrdersRebus();
         services.AddSingleton<IMessageBus, RebusMessageBus>();
-        services.AddSingleton<IIntegrationEventOutbox, IntegrationEventOutbox>();
-        services.AddHostedService<OutboxSchemaInitializer>();
-        services.AddHostedService<OutboxDispatcherHostedService>();
+        services.AddSingleton<IIntegrationEventOutbox, InMemoryIntegrationEventOutbox>();
+        services.AddHostedService<InMemoryOutboxDispatcherHostedService>();
 
         return services;
     }

@@ -1,6 +1,6 @@
 using Aspu.Common.Application.Ports.MessageBus;
 
-namespace Aspu.Modules.Orders.Infrastructure.Adapters.Postgres;
+namespace Aspu.Modules.Orders.Infrastructure.Adapters.InMemory;
 
 internal sealed class NullIntegrationEventOutbox : IIntegrationEventOutbox
 {
