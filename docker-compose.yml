@@ -11,6 +11,7 @@ services:
     depends_on:
       - mosquitto
       - nats
+      - postgres
 
   aspu.gateway:
     image: ${DOCKER_REGISTRY-}aspugateway
@@ -40,3 +41,18 @@ services:
     ports:
       - 4222:4222
       - 8222:8222
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_DB: aspu
+      POSTGRES_USER: aspu
+      POSTGRES_PASSWORD: aspu
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

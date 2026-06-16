@@ -1,9 +1,10 @@
 ﻿using Aspu.Common.Application.Abstractions.Messaging;
 using Aspu.Common.Application.Extensions;
+using Aspu.Common.Application.Ports.MessageBus;
 using Aspu.Common.Domain.Results;
 using Aspu.Modules.Orders.Domain.Model.CodeAggregate;
+using Aspu.Modules.Orders.IntegrationEvents.Codes;
 using FluentValidation;
-using Mediator;
 using Microsoft.Extensions.Logging;
 
 namespace Aspu.Modules.Orders.Application.UseCases.Codes.Commands.AddCode;
@@ -31,8 +32,8 @@ internal sealed class AddCodeCommandValidator : AbstractValidator<AddCodeCommand
 }
 
 public sealed class AddCodeCommandHandler(
-    IMediator _mediator,
-    ILogger<AddCodeCommandHandler> _logger)
+    IIntegrationEventOutbox outbox,
+    ILogger<AddCodeCommandHandler> logger)
     : IAppCommandHandler<AddCodeCommand, Guid>
 {
     public async ValueTask<Result<Guid>> Handle(AddCodeCommand request, CancellationToken cancellationToken)
@@ -41,21 +42,16 @@ public sealed class AddCodeCommandHandler(
         if (code.IsFailure)
             return code.Error;
 
-        await _mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
+        await outbox.EnqueueAsync(
+            CodeAddedIntegrationEvent.Create(
+                code.Value.Id,
+                code.Value.OrderId,
+                code.Value.OrderUnitId,
+                code.Value.Value),
+            cancellationToken);
 
-        AddCodeLogger.Log(_logger, code.Value.Value);
+        AddCodeLogger.Log(logger, code.Value.Value);
 
         return code.Value.Id;
-    }
-}
-
-public sealed record CodeNotification(Guid Id) : IAppNotification;
-
-public sealed class CodeNotificationHandler : IAppNotificationHandler<CodeNotification>
-{
-    public ValueTask Handle(CodeNotification notification, CancellationToken cancellationToken)
-    {
-        Serilog.Log.Debug("Add code: {@Id}", notification.Id);
-        return ValueTask.CompletedTask;
     }
 }
