@@ -1,27 +1,28 @@
-﻿using FluentValidation;
+﻿using Aspu.Common.Presentation.Results;
+using FluentValidation;
 
 namespace Aspu.Api.Extensions.Exceptions;
 
 internal sealed class ValidationExceptionHandler(
     IProblemDetailsService problemDetailsService,
+    IHostEnvironment environment,
     ILogger<ValidationExceptionHandler> logger) :
-    GenericExceptionHandler<ValidationException>(problemDetailsService, logger)
+    GenericExceptionHandler<ValidationException>(problemDetailsService, environment, logger)
 {
-    protected override string? ProblemDetailTitle { get; set; } = "Invalid validation request";
     protected override int ProblemDetailStatus { get; set; } = StatusCodes.Status400BadRequest;
-    protected override string? ProblemDetailType { get; set; } = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1";
+    protected override string? ProblemDetailTitle { get; set; } = ProblemDetailsMappings.ValidationFailureTitle;
+    protected override string? ProblemDetailType { get; set; } = ProblemDetailsMappings.ClientErrorTypeUri;
+    protected override string? ProblemDetailDescription { get; set; } = ProblemDetailsMappings.ValidationFailedDetail;
 
-    protected override void UpdateProblemDetails(ProblemDetailsContext context, Exception exception)
+    protected override void UpdateProblemDetails(ProblemDetailsContext context, ValidationException exception)
     {
-        if (exception is not ValidationException validationException)
-            return;
-
-        var errors = validationException.Errors
+        var errors = exception.Errors
             .GroupBy(e => e.PropertyName, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(
                 g => g.Key.ToLowerInvariant(),
                 g => g.Select(e => e.ErrorMessage).ToArray(),
                 StringComparer.OrdinalIgnoreCase);
-        context.ProblemDetails.Extensions.Add("errors", errors);
+
+        context.ProblemDetails.Extensions["errors"] = errors;
     }
 }

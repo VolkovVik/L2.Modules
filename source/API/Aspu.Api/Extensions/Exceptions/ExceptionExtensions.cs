@@ -4,10 +4,6 @@ namespace Aspu.Api.Extensions.Exceptions;
 
 internal static class ExceptionExtensions
 {
-    ///<remarks>
-    /// https://www.milanjovanovic.tech/blog/problem-details-for-aspnetcore-apis
-    ///</remarks>
-
     internal static IServiceCollection AddExceptionHandlers(
         this IServiceCollection services)
     {
