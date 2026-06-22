@@ -29,7 +29,7 @@ internal sealed class OrdersAddCodeHandler1(IMediator mediator) : IMqttHandler
 
 internal sealed class OrdersAddCodeHandler2(IMediator mediator) : IMqttHandler
 {
-    public string Topic => "/test/topic1";
+    public string Topic => "/test/topic2";
 
     public async Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
         await mediator.Send(new AddCodeCommand(Guid.NewGuid(), Guid.NewGuid(), "test"), cancellationToken);
