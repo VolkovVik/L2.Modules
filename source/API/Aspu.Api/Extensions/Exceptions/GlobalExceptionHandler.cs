@@ -1,6 +1,4 @@
-﻿using Aspu.Common.Presentation.Results;
-
-namespace Aspu.Api.Extensions.Exceptions;
+﻿namespace Aspu.Api.Extensions.Exceptions;
 
 internal sealed class GlobalExceptionHandler(
     IProblemDetailsService problemDetailsService,
@@ -8,7 +6,7 @@ internal sealed class GlobalExceptionHandler(
     ILogger<GlobalExceptionHandler> logger) :
     GenericExceptionHandler<Exception>(problemDetailsService, environment, logger)
 {
-    protected override string? ProblemDetailTitle { get; set; } = ProblemDetailsMappings.ServerFailureTitle;
     protected override int ProblemDetailStatus { get; set; } = StatusCodes.Status500InternalServerError;
-    protected override string? ProblemDetailType { get; set; } = ProblemDetailsMappings.ServerErrorTypeUri;
+    protected override string? ProblemDetailTitle { get; set; } = "Server failure";
+    protected override string? ProblemDetailType { get; set; } = "https://tools.ietf.org/html/rfc7231#section-6.6.1";
 }

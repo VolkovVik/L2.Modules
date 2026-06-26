@@ -1,5 +1,4 @@
-﻿using Aspu.Common.Presentation.Results;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Aspu.Api.Extensions.Exceptions;
 
@@ -10,9 +9,9 @@ internal sealed class ValidationExceptionHandler(
     GenericExceptionHandler<ValidationException>(problemDetailsService, environment, logger)
 {
     protected override int ProblemDetailStatus { get; set; } = StatusCodes.Status400BadRequest;
-    protected override string? ProblemDetailTitle { get; set; } = ProblemDetailsMappings.ValidationFailureTitle;
-    protected override string? ProblemDetailType { get; set; } = ProblemDetailsMappings.ClientErrorTypeUri;
-    protected override string? ProblemDetailDescription { get; set; } = ProblemDetailsMappings.ValidationFailedDetail;
+    protected override string? ProblemDetailTitle { get; set; } = "Validation failed";
+    protected override string? ProblemDetailType { get; set; } = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
+    protected override string? ProblemDetailDescription { get; set; } = "One or more validation errors occurred";
 
     protected override void UpdateProblemDetails(ProblemDetailsContext context, ValidationException exception)
     {

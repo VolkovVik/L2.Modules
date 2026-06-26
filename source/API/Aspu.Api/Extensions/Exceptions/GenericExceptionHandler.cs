@@ -1,4 +1,3 @@
-using Aspu.Common.Presentation.Results;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +14,7 @@ internal abstract class GenericExceptionHandler<TException>(
     protected virtual int ProblemDetailStatus { get; set; } = StatusCodes.Status404NotFound;
     protected virtual string? ProblemDetailType { get; set; } = string.Empty;
     protected virtual string? ProblemDetailTitle { get; set; } = string.Empty;
-    protected virtual string? ProblemDetailDescription { get; set; } = ProblemDetailsMappings.UnexpectedErrorDetail;
+    protected virtual string? ProblemDetailDescription { get; set; } = "An unexpected error occurred";
 
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
