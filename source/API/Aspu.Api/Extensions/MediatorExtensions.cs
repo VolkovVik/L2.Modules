@@ -1,4 +1,4 @@
-﻿using Aspu.Api.Middleware;
+﻿using Aspu.Api.Behaviors;
 
 namespace Aspu.Api.Extensions;
 

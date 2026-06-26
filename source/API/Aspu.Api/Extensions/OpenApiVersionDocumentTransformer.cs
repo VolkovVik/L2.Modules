@@ -16,8 +16,8 @@ public sealed class OpenApiVersionDocumentTransformer : IOpenApiDocumentTransfor
         var version = context.DocumentName;
 
         document.Info.Version = "1.0.0";
-        document.Info.Title = $"ASPU API Reference version {version}";
-        document.Info.Description = "This API demonstrates OpenAPI customization in a .NET 10 ASPU project";
+        document.Info.Title = $"API Reference version {version}";
+        document.Info.Description = "This API demonstrates OpenAPI customization in a .NET 10 project";
         document.Info.TermsOfService = new Uri(UriString);
         document.Info.Contact = new OpenApiContact
         {

@@ -2,7 +2,7 @@
 using FluentValidation.Results;
 using Mediator;
 
-namespace Aspu.Api.Middleware;
+namespace Aspu.Api.Behaviors;
 
 public sealed class ValidationBehavior<TMessage, TResponse>(
     IEnumerable<IValidator<TMessage>> _validators) :
