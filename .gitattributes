@@ -147,7 +147,7 @@ docker-compose*.yaml text eol=lf
 *.conf       text
 *.properties text
 
-# Mosquitto / MQTT broker config (used in /mosquitto)
+# Mosquitto / MQTT broker config (used in /.containers/mosquitto)
 *.acl        text eol=lf
 passwd       text eol=lf
 mosquitto*.conf text eol=lf
@@ -250,7 +250,7 @@ nbomber/             export-ignore
 TestResults/         export-ignore
 docs/                export-ignore
 tools/               export-ignore
-mosquitto/           export-ignore
+.containers/mosquitto/ export-ignore
 docker-compose*.yml  export-ignore
 Dockerfile           export-ignore
 README.md            export-ignore

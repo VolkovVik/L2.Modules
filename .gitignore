@@ -402,7 +402,12 @@ FodyWeavers.xsd
 *.sln.iml
 .idea/
 
-.containers
+.containers/*
+!.containers/mosquitto/
+.containers/mosquitto/*
+!.containers/mosquitto/config/
+.containers/mosquitto/data/
+.containers/mosquitto/log/
 
 # ============================================================================
 # Angular / Node.js (planned frontend workspace)
