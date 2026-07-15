@@ -17,13 +17,12 @@ internal static class NatsExtensions
         IConfiguration configuration)
     {
         var options = configuration.GetSection(NatsOptions.SectionName).Get<NatsOptions>();
-        if (options?.Enabled is not true)
+        if (options?.IsEnabled is not true)
             return services;
 
         services.AddConfiguredNatsClient();
         services.AddInboundProcessor<NatsOptions, INatsHandler>();
         services.AddHostedService<NatsSubscriptionsHostedService>();
-        services.AddHostedService<NatsJetstreamSubscriptionsHostedService>();
 
         return services;
     }

@@ -6,7 +6,7 @@ public sealed class SignalrOptions
 {
     public const string SectionName = "SignalR";
 
-    public bool Enabled { get; init; } = true;
+    public bool IsEnabled { get; init; } = true;
 
     public string HubPath { get; init; } = "/notifications-hub";
 
