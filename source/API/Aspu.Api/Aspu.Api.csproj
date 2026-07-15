@@ -36,6 +36,7 @@
 	  <PackageReference Include="Serilog.Sinks.Debug" />
 	  <PackageReference Include="Serilog.Sinks.File" />
 	  <PackageReference Include="Serilog.Sinks.Seq" />
+	  <PackageReference Include="System.Interactive.Async" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -50,6 +51,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Aspu.Benchmarks" />
+    <InternalsVisibleTo Include="Aspu.Api.IntegrationTests" />
   </ItemGroup>
 
   <ItemGroup>

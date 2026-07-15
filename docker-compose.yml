@@ -30,13 +30,17 @@ services:
     ports:
       - 1883:1883
     volumes:
-      - ./mosquitto/config:/mosquitto/config:ro
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+      - ./.containers/mosquitto/config:/mosquitto/config:ro
+      - ./.containers/mosquitto/data:/mosquitto/data
+      - ./.containers/mosquitto/log:/mosquitto/log
 
   nats:
     image: nats:latest
+    command: ['-js', '-sd', '/data']
     container_name: nats
     ports:
       - 4222:4222
       - 8222:8222
+    volumes:
+      - ./.containers/nats/data:/data
+    restart: unless-stopped

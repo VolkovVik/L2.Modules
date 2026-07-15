@@ -7,7 +7,7 @@ public sealed class MqttOptions : IInboundProcessorOptions
 {
     public const string SectionName = "Mqtt";
 
-    public bool Enabled { get; init; }
+    public bool IsEnabled { get; init; }
 
     public string Host { get; init; } = "localhost";
 

@@ -2,7 +2,7 @@ namespace Aspu.Common.Presentation.Abstractions.InboundProcessor;
 
 public interface IInboundProcessorOptions
 {
-    bool Enabled { get; init; }
+    bool IsEnabled { get; init; }
 
     /// <summary>
     /// Max concurrent inbound message handlers (each message still gets its own DI scope).

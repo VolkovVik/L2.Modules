@@ -6,11 +6,17 @@ public sealed class NatsOptions : IInboundProcessorOptions
 {
     public const string SectionName = "Nats";
 
-    public bool Enabled { get; init; }
+    public bool IsEnabled { get; init; }
+
+    public bool IsJetStreamEnabled { get; init; }
 
     public string Url { get; init; } = "nats://nats:4222";
 
     public string Name { get; init; } = "aspu-api";
+
+    public string StreamName { get; set; } = "aspu-stream";
+
+    public string ConsumerName { get; set; } = "aspu-consumer";
 
     /// <summary>
     /// Max reconnect attempts.

@@ -1,4 +1,5 @@
 ﻿using Aspu.Common.SourceGenerators.Application;
+using Serilog;
 
 namespace Aspu.Api.Adapters.Signalr;
 
@@ -20,12 +21,14 @@ internal sealed class SignalrMessageWorker(
         {
             await DrainRemainingAsync(CancellationToken.None);
         }
-    }
-
-    public override Task StopAsync(CancellationToken cancellationToken)
-    {
-        channel.CompleteWriter();
-        return base.StopAsync(cancellationToken);
+        catch (Exception exc)
+        {
+            Log.Error(exc, "SignalR hosted servise failed");
+        }
+        finally
+        {
+            channel.CompleteWriter();
+        }
     }
 
     private async Task DrainRemainingAsync(CancellationToken cancellationToken)

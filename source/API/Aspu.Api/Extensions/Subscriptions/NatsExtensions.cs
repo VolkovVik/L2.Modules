@@ -3,7 +3,10 @@ using Aspu.Api.Options;
 using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Aspu.Common.Presentation.Abstractions.NatsAdapter;
 using Microsoft.Extensions.Options;
+using NATS.Client.Core;
+using NATS.Client.JetStream;
 using NATS.Extensions.Microsoft.DependencyInjection;
+using NATS.Net;
 
 namespace Aspu.Api.Extensions.Subscriptions;
 
@@ -14,7 +17,7 @@ internal static class NatsExtensions
         IConfiguration configuration)
     {
         var options = configuration.GetSection(NatsOptions.SectionName).Get<NatsOptions>();
-        if (options?.Enabled is not true)
+        if (options?.IsEnabled is not true)
             return services;
 
         services.AddConfiguredNatsClient();
@@ -45,5 +48,8 @@ internal static class NatsExtensions
                 });
             });
         });
+
+        services.AddSingleton<INatsJSContext>(static sp =>
+            sp.GetRequiredService<INatsConnection>().CreateJetStreamContext());
     }
 }
