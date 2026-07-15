@@ -14,7 +14,8 @@
         "Microsoft": "Information",
         "Microsoft.AspNetCore": "Warning",
         //"Microsoft.AspNetCore.Hosting.Diagnostics": "Information"
-        "Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware": "Information"
+        "Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware": "Information",
+        "NATS": "Information"
       }
     },
     "WriteTo": [

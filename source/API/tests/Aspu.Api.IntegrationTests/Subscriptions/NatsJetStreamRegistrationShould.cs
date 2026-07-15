@@ -19,7 +19,8 @@ internal sealed class NatsJetStreamRegistrationShould
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
             {
-                ["Nats:Enabled"] = "true",
+                ["Nats:IsEnabled"] = "true",
+                ["Nats:IsJetStreamEnabled"] = "true",
                 ["Nats:Url"] = Nats.Container.GetConnectionString(),
                 ["Nats:Name"] = "aspu-api-integration-tests",
             })
@@ -31,9 +32,13 @@ internal sealed class NatsJetStreamRegistrationShould
         services.Configure<NatsOptions>(configuration.GetSection(NatsOptions.SectionName));
         services.AddNatsSubscriber(configuration);
 
-        await using var provider = services.BuildServiceProvider();
-        var jetStream = provider.GetRequiredService<INatsJSContext>();
+        await using var provider = services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true,
+        });
 
+        var jetStream = provider.GetRequiredService<INatsJSContext>();
         await Assert.That(jetStream).IsNotNull();
         await Assert.That(jetStream.Connection).IsNotNull();
 
