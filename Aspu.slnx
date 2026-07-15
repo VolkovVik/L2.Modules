@@ -28,6 +28,9 @@
     <Project Path="source/API/Aspu.Api/Aspu.Api.csproj" />
     <Project Path="source/API/Aspu.Gateway/Aspu.Gateway.csproj" Id="7c16cc6f-82c1-4f86-a2dc-81704ef690de" />
   </Folder>
+  <Folder Name="/source/API/tests/">
+    <Project Path="source/API/tests/Aspu.Api.IntegrationTests/Aspu.Api.IntegrationTests.csproj" Id="a4f8c2e1-9b3d-4a7f-8c6e-1d2e3f4a5b6c" />
+  </Folder>
   <Folder Name="/source/Common/">
     <Project Path="source/Common/Aspu.Common.Application/Aspu.Common.Application.csproj" Id="e554fdde-b8ec-4019-8018-17bc7ed5a1ba" />
     <Project Path="source/Common/Aspu.Common.Domain/Aspu.Common.Domain.csproj" Id="e416e515-1190-417d-9ad5-716cb647706f" />

@@ -36,7 +36,11 @@ services:
 
   nats:
     image: nats:latest
+    command: ['-js', '-sd', '/data']
     container_name: nats
     ports:
       - 4222:4222
       - 8222:8222
+    volumes:
+      - ./.containers/nats/data:/data
+    restart: unless-stopped
