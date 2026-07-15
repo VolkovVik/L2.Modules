@@ -28,7 +28,7 @@ internal sealed class NatsSubscriptionsHostedService(
 
         try
         {
-            if (options.Value.IsJetStreamEnabled)
+            if (!options.Value.IsJetStreamEnabled)
                 await ExecuteInternalAsync(subjects, stoppingToken);
             else
                 await JetstreamExecuteInternalAsync(subjects, stoppingToken);
