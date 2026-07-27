@@ -11,6 +11,13 @@ public static class ApiConfiguration
         IConfiguration configuration)
     {
         services.AddValidators();
+        return services.AddSubscribers(configuration);
+    }
+
+    private static IServiceCollection AddSubscribers(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
         services.AddMqttSubscriber(configuration);
         services.AddNatsSubscriber(configuration);
         services.AddSignalRSubscriber(configuration);

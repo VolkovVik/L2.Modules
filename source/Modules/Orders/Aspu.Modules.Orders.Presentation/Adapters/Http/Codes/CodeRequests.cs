@@ -24,7 +24,7 @@ internal sealed class CodeRequests : IHttpEndpoint
             CancellationToken cancellationToken) =>
         {
             var response = await mediator.Send(new GetCodeByIdCommand(id), cancellationToken);
-            return response!.Match(Results.Ok, ApiResults.Problem);
+            return response.Match(Results.Ok, ApiResults.Problem);
         })
         .WithName("GetCodesById")
         .WithSummary("Get codes by ID")

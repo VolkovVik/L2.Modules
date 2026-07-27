@@ -69,7 +69,7 @@ public sealed class SignalrNotificationRegistrationGenerator : BaseRegistrationG
         sb.AppendLine("public interface ISignalrNotificationsHub");
         sb.AppendLine("{");
         foreach (var item in items)
-            sb.Append("    Task ").Append(item!.Key).Append('(').Append(item.Value).AppendLine(" notification, CancellationToken cancellationToken = default);").AppendLine();
+            sb.Append("    Task ").Append(item.Key).Append('(').Append(item.Value).AppendLine(" notification, CancellationToken cancellationToken = default);").AppendLine();
         sb.AppendLine("}");
         sb.AppendLine();
 
@@ -102,7 +102,7 @@ public sealed class SignalrNotificationRegistrationGenerator : BaseRegistrationG
 
         foreach (var item in items)
         {
-            sb.Append("    public Task PublishAsync(").Append(item!.Value).AppendLine(" notification, CancellationToken cancellationToken = default)");
+            sb.Append("    public Task PublishAsync(").Append(item.Value).AppendLine(" notification, CancellationToken cancellationToken = default)");
             sb.AppendLine("    {");
             sb.AppendLine("        if (!string.IsNullOrWhiteSpace(notification.Audience))");
             sb.Append("            return getAudience(notification.Audience).").Append(item.Key).AppendLine("(notification, cancellationToken);");
@@ -121,8 +121,8 @@ public sealed class SignalrNotificationRegistrationGenerator : BaseRegistrationG
 
         foreach (var item in items)
         {
-            var parameterName = item!.Key.ToLowerInvariant();
-            sb.Append("            ").Append(item!.Value).Append(' ').Append(parameterName).Append(" => PublishAsync(").Append(parameterName).AppendLine(", cancellationToken),");
+            var parameterName = item.Key.ToLowerInvariant();
+            sb.Append("            ").Append(item.Value).Append(' ').Append(parameterName).Append(" => PublishAsync(").Append(parameterName).AppendLine(", cancellationToken),");
         }
 
         sb.AppendLine("            _ => throw new NotSupportedException($\"SignalR notification type '{notification.GetType().Name}' is not registered.\"),");

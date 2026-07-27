@@ -5,8 +5,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<ServerGarbageCollection>false</ServerGarbageCollection>
-	<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+	  <ServerGarbageCollection>false</ServerGarbageCollection>
+	  <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>

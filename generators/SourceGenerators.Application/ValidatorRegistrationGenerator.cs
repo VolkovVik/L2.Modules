@@ -51,7 +51,7 @@ public sealed class ValidatorRegistrationGenerator : BaseRegistrationGenerator, 
             .Where(x => !x.IsGlobalNamespace)
             .Select(x => x.ToDisplayString())
             .OrderBy(x => x, StringComparer.Ordinal)
-            .ToImmutableHashSet();
+            .ToImmutableHashSet(StringComparer.Ordinal);
         foreach (var @namespace in namespaces)
             sb.Append("using ").Append(@namespace).Append(';').AppendLine();
 

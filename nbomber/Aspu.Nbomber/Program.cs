@@ -15,12 +15,12 @@ var scenario = Scenario.Create("http_scenario", async context =>
 })
 .WithWarmUpDuration(TimeSpan.FromSeconds(10))
 .WithLoadSimulations(
-///Simulation.RampingConstant(copies: 100, during: TimeSpan.FromSeconds(30)),
-///Simulation.KeepConstant(copies: 100, during: TimeSpan.FromSeconds(30)),
-///Simulation.RampingConstant(copies: 0, during: TimeSpan.FromSeconds(30))
-Simulation.RampingInject(rate: 100, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30)),
-Simulation.Inject(rate: 100, interval: TimeSpan.FromMilliseconds(1), during: TimeSpan.FromSeconds(30)),
-Simulation.RampingInject(rate: 0, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30))
+    ///Simulation.RampingConstant(copies: 100, during: TimeSpan.FromSeconds(30)),
+    ///Simulation.KeepConstant(copies: 100, during: TimeSpan.FromSeconds(30)),
+    ///Simulation.RampingConstant(copies: 0, during: TimeSpan.FromSeconds(30))
+    Simulation.RampingInject(rate: 100, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30)),
+    Simulation.Inject(rate: 100, interval: TimeSpan.FromMilliseconds(1), during: TimeSpan.FromSeconds(30)),
+    Simulation.RampingInject(rate: 0, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30))
 );
 
 NBomberRunner
