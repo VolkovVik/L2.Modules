@@ -59,7 +59,7 @@ public class SignalrBenchmarks
                 (audience) => hubContext.Clients.Group(audience!));
         });
 
-        var app = builder.Build();
+        await using var app = builder.Build();
         app.MapHub<SignalrNotificationsHub>(HubPath);
         await app.StartAsync();
 
@@ -80,26 +80,29 @@ public class SignalrBenchmarks
             .WithAutomaticReconnect()
             .Build();
 
-        connection.On<Test1Notification>("Test1Notification", _ => receiveGate.Notify());
+        using (connection.On<Test1Notification>("Test1Notification", _ => receiveGate.Notify()))
+        {
+            await connection.StartAsync();
 
-        await connection.StartAsync();
+            var channel = app.Services.GetRequiredService<ISignalrNotificationChannel>();
 
-        var channel = app.Services.GetRequiredService<ISignalrNotificationChannel>();
+            receiveGate.Reset();
 
-        receiveGate.Reset();
+            await channel.WriteAsync(Notification, CancellationToken.None);
+            await receiveGate.WaitAsync(CancellationToken.None);
 
-        await channel.WriteAsync(Notification, CancellationToken.None);
-        await receiveGate.WaitAsync(CancellationToken.None);
-
-        s_ctx = new Context(app, connection, channel, receiveGate);
+            s_ctx = new Context(app, connection, channel, receiveGate);
+        }
     }
 
     [GlobalCleanup]
     public static async Task CleanupAsync()
     {
+#pragma warning disable IDISP007 // Don't dispose injected
         await s_ctx.Connection.DisposeAsync();
         await s_ctx.App.StopAsync();
         await s_ctx.App.DisposeAsync();
+#pragma warning restore IDISP007 // Don't dispose injected
     }
 
     [IterationSetup]
