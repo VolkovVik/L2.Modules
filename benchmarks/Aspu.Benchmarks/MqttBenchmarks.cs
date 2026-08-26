@@ -47,7 +47,7 @@ public class MqttBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public Task MatchedHandler() =>
+    public Task MatchedHandlerAsync() =>
         s_ctx.Service.ProcessOneAsync(s_ctx.MatchedTopic, CancellationToken.None);
 
     private sealed class Context

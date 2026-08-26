@@ -113,7 +113,7 @@ public class SignalrBenchmarks
     /// Reported Mean/Allocated are per single message (OperationsPerInvoke = 100).
     /// </summary>
     [Benchmark(OperationsPerInvoke = MessagesPerIteration)]
-    public async Task SendToWebSocketClient()
+    public async Task SendToWebSocketClientAsync()
     {
         for (var i = 0; i < MessagesPerIteration; i++)
         {
