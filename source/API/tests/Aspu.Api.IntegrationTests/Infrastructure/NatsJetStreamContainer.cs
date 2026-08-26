@@ -7,7 +7,7 @@ internal sealed class NatsJetStreamContainer : IAsyncInitializer, IAsyncDisposab
 {
     public NatsContainer Container { get; } = new NatsBuilder("nats:latest").Build();
 
-    public async Task InitializeAsync() => await Container.StartAsync();
+    public Task InitializeAsync() => Container.StartAsync();
 
-    public async ValueTask DisposeAsync() => await Container.DisposeAsync();
+    public ValueTask DisposeAsync() => Container.DisposeAsync();
 }
