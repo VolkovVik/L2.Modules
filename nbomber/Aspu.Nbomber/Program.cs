@@ -7,7 +7,7 @@ using var httpClient = Http.CreateDefaultClient();
 
 var scenario = Scenario.Create("http_scenario", async context =>
 {
-    var request = Http.CreateRequest("GET", "https://localhost:5001/")
+    using var request = Http.CreateRequest("GET", "https://localhost:5001/")
         .WithHeader("Content-Type", "application/json");
     /// .WithBody(new StringContent("{ some JSON }", Encoding.UTF8, "application/json"));
 

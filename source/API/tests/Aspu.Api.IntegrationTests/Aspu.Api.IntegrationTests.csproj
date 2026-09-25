@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
     <PackageReference Include="NATS.Net" />
     <PackageReference Include="Shouldly" />
+    <PackageReference Include="SSH.NET" />
     <PackageReference Include="Testcontainers.Nats" />
     <PackageReference Include="TUnit" />
   </ItemGroup>
