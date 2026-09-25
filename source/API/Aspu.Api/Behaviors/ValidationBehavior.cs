@@ -5,7 +5,7 @@ using Mediator;
 namespace Aspu.Api.Behaviors;
 
 public sealed class ValidationBehavior<TMessage, TResponse>(
-    IEnumerable<IValidator<TMessage>> _validators) :
+    IEnumerable<IValidator<TMessage>> validators) :
     IPipelineBehavior<TMessage, TResponse>
     where TMessage : notnull, IMessage
 {
@@ -14,13 +14,13 @@ public sealed class ValidationBehavior<TMessage, TResponse>(
         MessageHandlerDelegate<TMessage, TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (!_validators.Any())
+        if (!validators.Any())
             return await next(message, cancellationToken);
 
         var context = new ValidationContext<TMessage>(message);
         var failures = new List<ValidationFailure>();
 
-        foreach (var validator in _validators)
+        foreach (var validator in validators)
         {
             var result = await validator.ValidateAsync(context, cancellationToken);
             if (!result.IsValid)

@@ -18,7 +18,7 @@ internal sealed class GetCodeCommandValidator : AbstractValidator<GetCodeCommand
             .StringMustBeNotWhiteSpace();
 }
 
-public sealed class GetCodeCommandHandler(IMediator _mediator)
+public sealed class GetCodeCommandHandler(IMediator mediator)
     : IAppCommandHandler<GetCodeCommand, Guid>
 {
     public async ValueTask<Result<Guid>> Handle(GetCodeCommand request, CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ public sealed class GetCodeCommandHandler(IMediator _mediator)
         if (code.IsFailure)
             return code.Error;
 
-        await _mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
+        await mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
 
         return code.Value.Id;
     }

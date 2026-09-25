@@ -40,7 +40,7 @@ internal sealed class PingValidator : AbstractValidator<Ping>
     }
 }
 
-public sealed class PingHandler(IMediator _mediator) : IRequestHandler<Ping, Pong?>
+public sealed class PingHandler(IMediator mediator) : IRequestHandler<Ping, Pong?>
 {
     public async ValueTask<Pong?> Handle(Ping request, CancellationToken cancellationToken)
     {
@@ -48,7 +48,7 @@ public sealed class PingHandler(IMediator _mediator) : IRequestHandler<Ping, Pon
         Log.Debug("Start {@Id}", id);
         var result = new Pong(id);
         Log.Debug("Publish {@Id}", id);
-        await _mediator.Publish(new PingNotification(id), cancellationToken);
+        await mediator.Publish(new PingNotification(id), cancellationToken);
         Log.Debug("Stop {@Id}", id);
         return result;
     }

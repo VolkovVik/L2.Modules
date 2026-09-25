@@ -18,7 +18,7 @@ internal sealed class GetCodeByIdCommandValidator : AbstractValidator<GetCodeByI
             .NotEmpty();
 }
 
-public sealed class GetCodeByIdCommandHandler(IMediator _mediator)
+public sealed class GetCodeByIdCommandHandler(IMediator mediator)
     : IAppCommandHandler<GetCodeByIdCommand, Guid>
 {
     public async ValueTask<Result<Guid>> Handle(GetCodeByIdCommand request, CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ public sealed class GetCodeByIdCommandHandler(IMediator _mediator)
         if (code.IsFailure)
             return code.Error;
 
-        await _mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
+        await mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
 
         return code.Value.Id;
     }

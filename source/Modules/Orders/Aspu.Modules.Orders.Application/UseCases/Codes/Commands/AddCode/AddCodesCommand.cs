@@ -31,8 +31,8 @@ internal sealed class AddCodeCommandValidator : AbstractValidator<AddCodeCommand
 }
 
 public sealed class AddCodeCommandHandler(
-    IMediator _mediator,
-    ILogger<AddCodeCommandHandler> _logger)
+    IMediator mediator,
+    ILogger<AddCodeCommandHandler> logger)
     : IAppCommandHandler<AddCodeCommand, Guid>
 {
     public async ValueTask<Result<Guid>> Handle(AddCodeCommand request, CancellationToken cancellationToken)
@@ -41,9 +41,9 @@ public sealed class AddCodeCommandHandler(
         if (code.IsFailure)
             return code.Error;
 
-        await _mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
+        await mediator.Publish(new CodeNotification(code.Value.Id), cancellationToken);
 
-        AddCodeLogger.Log(_logger, code.Value.Value);
+        AddCodeLogger.Log(logger, code.Value.Value);
 
         return code.Value.Id;
     }
