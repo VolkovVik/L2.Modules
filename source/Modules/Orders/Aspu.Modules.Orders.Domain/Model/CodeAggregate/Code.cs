@@ -166,7 +166,7 @@ public sealed class Code : Aggregate
     /// <param name="orderUnitId"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static Result<Code, Error> Create(Guid orderId, Guid orderUnitId, string value)
+    public static AppResult<Code, Error> Create(Guid orderId, Guid orderUnitId, string value)
     {
         if (orderId == Guid.Empty)
             return Error.ValueIsInvalid(nameof(orderId));
@@ -195,7 +195,7 @@ public sealed class Code : Aggregate
     /// <param name="orderId">Order identifier</param>
     /// <param name="orderUnitId">Product type identifier</param>
     /// <returns></returns>
-    public Result<object, Error> SetPrinting(Guid orderId, Guid orderUnitId)
+    public AppResult<object, Error> SetPrinting(Guid orderId, Guid orderUnitId)
     {
         if (OrderId != orderId)
             return Errors.CodeHasOtherOrder(Value);
@@ -221,7 +221,7 @@ public sealed class Code : Aggregate
     /// <param name="orderUnitId">Product type identifier</param>
     /// <param name="printedOn">Print date</param>
     /// <returns></returns>
-    public Result<object, Error> SetPrinted(Guid orderId, Guid orderUnitId, DateTime? printedOn = null)
+    public AppResult<object, Error> SetPrinted(Guid orderId, Guid orderUnitId, DateTime? printedOn = null)
     {
         printedOn ??= DateTime.UtcNow;
 
@@ -248,7 +248,7 @@ public sealed class Code : Aggregate
     /// <param name="orderId">Order identifier</param>
     /// <param name="orderUnitId">Product type identifier</param>
     /// <returns></returns>
-    public Result<object, Error> SetUnprinted(Guid orderId, Guid orderUnitId)
+    public AppResult<object, Error> SetUnprinted(Guid orderId, Guid orderUnitId)
     {
         if (OrderId != orderId)
             return Errors.CodeHasOtherOrder(Value);
@@ -274,7 +274,7 @@ public sealed class Code : Aggregate
     /// <param name="orderUnitId">Product type identifier</param>
     /// <param name="defectedOn">Defect write-off date</param>
     /// <returns></returns>
-    public Result<object, Error> SetDefected(Guid orderId, Guid orderUnitId, DateTime? defectedOn = null)
+    public AppResult<object, Error> SetDefected(Guid orderId, Guid orderUnitId, DateTime? defectedOn = null)
     {
         defectedOn ??= DateTime.UtcNow;
 
@@ -314,7 +314,7 @@ public sealed class Code : Aggregate
     /// <param name="validatedOn">Validation date</param>
     /// <param name="isResetDefected">Flag to reset defect write-off</param>
     /// <returns></returns>
-    public Result<object, Error> SetValidated(Guid orderId, Guid orderUnitId, DateTime? validatedOn = null, bool isResetDefected = false)
+    public AppResult<object, Error> SetValidated(Guid orderId, Guid orderUnitId, DateTime? validatedOn = null, bool isResetDefected = false)
     {
         validatedOn ??= DateTime.UtcNow;
 

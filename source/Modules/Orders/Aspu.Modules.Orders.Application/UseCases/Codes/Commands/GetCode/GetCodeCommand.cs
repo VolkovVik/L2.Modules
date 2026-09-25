@@ -21,7 +21,7 @@ internal sealed class GetCodeCommandValidator : AbstractValidator<GetCodeCommand
 public sealed class GetCodeCommandHandler(IMediator mediator)
     : IAppCommandHandler<GetCodeCommand, Guid>
 {
-    public async ValueTask<Result<Guid>> Handle(GetCodeCommand request, CancellationToken cancellationToken)
+    public async ValueTask<AppResult<Guid>> Handle(GetCodeCommand request, CancellationToken cancellationToken)
     {
         var code = Code.Create(Guid.NewGuid(), Guid.NewGuid(), request.Value);
         if (code.IsFailure)

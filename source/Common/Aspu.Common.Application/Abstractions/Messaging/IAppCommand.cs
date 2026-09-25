@@ -5,6 +5,6 @@ namespace Aspu.Common.Application.Abstractions.Messaging;
 
 public interface IAppBaseCommand;
 
-public interface IAppCommand : IRequest<Result>, IAppBaseCommand;
+public interface IAppCommand : IRequest<AppResult>, IAppBaseCommand;
 
-public interface IAppCommand<TResponse> : IRequest<Result<TResponse>>, IAppBaseCommand;
+public interface IAppCommand<TResponse> : IRequest<AppResult<TResponse>>, IAppBaseCommand;

@@ -35,7 +35,7 @@ public sealed class AddCodeCommandHandler(
     ILogger<AddCodeCommandHandler> logger)
     : IAppCommandHandler<AddCodeCommand, Guid>
 {
-    public async ValueTask<Result<Guid>> Handle(AddCodeCommand request, CancellationToken cancellationToken)
+    public async ValueTask<AppResult<Guid>> Handle(AddCodeCommand request, CancellationToken cancellationToken)
     {
         var code = Code.Create(request.OrderId!.Value, request.OrderUnitId!.Value, request.Value);
         if (code.IsFailure)

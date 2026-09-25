@@ -26,7 +26,7 @@ public sealed class ReplaceCodeCommandHandler(IMediator mediator)
 #pragma warning restore CS9113 // Parameter is unread.
     : IAppCommandHandler<ReplaceCodeCommand, Guid>
 {
-    public async ValueTask<Result<Guid>> Handle(ReplaceCodeCommand request, CancellationToken cancellationToken)
+    public async ValueTask<AppResult<Guid>> Handle(ReplaceCodeCommand request, CancellationToken cancellationToken)
     {
         var code = Code.Create(Guid.NewGuid(), Guid.NewGuid(), request.NewValue);
         if (code.IsFailure)

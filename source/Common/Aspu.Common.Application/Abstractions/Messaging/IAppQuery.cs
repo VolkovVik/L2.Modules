@@ -3,4 +3,4 @@ using Mediator;
 
 namespace Aspu.Common.Application.Abstractions.Messaging;
 
-public interface IAppQuery<TResponse> : IRequest<Result<TResponse>>;
+public interface IAppQuery<TResponse> : IRequest<AppResult<TResponse>>;

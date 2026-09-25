@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using SourceGenerators.Domain;
 
 namespace SourceGenerators.Domain;
 
@@ -117,7 +116,7 @@ public sealed class DomainEnumGenerator : GeneratorInternal<DomainEnumGenerator>
           .AppendLine(SummaryEnd)
           .AppendLine("    /// <param name=\"name\"></param>")
           .AppendLine("    /// <returns></returns>")
-          .Append("    public static Aspu.Common.Domain.Results.Result<").Append(className).AppendLine(", Error> GetByName(string name)")
+          .Append("    public static AppResult<").Append(className).AppendLine(", Error> GetByName(string name)")
           .AppendLine("    {")
           .AppendLine("        var value = GetList().FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));")
           .AppendLine("        return value is not null ? value : Error.ValueIsInvalid(name);")

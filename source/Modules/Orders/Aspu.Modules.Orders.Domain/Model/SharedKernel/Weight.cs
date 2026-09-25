@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Aspu.Common.Domain.Errors;
+using Aspu.Common.Domain.Results;
 using CSharpFunctionalExtensions;
 
 namespace Aspu.Modules.Orders.Domain.Model.SharedKernel;
@@ -35,7 +36,7 @@ public sealed class Weight : ValueObject
     /// </summary>
     /// <param name="value">Value in grams</param>
     /// <returns>Result</returns>
-    public static Common.Domain.Results.Result<Weight, Error> Create(int value)
+    public static AppResult<Weight, Error> Create(int value)
     {
         if (value <= 0)
             return Error.ValueIsRequired(nameof(value));

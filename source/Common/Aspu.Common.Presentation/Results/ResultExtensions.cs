@@ -5,7 +5,7 @@ namespace Aspu.Common.Presentation.Results;
 
 public static class ResultExtensions
 {
-    extension(Result result)
+    extension(AppResult result)
     {
         public TOut Match<TOut>(
             Func<TOut> onSuccess,
@@ -13,11 +13,11 @@ public static class ResultExtensions
             result.IsSuccess ? onSuccess() : onFailure(result.Error);
     }
 
-    extension<TIn>(Result<TIn> result)
+    extension<TIn>(AppResult<TIn> result)
     {
         public TOut Match<TOut>(
             Func<TIn, TOut> onSuccess,
-            Func<Result<TIn>, TOut> onFailure) =>
+            Func<AppResult<TIn>, TOut> onFailure) =>
             result.IsSuccess ? onSuccess(result.Value) : onFailure(result);
     }
 }
