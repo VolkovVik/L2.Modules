@@ -17,6 +17,11 @@ internal sealed class CodesParsingShould
         yield return "\u001d\u001d";
         yield return "\u001d \u001d";
         yield return "05147004940133770662";
+        yield return "0112345";
+        yield return "-0147004940133770662";
+        yield return "+0147004940133770662";
+        yield return " 00147004940133770662";
+        yield return "0400123456";
     }
 
     public static IEnumerable<Func<(string, Dictionary<string, string>)>> TestCases()
@@ -53,10 +58,28 @@ internal sealed class CodesParsingShould
                 { "17", "270102" },
                 { "93", "abcd" },
             });
+        yield return () => ("01012345678912341726",
+            new Dictionary<string, string>(1, StringComparer.Ordinal) {
+                { "01", "01234567891234" },
+            });
+        yield return () => ("3012\u001d24212\u001d802012345\u001d10abc",
+            new Dictionary<string, string>(4, StringComparer.Ordinal) {
+                { "30", "12" },
+                { "242", "12" },
+                { "8020", "12345" },
+                { "10", "abc" },
+            });
+        yield return () => ("10abc\u001d10def",
+            new Dictionary<string, string>(1, StringComparer.Ordinal) {
+                { "10", "abc" },
+            });
     }
 
     public static IEnumerable<(string, char, char, string)> TransformTestCases()
     {
+        yield return ("01012345678912341726", '(', ')', "(01)01234567891234");
+        yield return ("3012\u001d24212\u001d802012345\u001d10abc", '(', ')', "(30)12(242)12(8020)12345(10)abc");
+        yield return ("10\u001d10\u001d10\u001d10\u001d10\u001d10\u001d", '(', ')', "(10)(10)(10)(10)(10)(10)");
         yield return ("00147004940133770662", '(', ')', "(00)147004940133770662");
         yield return ("010123456789123421123456\u001d93abcd", '(', ')', "(01)01234567891234(21)123456(93)abcd");
         yield return ("010123456789123421123456\u001d91abcd\u001d920123456789", '[', ']', "[01]01234567891234[21]123456[91]abcd[92]0123456789");

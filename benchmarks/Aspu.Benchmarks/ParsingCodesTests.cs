@@ -9,10 +9,10 @@ using BenchmarkDotNet.Attributes;
 public class ParsingCodesTests
 {
     [Benchmark]
-    public void Parse() =>
+    public IDictionary<string, string> Parse() =>
         CodesParsing.Parse("0104636332455360210000000033461\u001d10ddddd\u001d111234561712345693abcd");
 
     [Benchmark]
-    public void Transform() =>
+    public string Transform() =>
        CodesParsing.Transform("0104636332455360210000000033461\u001d10ddddd\u001d111234561712345693abcd");
 }
