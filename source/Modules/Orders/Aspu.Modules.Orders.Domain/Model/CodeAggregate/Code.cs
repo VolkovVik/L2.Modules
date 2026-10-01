@@ -37,7 +37,7 @@ public sealed class Code : Aggregate
     /// <summary>
     ///     Value
     /// </summary>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = null!;
 
     /// <summary>
     ///     Order identifier
@@ -62,12 +62,12 @@ public sealed class Code : Aggregate
     /// <summary>
     ///     Print status
     /// </summary>
-    public CodePrintedStatus PrintedStatus { get; private set; }
+    public CodePrintedStatus PrintedStatus { get; private set; } = null!;
 
     /// <summary>
     ///     Aggregation status
     /// </summary>
-    public CodeAggregatedStatus AggregatedStatus { get; private set; }
+    public CodeAggregatedStatus AggregatedStatus { get; private set; } = null!;
 
     /// <summary>
     ///     Index

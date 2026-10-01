@@ -13,7 +13,7 @@ public sealed record AddCodeCommand(Guid? OrderId, Guid? OrderUnitId, string Val
 
 public static partial class AddCodeLogger
 {
-    [LoggerMessage(EventId = 13, Level = LogLevel.Critical, Message = "Add code {Value}")]
+    [LoggerMessage(EventId = 13, Level = LogLevel.Information, Message = "Add code {Value}")]
     public static partial void Log(ILogger logger, string value);
 }
 

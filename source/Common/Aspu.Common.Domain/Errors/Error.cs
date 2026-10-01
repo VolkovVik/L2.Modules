@@ -14,12 +14,12 @@ public record Error : IError
     /// <summary>
     ///     Error code
     /// </summary>
-    public string Code { get; }
+    public string Code { get; } = null!;
 
     /// <summary>
     ///     Error description
     /// </summary>
-    public string Description { get; }
+    public string Description { get; } = null!;
 
     /// <summary>
     ///     Error type

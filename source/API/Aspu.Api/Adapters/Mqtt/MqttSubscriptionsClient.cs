@@ -19,7 +19,7 @@ internal sealed class MqttSubscriptionsClient(
 
     private readonly MqttOptions _options = options.Value;
 
-    private TaskCompletionSource _disconnectCompletion;
+    private TaskCompletionSource _disconnectCompletion = null!;
 
     /// <summary>
     /// Runs a single broker session

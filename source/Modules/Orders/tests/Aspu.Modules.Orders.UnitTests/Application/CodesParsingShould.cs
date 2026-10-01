@@ -4,7 +4,7 @@ namespace Aspu.Modules.Orders.UnitTests.Application;
 
 internal sealed class CodesParsingShould
 {
-    public static IEnumerable<string> TestEmptyCases()
+    public static IEnumerable<string?> TestEmptyCases()
     {
         yield return null;
         yield return "";
