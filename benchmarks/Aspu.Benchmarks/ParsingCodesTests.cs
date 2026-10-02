@@ -8,11 +8,11 @@ using BenchmarkDotNet.Attributes;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1110:Declare type inside namespace", Justification = "<Pending>")]
 public class ParsingCodesTests
 {
-    [Benchmark]
-    public IDictionary<string, string> Parse() =>
-        CodesParsing.Parse("0104636332455360210000000033461\u001d10ddddd\u001d111234561712345693abcd");
+    private const string _code = "0104636332455360210000000033461\u001d10ddddd\u001d111234561712345693abcd3353000123";
 
     [Benchmark]
-    public string Transform() =>
-       CodesParsing.Transform("0104636332455360210000000033461\u001d10ddddd\u001d111234561712345693abcd");
+    public IDictionary<string, string> Parse() => CodesParsing.Parse(_code);
+
+    [Benchmark]
+    public string Transform() => CodesParsing.Transform(_code);
 }
