@@ -6,8 +6,9 @@ namespace Aspu.Modules.Orders.Application;
 public static class CodesParsing
 {
     private const char GroupSeparator = '\u001d';
+    private const int MaxStackallocLength = 256 * 2;
 
-    private record struct ApplicationId(string Id, int Length, bool IsVariable = false) { }
+    private sealed record ApplicationId(string Id, int Length, bool IsVariable = false);
 
     private static readonly FrozenDictionary<int, ApplicationId> _dictionary =
         new Dictionary<int, ApplicationId>(128)
@@ -129,7 +130,7 @@ public static class CodesParsing
             }
 
             result.TryAdd(value.Id, span[..length].ToString());
-            span = span[length..];
+            span = SkipGroupSeparator(span[length..]);
         }
         return result;
     }
@@ -139,8 +140,13 @@ public static class CodesParsing
         if (string.IsNullOrWhiteSpace(code))
             return string.Empty;
 
+        // Each AI consumes at least 2 input chars and adds 2 brackets, so the output never exceeds twice the input
+        var size = code.Length * 2;
+        if (size <= MaxStackallocLength)
+            return TransformInternal(stackalloc char[size], code, begin, end);
+
         var pool = ArrayPool<char>.Shared;
-        var buffer = pool.Rent(code.Length * 2);
+        var buffer = pool.Rent(size);
         try
         {
             return TransformInternal(buffer, code, begin, end);
@@ -151,7 +157,7 @@ public static class CodesParsing
         }
     }
 
-    private static string TransformInternal(char[] buffer, string code, char begin, char end)
+    private static string TransformInternal(Span<char> buffer, string code, char begin, char end)
     {
         var pos = 0;
         var span = !code.StartsWith(GroupSeparator)
@@ -162,14 +168,14 @@ public static class CodesParsing
         {
             var value = GetApplicationId(span);
             if (value is null)
-                return new string(buffer, 0, pos);
+                return new string(buffer[..pos]);
 
             if (!value.IsVariable && span.Length - value.Id.Length < value.Length)
-                return new string(buffer, 0, pos);
+                return new string(buffer[..pos]);
 
             buffer[pos++] = begin;
 
-            value.Id.AsSpan().CopyTo(buffer.AsSpan(pos));
+            value.Id.CopyTo(buffer[pos..]);
             pos += value.Id.Length;
 
             buffer[pos++] = end;
@@ -177,7 +183,7 @@ public static class CodesParsing
             span = span[value.Id.Length..];
             if (!value.IsVariable)
             {
-                span[..value.Length].CopyTo(buffer.AsSpan(pos));
+                span[..value.Length].CopyTo(buffer[pos..]);
                 pos += value.Length;
 
                 span = span[value.Length..];
@@ -187,20 +193,24 @@ public static class CodesParsing
             var index = span[..length].IndexOf(GroupSeparator);
             if (index >= 0)
             {
-                span[..index].CopyTo(buffer.AsSpan(pos));
+                span[..index].CopyTo(buffer[pos..]);
                 pos += index;
 
                 span = span[(index + 1)..];
                 continue;
             }
 
-            span[..length].CopyTo(buffer.AsSpan(pos));
+            span[..length].CopyTo(buffer[pos..]);
             pos += length;
 
-            span = span[length..];
+            span = SkipGroupSeparator(span[length..]);
         }
-        return new string(buffer, 0, pos);
+        return new string(buffer[..pos]);
     }
+
+    // A variable-length field of maximum length may still be terminated by a group separator
+    private static ReadOnlySpan<char> SkipGroupSeparator(ReadOnlySpan<char> span) =>
+        span.StartsWith(GroupSeparator) ? span[1..] : span;
 
     private static ApplicationId? GetApplicationId(ReadOnlySpan<char> code)
     {

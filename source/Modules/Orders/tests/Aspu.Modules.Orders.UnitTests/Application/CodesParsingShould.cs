@@ -69,6 +69,11 @@ internal sealed class CodesParsingShould
                 { "8020", "12345" },
                 { "10", "abc" },
             });
+        yield return () => ("3712345678\u001d10abc",
+            new Dictionary<string, string>(2, StringComparer.Ordinal) {
+                { "37", "12345678" },
+                { "10", "abc" },
+            });
         yield return () => ("10abc\u001d10def",
             new Dictionary<string, string>(1, StringComparer.Ordinal) {
                 { "10", "abc" },
@@ -77,6 +82,9 @@ internal sealed class CodesParsingShould
 
     public static IEnumerable<(string, char, char, string)> TransformTestCases()
     {
+        // Longer than the stackalloc threshold (256 chars), the buffer comes from ArrayPool
+        var data = new string('a', 90);
+        yield return ($"91{data}\u001d92{data}\u001d93{data}\u001d94{data}", '(', ')', $"(91){data}(92){data}(93){data}(94){data}");
         yield return ("01012345678912341726", '(', ')', "(01)01234567891234");
         yield return ("3012\u001d24212\u001d802012345\u001d10abc", '(', ')', "(30)12(242)12(8020)12345(10)abc");
         yield return ("10\u001d10\u001d10\u001d10\u001d10\u001d10\u001d", '(', ')', "(10)(10)(10)(10)(10)(10)");
