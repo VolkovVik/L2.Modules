@@ -226,10 +226,7 @@ public static class CodesParsing
 
             key = key * 10 + (code[i] - '0');
 
-            if (i < 1)
-                continue;
-
-            if (_dictionary.TryGetValue(key, out var value) && value.Id.Length == i + 1)
+            if (i < 1 && _dictionary.TryGetValue(key, out var value) && value.Id.Length == i + 1)
                 return value;
         }
         return null;
