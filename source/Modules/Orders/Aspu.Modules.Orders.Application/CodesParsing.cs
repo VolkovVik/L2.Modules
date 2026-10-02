@@ -97,40 +97,25 @@ public static class CodesParsing
     public static IDictionary<string, string> Parse(string code)
     {
         var result = new Dictionary<string, string>(8, StringComparer.Ordinal);
+
         if (string.IsNullOrWhiteSpace(code))
             return result;
 
-        var span = !code.StartsWith(GroupSeparator)
-            ? code.AsSpan()
-            : code.AsSpan(1);
+        var span = code.AsSpan();
 
         while (!span.IsEmpty)
         {
-            var value = GetApplicationId(span);
-            if (value is null)
+            span = SkipGroupSeparator(span);
+
+            var (applicationId, length) = ReadElement(span);
+            if (applicationId is null)
                 return result;
 
-            span = span[value.Id.Length..];
-            if (!value.IsVariable)
-            {
-                if (span.Length < value.Length)
-                    return result;
+            span = span[applicationId.Id.Length..];
 
-                result.TryAdd(value.Id, span[..value.Length].ToString());
-                span = span[value.Length..];
-                continue;
-            }
-            var length = span.Length < value.Length ? span.Length : value.Length;
-            var index = span[..length].IndexOf(GroupSeparator);
-            if (index >= 0)
-            {
-                result.TryAdd(value.Id, span[..index].ToString());
-                span = span[(index + 1)..];
-                continue;
-            }
+            result.TryAdd(applicationId.Id, span[..length].ToString());
 
-            result.TryAdd(value.Id, span[..length].ToString());
-            span = SkipGroupSeparator(span[length..]);
+            span = span[length..];
         }
         return result;
     }
@@ -160,55 +145,48 @@ public static class CodesParsing
     private static string TransformInternal(Span<char> buffer, string code, char begin, char end)
     {
         var pos = 0;
-        var span = !code.StartsWith(GroupSeparator)
-            ? code.AsSpan()
-            : code.AsSpan(1);
+        var span = code.AsSpan();
 
         while (!span.IsEmpty)
         {
-            var value = GetApplicationId(span);
-            if (value is null)
+            span = SkipGroupSeparator(span);
+
+            var (applicationId, length) = ReadElement(span);
+            if (applicationId is null)
                 return new string(buffer[..pos]);
 
-            if (!value.IsVariable && span.Length - value.Id.Length < value.Length)
-                return new string(buffer[..pos]);
+            span = span[applicationId.Id.Length..];
 
             buffer[pos++] = begin;
-
-            value.Id.CopyTo(buffer[pos..]);
-            pos += value.Id.Length;
-
+            applicationId.Id.CopyTo(buffer[pos..]);
+            pos += applicationId.Id.Length;
             buffer[pos++] = end;
-
-            span = span[value.Id.Length..];
-            if (!value.IsVariable)
-            {
-                span[..value.Length].CopyTo(buffer[pos..]);
-                pos += value.Length;
-
-                span = span[value.Length..];
-                continue;
-            }
-            var length = span.Length < value.Length ? span.Length : value.Length;
-            var index = span[..length].IndexOf(GroupSeparator);
-            if (index >= 0)
-            {
-                span[..index].CopyTo(buffer[pos..]);
-                pos += index;
-
-                span = span[(index + 1)..];
-                continue;
-            }
-
             span[..length].CopyTo(buffer[pos..]);
             pos += length;
 
-            span = SkipGroupSeparator(span[length..]);
+            span = span[length..];
         }
+
         return new string(buffer[..pos]);
     }
 
-    // A variable-length field of maximum length may still be terminated by a group separator
+    private static (ApplicationId? id, int length) ReadElement(ReadOnlySpan<char> span)
+    {
+        var applicationId = GetApplicationId(span);
+        if (applicationId is null)
+            return (null, 0);
+
+        span = span[applicationId.Id.Length..];
+        var length = Math.Min(span.Length, applicationId.Length);
+        if (!applicationId.IsVariable)
+            return (applicationId.Length != length ? null : applicationId, length);
+
+        var index = span[..length].IndexOf(GroupSeparator);
+        return index >= 0
+            ? (applicationId, index)
+            : (applicationId, length);
+    }
+
     private static ReadOnlySpan<char> SkipGroupSeparator(ReadOnlySpan<char> span) =>
         span.StartsWith(GroupSeparator) ? span[1..] : span;
 
@@ -226,7 +204,7 @@ public static class CodesParsing
 
             key = key * 10 + (code[i] - '0');
 
-            if (i < 1 && _dictionary.TryGetValue(key, out var value) && value.Id.Length == i + 1)
+            if (i > 0 && _dictionary.TryGetValue(key, out var value) && value.Id.Length == i + 1)
                 return value;
         }
         return null;
