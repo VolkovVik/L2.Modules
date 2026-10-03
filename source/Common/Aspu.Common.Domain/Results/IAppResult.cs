@@ -2,7 +2,7 @@
 
 namespace Aspu.Common.Domain.Results;
 
-public interface IResult
+public interface IAppResult
 {
     bool IsSuccess { get; }
 
@@ -11,12 +11,12 @@ public interface IResult
     string? Description { get; }
 }
 
-public interface IResult<out TValue> : IResult
+public interface IAppResult<out TValue> : IAppResult
 {
     TValue? Value { get; }
 }
 
-public interface IResult<out TValue, out TError> : IResult<TValue>
+public interface IAppResult<out TValue, out TError> : IAppResult<TValue>
     where TError : IError
 {
     TError? Error { get; }

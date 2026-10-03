@@ -38,7 +38,7 @@ public record AppResult<TValue> : AppResult<TValue, Error>
         AppResult<TValue>.Failure(error);
 }
 
-public record AppResult<TValue, TError> : IResult<TValue, TError>
+public record AppResult<TValue, TError> : IAppResult<TValue, TError>
     where TError : IError
 {
     [MemberNotNullWhen(true, nameof(Value))]
