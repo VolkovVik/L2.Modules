@@ -10,89 +10,92 @@ public static class CodesParsing
 
     private sealed record ApplicationId(string Id, int Length, bool IsVariable = false);
 
-    private static readonly FrozenDictionary<int, ApplicationId> _dictionary =
-        new List<ApplicationId>(128)
+    private static readonly FrozenDictionary<string, ApplicationId> _dictionary =
+        new ApplicationId[]
         {
-            { new ApplicationId("00", 18) },
-            { new ApplicationId("01", 14) },
-            { new ApplicationId("02", 14) },
-            { new ApplicationId("10", 20, IsVariable: true) },
-            { new ApplicationId("11", 6) },
-            { new ApplicationId("12", 6) },
-            { new ApplicationId("13", 6) },
-            { new ApplicationId("15", 6) },
-            { new ApplicationId("17", 6) },
-            { new ApplicationId("20", 2) },
-            { new ApplicationId("21", 20, IsVariable: true) },
-            { new ApplicationId("22", 20, IsVariable: true) },
-            { new ApplicationId("240", 30, IsVariable: true) },
-            { new ApplicationId("241", 30, IsVariable: true) },
-            { new ApplicationId("242", 6, IsVariable: true) },
-            { new ApplicationId("250", 30, IsVariable: true) },
-            { new ApplicationId("251", 30, IsVariable: true) },
-            { new ApplicationId("253", 30, IsVariable: true) },
-            { new ApplicationId("254", 20, IsVariable: true) },
-            { new ApplicationId("255", 25, IsVariable: true) },
-            { new ApplicationId("30", 8, IsVariable: true) },
-            { new ApplicationId("3100",6) },
-            { new ApplicationId("3101",6) },
-            { new ApplicationId("3102",6) },
-            { new ApplicationId("3103",6) },
-            { new ApplicationId("3104",6) },
-            { new ApplicationId("3105",6) },
-            { new ApplicationId("3106",6) },
-            { new ApplicationId("3350",6) },
-            { new ApplicationId("3351",6) },
-            { new ApplicationId("3352",6) },
-            { new ApplicationId("3353",6) },
-            { new ApplicationId("3354",6) },
-            { new ApplicationId("3355",6) },
-            { new ApplicationId("3356",6) },
-            { new ApplicationId("37", 8, IsVariable: true) },
-            { new ApplicationId("400", 30, IsVariable: true) },
-            { new ApplicationId("401", 30, IsVariable: true) },
-            { new ApplicationId("402", 17) },
-            { new ApplicationId("403", 30, IsVariable: true) },
-            { new ApplicationId("410", 13) },
-            { new ApplicationId("411", 13) },
-            { new ApplicationId("412", 13) },
-            { new ApplicationId("413", 13) },
-            { new ApplicationId("414", 13) },
-            { new ApplicationId("415", 13) },
-            { new ApplicationId("420", 20, IsVariable: true) },
-            { new ApplicationId("421", 12, IsVariable: true) },
-            { new ApplicationId("422", 3) },
-            { new ApplicationId("423", 15, IsVariable: true) },
-            { new ApplicationId("424", 3) },
-            { new ApplicationId("425", 15, IsVariable: true) },
-            { new ApplicationId("426", 3) },
-            { new ApplicationId("7001", 13) },
-            { new ApplicationId("7002", 30, IsVariable: true) },
-            { new ApplicationId("7003", 10) },
-            { new ApplicationId("8001", 14) },
-            { new ApplicationId("8002", 20, IsVariable: true) },
-            { new ApplicationId("8003", 30, IsVariable: true) },
-            { new ApplicationId("8004", 30, IsVariable: true) },
-            { new ApplicationId("8005", 6) },
-            { new ApplicationId("8006", 18) },
-            { new ApplicationId("8007", 34, IsVariable: true) },
-            { new ApplicationId("8008", 12, IsVariable: true) },
-            { new ApplicationId("8013", 25, IsVariable: true) },
-            { new ApplicationId("8017", 18) },
-            { new ApplicationId("8018", 18) },
-            { new ApplicationId("8020", 25, IsVariable: true) },
-            { new ApplicationId("8110", 70, IsVariable: true) },
-            { new ApplicationId("90", 30, IsVariable: true) },
-            { new ApplicationId("91", 90, IsVariable: true) },
-            { new ApplicationId("92", 90, IsVariable: true) },
-            { new ApplicationId("93", 90, IsVariable: true) },
-            { new ApplicationId("94", 90, IsVariable: true) },
-            { new ApplicationId("95", 90, IsVariable: true) },
-            { new ApplicationId("96", 90, IsVariable: true) },
-            { new ApplicationId("97", 90, IsVariable: true) },
-            { new ApplicationId("98", 90, IsVariable: true) },
-            { new ApplicationId("99", 90, IsVariable: true) },
-        }.ToFrozenDictionary(x => int.Parse(x.Id, System.Globalization.CultureInfo.InvariantCulture), x => x);
+            new("00", 18),
+            new("01", 14),
+            new("02", 14),
+            new("10", 20, IsVariable: true),
+            new("11", 6),
+            new("12", 6),
+            new("13", 6),
+            new("15", 6),
+            new("17", 6),
+            new("20", 2),
+            new("21", 20, IsVariable: true),
+            new("22", 20, IsVariable: true),
+            new("240", 30, IsVariable: true),
+            new("241", 30, IsVariable: true),
+            new("242", 6, IsVariable: true),
+            new("250", 30, IsVariable: true),
+            new("251", 30, IsVariable: true),
+            new("253", 30, IsVariable: true),
+            new("254", 20, IsVariable: true),
+            new("255", 25, IsVariable: true),
+            new("30", 8, IsVariable: true),
+            new("3100", 6),
+            new("3101", 6),
+            new("3102", 6),
+            new("3103", 6),
+            new("3104", 6),
+            new("3105", 6),
+            new("3106", 6),
+            new("3350", 6),
+            new("3351", 6),
+            new("3352", 6),
+            new("3353", 6),
+            new("3354", 6),
+            new("3355", 6),
+            new("3356", 6),
+            new("37", 8, IsVariable: true),
+            new("400", 30, IsVariable: true),
+            new("401", 30, IsVariable: true),
+            new("402", 17),
+            new("403", 30, IsVariable: true),
+            new("410", 13),
+            new("411", 13),
+            new("412", 13),
+            new("413", 13),
+            new("414", 13),
+            new("415", 13),
+            new("420", 20, IsVariable: true),
+            new("421", 12, IsVariable: true),
+            new("422", 3),
+            new("423", 15, IsVariable: true),
+            new("424", 3),
+            new("425", 15, IsVariable: true),
+            new("426", 3),
+            new("7001", 13),
+            new("7002", 30, IsVariable: true),
+            new("7003", 10),
+            new("8001", 14),
+            new("8002", 20, IsVariable: true),
+            new("8003", 30, IsVariable: true),
+            new("8004", 30, IsVariable: true),
+            new("8005", 6),
+            new("8006", 18),
+            new("8007", 34, IsVariable: true),
+            new("8008", 12, IsVariable: true),
+            new("8013", 25, IsVariable: true),
+            new("8017", 18),
+            new("8018", 18),
+            new("8020", 25, IsVariable: true),
+            new("8110", 70, IsVariable: true),
+            new("90", 30, IsVariable: true),
+            new("91", 90, IsVariable: true),
+            new("92", 90, IsVariable: true),
+            new("93", 90, IsVariable: true),
+            new("94", 90, IsVariable: true),
+            new("95", 90, IsVariable: true),
+            new("96", 90, IsVariable: true),
+            new("97", 90, IsVariable: true),
+            new("98", 90, IsVariable: true),
+            new("99", 90, IsVariable: true),
+        }.ToFrozenDictionary(x => x.Id, x => x, StringComparer.Ordinal);
+
+    private static readonly FrozenDictionary<string, ApplicationId>.AlternateLookup<ReadOnlySpan<char>> _lookup =
+        _dictionary.GetAlternateLookup<ReadOnlySpan<char>>();
 
     public static IDictionary<string, string> Parse(string code)
     {
@@ -170,7 +173,7 @@ public static class CodesParsing
         return new string(buffer[..pos]);
     }
 
-    private static (ApplicationId? id, int length) ReadElement(ReadOnlySpan<char> span)
+    private static (ApplicationId? applicationId, int length) ReadElement(ReadOnlySpan<char> span)
     {
         var applicationId = GetApplicationId(span);
         if (applicationId is null)
@@ -189,16 +192,10 @@ public static class CodesParsing
 
     private static ApplicationId? GetApplicationId(ReadOnlySpan<char> code)
     {
-        var key = 0;
-        var length = Math.Min(4, code.Length);
-        for (var i = 0; i < length; i++)
+        var length = Math.Min(4, code.Length - 1);
+        for (var i = 2; i <= length; i++)
         {
-            if (!char.IsAsciiDigit(code[i]))
-                return null;
-
-            key = key * 10 + (code[i] - '0');
-
-            if (i > 0 && _dictionary.TryGetValue(key, out var value) && value.Id.Length == i + 1)
+            if (_lookup.TryGetValue(code[..i], out var value))
                 return value;
         }
         return null;
