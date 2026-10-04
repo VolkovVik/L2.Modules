@@ -52,6 +52,6 @@
   </Folder>
   <Folder Name="/tests/" />
   <Project Path="docker-compose.dcproj">
-    <Build />
+    <Build Project="false" />
   </Project>
 </Solution>
