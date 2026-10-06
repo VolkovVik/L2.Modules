@@ -51,11 +51,6 @@ internal sealed class MqttSubscriptionsClient(
             }
 
             await _disconnectCompletion.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
-
-        }
-        catch (Exception exc)
-        {
-            Log.Error(exc, "MQTT exception");
         }
         finally
         {
@@ -68,7 +63,7 @@ internal sealed class MqttSubscriptionsClient(
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "MQTT disconnect after session end");
+                Log.Warning(ex, "MQTT disconnect after session end");
             }
 
             client.Dispose();

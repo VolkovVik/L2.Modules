@@ -31,8 +31,9 @@ internal sealed class MqttSubscriptionsHostedService(
                 try
                 {
                     await mqttClient.RunSessionAsync(subscriptions, stoppingToken).ConfigureAwait(false);
+                    Log.Warning("MQTT session ended; reconnect in {@Seconds} s", reconnectDelay);
                 }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                catch (Exception) when (stoppingToken.IsCancellationRequested)
                 {
                     break;
                 }
@@ -40,10 +41,9 @@ internal sealed class MqttSubscriptionsHostedService(
                 {
                     Log.Error(exc, "MQTT session error; retry in {@Seconds} s", reconnectDelay);
                 }
-                finally
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(reconnectDelay), stoppingToken).ConfigureAwait(false);
-                }
+
+                await Task.Delay(TimeSpan.FromSeconds(reconnectDelay), stoppingToken)
+                    .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
             }
         }
         finally
