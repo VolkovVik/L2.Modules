@@ -81,7 +81,7 @@ public sealed class DomainEnumGenerator : GeneratorInternal<DomainEnumGenerator>
           .AppendLine("    ///     Ctr")
           .AppendLine(SummaryEnd)
           .AppendLine("    /// <param name=\"name\">Name</param>")
-          .Append("    public ").Append(className).AppendLine("(string name) : this()")
+          .Append("    private ").Append(className).AppendLine("(string name) : this()")
           .AppendLine("    {")
           .AppendLine("        Name = name.ToLowerInvariant();")
           .AppendLine("    }")

@@ -353,10 +353,10 @@ public sealed class Code : Aggregate
         private static readonly string Name = $"{nameof(Code).ToLowerInvariant()}";
 
         public static Error CodeHasOtherOrder(string value) =>
-            Error.Failure($"{Name}.has.other.order.status", $"Код маркировки {value} принадлежит другому заказу");
+            Error.Failure($"{Name}.has.other.order", $"Код маркировки {value} принадлежит другому заказу");
 
         public static Error CodeHasOtherOrderUnit(string value) =>
-           Error.Failure($"{Name}.has.overdue.status", $"Код маркировки {value} принадлежит другому продуктовому типу");
+            Error.Failure($"{Name}.has.other.order.unit", $"Код маркировки {value} принадлежит другому продуктовому типу");
 
         public static Error CodeHasExpiredStatus(string value) =>
             Error.Failure($"{Name}.has.expired.status", $"Код маркировки {value} находится в статусе \"Просрочен\"");
