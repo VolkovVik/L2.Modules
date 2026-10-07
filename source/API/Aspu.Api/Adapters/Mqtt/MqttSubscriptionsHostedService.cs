@@ -18,13 +18,16 @@ internal sealed class MqttSubscriptionsHostedService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (handlerTopics.IsEmpty)
-            Log.Warning("MQTT subscriber has no handlers registered");
-
         var reconnectDelay = options.Value.ReconnectDelaySeconds;
 
         try
         {
+            if (handlerTopics.IsEmpty)
+            {
+                Log.Warning("MQTT subscriber has no handlers registered");
+                return;
+            }
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
