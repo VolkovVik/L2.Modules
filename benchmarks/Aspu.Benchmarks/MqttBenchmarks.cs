@@ -16,6 +16,7 @@ public class MqttBenchmarks
     private static Context s_ctx = null!;
 
     public const string TopicName = "benchmark/topic";
+    public const string WildcardTopicName = "benchmark/+/wildcard";
 
     [GlobalSetup]
     public static void Setup()
@@ -25,7 +26,11 @@ public class MqttBenchmarks
 
         var services = new ServiceCollection();
         services.AddSingleton<IMqttHandler, BenchmarkMqttHandler>();
-        services.AddSingleton<InboundProcessorHandlerRegistry<IMqttHandler>>();
+        services.AddSingleton<IMqttHandler, BenchmarkWildcardMqttHandler>();
+        services.AddSingleton(sp => new InboundProcessorHandlerRegistry<IMqttHandler>(
+            sp.GetRequiredService<IServiceScopeFactory>(),
+            new MqttTopicMatcher(),
+            NullLogger<InboundProcessorHandlerRegistry<IMqttHandler>>.Instance));
         var rootServices = services.BuildServiceProvider();
 
         s_ctx = new Context
@@ -43,6 +48,12 @@ public class MqttBenchmarks
                 Topic = TopicName,
                 Payload = new byte[128],
             },
+            WildcardTopic = new InboundProcessorMessage
+            {
+                Type = "Mqtt",
+                Topic = "benchmark/device-1/wildcard",
+                Payload = new byte[128],
+            },
         };
     }
 
@@ -50,10 +61,15 @@ public class MqttBenchmarks
     public Task MatchedHandlerAsync() =>
         s_ctx.Service.ProcessOneAsync(s_ctx.MatchedTopic, CancellationToken.None);
 
+    [Benchmark]
+    public Task WildcardHandlerAsync() =>
+        s_ctx.Service.ProcessOneAsync(s_ctx.WildcardTopic, CancellationToken.None);
+
     private sealed class Context
     {
         public required ServiceProvider RootServices { get; init; }
         public required InboundProcessorMessage MatchedTopic { get; init; }
+        public required InboundProcessorMessage WildcardTopic { get; init; }
         public required InboundProcessorHostedService<MqttOptions, IMqttHandler> Service { get; init; }
 
     }
@@ -61,6 +77,14 @@ public class MqttBenchmarks
     private sealed class BenchmarkMqttHandler : IMqttHandler
     {
         public string Topic => TopicName;
+
+        public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
+            Task.CompletedTask;
+    }
+
+    private sealed class BenchmarkWildcardMqttHandler : IMqttHandler
+    {
+        public string Topic => WildcardTopicName;
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;

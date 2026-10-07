@@ -18,9 +18,11 @@ internal sealed class MqttSubscriptionsHostedService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var subscriptions = handlerTopics.GetSubscriptions();
-        if (subscriptions.Count == 0)
-            Log.Warning("MQTT subscriber has no valid topic to subscribe");
+        if (handlerTopics.IsEmpty)
+        {
+            Log.Warning("MQTT subscriber has no handlers registered");
+            return;
+        }
 
         var reconnectDelay = options.Value.ReconnectDelaySeconds;
 
@@ -30,6 +32,7 @@ internal sealed class MqttSubscriptionsHostedService(
             {
                 try
                 {
+                    var subscriptions = handlerTopics.GetSubscriptions();
                     await mqttClient.RunSessionAsync(subscriptions, stoppingToken).ConfigureAwait(false);
                     Log.Warning("MQTT session ended; reconnect in {@Seconds} s", reconnectDelay);
                 }

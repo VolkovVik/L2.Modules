@@ -21,7 +21,7 @@ internal static class NatsExtensions
             return services;
 
         services.AddConfiguredNatsClient();
-        services.AddInboundProcessor<NatsOptions, INatsHandler>();
+        services.AddInboundProcessor<NatsOptions, INatsHandler, NatsTopicMatcher>();
         services.AddHostedService<NatsSubscriptionsHostedService>();
 
         return services;

@@ -8,8 +8,8 @@ using Microsoft.Extensions.Options;
 namespace Aspu.Common.Presentation.Abstractions.InboundProcessor;
 
 /// <summary>
-/// Reads messages from the inbound channel and runs <see cref="IInboundProcessorHandler"/> per message in a new DI scope.
-/// Processing uses <c>Parallel.ForEachAsync</c> with <see cref="MqttOptions.InboundProcessorMaxDegreeOfParallelism"/>.
+/// Reads messages from the inbound channel and runs every <see cref="IInboundProcessorHandler"/> whose topic pattern matches, in a new DI scope per message.
+/// Processing uses <c>Parallel.ForEachAsync</c> with <see cref="IInboundProcessorOptions.InboundProcessorMaxDegreeOfParallelism"/>.
 /// </summary>
 public sealed class InboundProcessorHostedService<TOptions, THandler>(
     IOptions<TOptions> options,
@@ -56,35 +56,41 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
         if (payload.IsEmpty || string.IsNullOrWhiteSpace(item.Topic))
             return;
 
-        if (!handlerRegistry.IsEnabled(item.Topic))
+        if (!handlerRegistry.TryResolve(item.Topic, out var patterns))
         {
             if (logger.IsEnabled(LogLevel.Warning))
                 logger.LogWarning("Inbound processor handler for topic {Topic} isn't found", item.Topic);
+
             return;
         }
 
         await using var scope = scopeFactory.CreateAsyncScope();
         var sp = scope.ServiceProvider;
-        var handlers = sp.GetServices<THandler>();
-        var handler = handlers.FirstOrDefault(x => string.Equals(x.Topic, item.Topic, StringComparison.OrdinalIgnoreCase));
-        if (handler is null)
-            return;
+        var allHandlers = sp.GetServices<THandler>();
+        var handlers = allHandlers.Where(x => patterns.Contains(x.Topic.Trim(), StringComparer.Ordinal)).ToList();
+        if (!handlers.Any())
+        {
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning("Inbound processor handlers for topic {Topic} isn't found", item.Topic);
 
-        try
-        {
-            await handler.HandleAsync(item.Topic, payload, cancellationToken).ConfigureAwait(false);
+            return;
         }
-        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+
+        foreach (var handler in handlers)
         {
-            logger.LogError(ex, "Inbound processor handler for topic {Topic} failed", item.Topic);
-        }
-        finally
-        {
-            if (logger.IsEnabled(LogLevel.Information))
+            try
             {
-                var deltaTime = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
-                logger.LogInformation("Inbound processor handler on {@Topic} {@Payload} {@Total} ms", item.Topic, Encoding.UTF8.GetString(payload.Span), deltaTime);
+                await handler.HandleAsync(item.Topic, payload, cancellationToken).ConfigureAwait(false);
             }
+            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+            {
+                logger.LogError(ex, "Inbound processor handler {@Handler} ({@HandlerTopic}) for topic {@Topic} failed", handler.GetType().Name, handler.Topic, item.Topic);
+            }
+        }
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            var deltaTime = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
+            logger.LogInformation("Inbound processor handler on {@Topic} {@Payload} {@Total} ms", item.Topic, Encoding.UTF8.GetString(payload.Span), deltaTime);
         }
     }
 }

@@ -16,7 +16,7 @@ internal static class MqttExtensions
             return services;
 
         services.AddSingleton<MqttSubscriptionsClient>();
-        services.AddInboundProcessor<MqttOptions, IMqttHandler>();
+        services.AddInboundProcessor<MqttOptions, IMqttHandler, MqttTopicMatcher>();
         services.AddHostedService<MqttSubscriptionsHostedService>();
 
         return services;

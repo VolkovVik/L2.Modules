@@ -19,8 +19,7 @@ internal sealed class NatsSubscriptionsHostedService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var subjects = handlerTopics.GetSubscriptions();
-        if (subjects.Count == 0)
+        if (handlerTopics.IsEmpty)
         {
             Log.Warning("NATS subscriber has no handlers registered");
             return;
@@ -28,6 +27,7 @@ internal sealed class NatsSubscriptionsHostedService(
 
         try
         {
+            var subjects = handlerTopics.GetSubscriptions();
             if (!options.Value.IsJetStreamEnabled)
                 await ExecuteInternalAsync(subjects, stoppingToken);
             else
