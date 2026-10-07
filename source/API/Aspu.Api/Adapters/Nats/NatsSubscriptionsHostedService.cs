@@ -20,10 +20,7 @@ internal sealed class NatsSubscriptionsHostedService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         if (handlerTopics.IsEmpty)
-        {
             Log.Warning("NATS subscriber has no handlers registered");
-            return;
-        }
 
         try
         {

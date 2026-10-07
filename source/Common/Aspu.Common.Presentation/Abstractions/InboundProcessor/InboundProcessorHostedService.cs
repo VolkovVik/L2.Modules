@@ -59,7 +59,7 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
         if (!handlerRegistry.TryResolve(item.Topic, out var patterns))
         {
             if (logger.IsEnabled(LogLevel.Warning))
-                logger.LogWarning("Inbound processor handler for topic {Topic} isn't found", item.Topic);
+                logger.LogWarning("Inbound processor handler patterns for topic {Topic} isn't found", item.Topic);
 
             return;
         }
