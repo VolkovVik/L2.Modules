@@ -68,7 +68,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         var isEnabled = registry.TryResolve("orders.created", out var patterns);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(patterns).IsEquivalentTo(["orders.created", "orders.*", "orders.>"]);
+        await Assert.That(patterns).IsEquivalentTo(["orders.created"]);
     }
 
     [Test]

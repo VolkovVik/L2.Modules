@@ -19,7 +19,7 @@ public sealed class InboundProcessorHandlerRegistry<THandler>
     private readonly ITopicMatcher _matcher;
     private readonly FrozenSet<string> _topicSet;
     private readonly FrozenSet<string> _wildcardSet;
-    private readonly ConcurrentDictionary<string, string[]> _resolveCache = new(-1, MaxCachedTopics, StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, string[]> _resolveCache = new(StringComparer.Ordinal);
     private int _resolveCacheCount;
 
     public InboundProcessorHandlerRegistry(
@@ -64,25 +64,25 @@ public sealed class InboundProcessorHandlerRegistry<THandler>
         if (string.IsNullOrWhiteSpace(topic))
             return false;
 
+        if (_topicSet.Contains(topic))
+        {
+            patterns = [topic];
+            return true;
+        }
+
         if (_resolveCache.TryGetValue(topic, out var items))
         {
             patterns = items;
             return true;
         }
 
-        var list = new List<string>();
-        if (_topicSet.Contains(topic))
-            list.Add(topic);
-
-        list.AddRange(_wildcardSet.Where(t => _matcher.IsMatch(t, topic)));
-        if (!list.Any())
+        patterns = [.. _wildcardSet.Where(t => _matcher.IsMatch(t, topic))];
+        if (!patterns.Any())
             return false;
 
-        list = [.. list.Distinct(StringComparer.Ordinal)];
-        if (Volatile.Read(ref _resolveCacheCount) < MaxCachedTopics && _resolveCache.TryAdd(topic, [.. list]))
+        if (Volatile.Read(ref _resolveCacheCount) < MaxCachedTopics && _resolveCache.TryAdd(topic, [.. patterns]))
             Interlocked.Increment(ref _resolveCacheCount);
 
-        patterns = [.. list];
         return true;
     }
 }
