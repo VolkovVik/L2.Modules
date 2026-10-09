@@ -13,10 +13,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, ExactHandler>());
 
-        var isEnabled = registry.TryResolve("orders.created", out var pattern);
+        var isEnabled = registry.TryResolve("orders.created", out var handlerType);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(pattern).IsEqualTo("orders.created");
+        await Assert.That(handlerType).IsEqualTo(typeof(ExactHandler));
     }
 
     [Test]
@@ -25,10 +25,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, SingleTokenHandler>());
 
-        var isEnabled = registry.TryResolve("orders.updated", out var pattern);
+        var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(pattern).IsEqualTo("orders.*");
+        await Assert.That(handlerType).IsEqualTo(typeof(SingleTokenHandler));
     }
 
     [Test]
@@ -37,10 +37,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, TailHandler>());
 
-        var isEnabled = registry.TryResolve("orders.deleted.v2", out var pattern);
+        var isEnabled = registry.TryResolve("orders.deleted.v2", out var handlerType);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(pattern).IsEqualTo("orders.>");
+        await Assert.That(handlerType).IsEqualTo(typeof(TailHandler));
     }
 
     [Test]
@@ -51,13 +51,13 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
             .AddSingleton<INatsHandler, CustomersHandler>()
             .AddSingleton<INatsHandler, InvoicesHandler>());
 
-        var isExactEnabled = registry.TryResolve("orders.created", out var exactPattern);
-        var isWildcardEnabled = registry.TryResolve("invoices.paid.v2", out var wildcardPattern);
+        var isExactEnabled = registry.TryResolve("orders.created", out var exactHandlerType);
+        var isWildcardEnabled = registry.TryResolve("invoices.paid.v2", out var wildcardHandlerType);
 
         await Assert.That(isExactEnabled).IsTrue();
-        await Assert.That(exactPattern).IsEqualTo("orders.created");
+        await Assert.That(exactHandlerType).IsEqualTo(typeof(ExactHandler));
         await Assert.That(isWildcardEnabled).IsTrue();
-        await Assert.That(wildcardPattern).IsEqualTo("invoices.>");
+        await Assert.That(wildcardHandlerType).IsEqualTo(typeof(InvoicesHandler));
     }
 
     [Test]
@@ -67,10 +67,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
             .AddSingleton<INatsHandler, SingleTokenHandler>());
 
         registry.TryResolve("orders.updated", out _);
-        var isEnabled = registry.TryResolve("orders.updated", out var pattern);
+        var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(pattern).IsEqualTo("orders.*");
+        await Assert.That(handlerType).IsEqualTo(typeof(SingleTokenHandler));
     }
 
     [Test]
@@ -80,10 +80,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
             .AddSingleton<INatsHandler, ExactHandler>()
             .AddSingleton<INatsHandler, CustomersHandler>());
 
-        var isEnabled = registry.TryResolve("payments.updated", out var pattern);
+        var isEnabled = registry.TryResolve("payments.updated", out var handlerType);
 
         await Assert.That(isEnabled).IsFalse();
-        await Assert.That(pattern).IsNull();
+        await Assert.That(handlerType).IsNull();
     }
 
     [Test]

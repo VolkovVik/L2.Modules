@@ -13,8 +13,8 @@ internal static partial class InboundProcessorLog
     [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "Inbound processor handler for topic {Topic} isn't found")]
     public static partial void HandlerNotFound(ILogger logger, string topic);
 
-    [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "Inbound processor handler {Handler} ({HandlerTopic}) for topic {Topic} failed")]
-    public static partial void HandlerFailed(ILogger logger, Exception exception, string handler, string handlerTopic, string topic);
+    [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "Inbound processor handler {Handler} for topic {Topic} failed")]
+    public static partial void HandlerFailed(ILogger logger, Exception exception, string handler, string topic);
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Information, Message = "Inbound processor handler on {Topic} {Payload} {Total} ms")]
     public static partial void Processed(ILogger logger, string topic, string payload, double total);

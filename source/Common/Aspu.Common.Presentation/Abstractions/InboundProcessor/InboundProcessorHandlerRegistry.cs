@@ -22,8 +22,8 @@ public sealed class InboundProcessorHandlerRegistry<THandler>
 
     private int _resolveCacheCount;
     private readonly FrozenDictionary<string, Type> _handlerTypes;
-    private readonly FrozenSet<string> _wildcardSet;
-    private readonly ConcurrentDictionary<string, string> _resolveCache = new(StringComparer.Ordinal);
+    private readonly HandlerInfo[] _wildcardHandlers;
+    private readonly ConcurrentDictionary<string, Type> _resolveCache = new(StringComparer.Ordinal);
 
     public InboundProcessorHandlerRegistry(
         IServiceScopeFactory scopeFactory,
@@ -45,39 +45,31 @@ public sealed class InboundProcessorHandlerRegistry<THandler>
         // Handler type is the keyed-service key, so the processor resolves only the matching handler.
         _handlerTypes = handlers.ToFrozenDictionary(h => h.Topic, h => h.HandlerType, StringComparer.Ordinal);
 
-        _wildcardSet = _handlerTypes.Keys
-           .Where(matcher.IsWildcard)
-           .ToFrozenSet(StringComparer.Ordinal);
+        _wildcardHandlers = [.. handlers.Where(h => matcher.IsWildcard(h.Topic))];
     }
 
     public bool IsEmpty => _handlerTypes.Count == 0;
 
     public IReadOnlyList<string> GetSubscriptions() => [.. _handlerTypes.Keys];
 
-    /// <summary>Handler type (keyed-service key) for a pattern returned by <see cref="TryResolve"/>.</summary>
-    public Type GetHandlerType(string pattern) => _handlerTypes[pattern];
-
-    public bool TryResolve(string topic, [NotNullWhen(true)] out string? pattern)
+    public bool TryResolve(string topic, [NotNullWhen(true)] out Type? handlerType)
     {
-        pattern = null;
+        handlerType = null;
 
         if (string.IsNullOrWhiteSpace(topic))
             return false;
 
-        if (_handlerTypes.ContainsKey(topic))
-        {
-            pattern = topic;
-            return true;
-        }
-
-        if (_resolveCache.TryGetValue(topic, out pattern))
+        if (_handlerTypes.TryGetValue(topic, out handlerType))
             return true;
 
-        pattern = _wildcardSet.FirstOrDefault(t => _matcher.IsMatch(t, topic));
-        if (pattern is null)
+        if (_resolveCache.TryGetValue(topic, out handlerType))
+            return true;
+
+        handlerType = Array.Find(_wildcardHandlers, h => _matcher.IsMatch(h.Topic, topic))?.HandlerType;
+        if (handlerType is null)
             return false;
 
-        if (Volatile.Read(ref _resolveCacheCount) < MaxCachedTopics && _resolveCache.TryAdd(topic, pattern))
+        if (Volatile.Read(ref _resolveCacheCount) < MaxCachedTopics && _resolveCache.TryAdd(topic, handlerType))
             Interlocked.Increment(ref _resolveCacheCount);
 
         return true;

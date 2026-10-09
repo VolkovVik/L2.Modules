@@ -56,27 +56,27 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
         if (payload.IsEmpty || string.IsNullOrWhiteSpace(item.Topic))
             return;
 
-        if (!handlerRegistry.TryResolve(item.Topic, out var pattern))
+        if (!handlerRegistry.TryResolve(item.Topic, out var handlerType))
         {
             InboundProcessorLog.PatternNotFound(logger, item.Topic);
             return;
         }
 
-        await using var scope = scopeFactory.CreateAsyncScope();
-        var handler = scope.ServiceProvider.GetKeyedService<THandler>(handlerRegistry.GetHandlerType(pattern));
-        if (handler is null)
-        {
-            InboundProcessorLog.HandlerNotFound(logger, item.Topic);
-            return;
-        }
-
         try
         {
+            await using var scope = scopeFactory.CreateAsyncScope();
+            var handler = scope.ServiceProvider.GetKeyedService<THandler>(handlerType);
+            if (handler is null)
+            {
+                InboundProcessorLog.HandlerNotFound(logger, item.Topic);
+                return;
+            }
+
             await handler.HandleAsync(item.Topic, payload, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {
-            InboundProcessorLog.HandlerFailed(logger, ex, handler.GetType().Name, handler.Topic, item.Topic);
+            InboundProcessorLog.HandlerFailed(logger, ex, handlerType.Name, item.Topic);
         }
 
         if (logger.IsEnabled(LogLevel.Information))
