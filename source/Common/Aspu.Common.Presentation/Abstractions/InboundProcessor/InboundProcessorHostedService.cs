@@ -76,7 +76,11 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
 
             await handler.HandleAsync(item.Topic, payload, cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+        catch (Exception ex)
         {
             InboundProcessorLog.HandlerFailed(logger, ex, handlerType.Name, item.Topic);
         }
