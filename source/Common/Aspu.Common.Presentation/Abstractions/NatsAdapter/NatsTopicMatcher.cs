@@ -10,6 +10,8 @@ public sealed class NatsTopicMatcher : ITopicMatcher
 {
     private const char Separator = '.';
 
+    public string Name => nameof(NatsTopicMatcher);
+
     public bool IsValid(string pattern)
     {
         if (string.IsNullOrWhiteSpace(pattern))

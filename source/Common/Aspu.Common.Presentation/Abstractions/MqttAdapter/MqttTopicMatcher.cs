@@ -11,6 +11,8 @@ public sealed class MqttTopicMatcher : ITopicMatcher
 {
     private const char Separator = '/';
 
+    public string Name => nameof(MqttTopicMatcher);
+
     public bool IsValid(string pattern)
     {
         if (string.IsNullOrWhiteSpace(pattern))

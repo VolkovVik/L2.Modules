@@ -27,6 +27,8 @@ public class MqttBenchmarks
         var services = new ServiceCollection();
         services.AddSingleton<IMqttHandler, BenchmarkMqttHandler>();
         services.AddSingleton<IMqttHandler, BenchmarkWildcardMqttHandler>();
+        services.AddKeyedSingleton<IMqttHandler, BenchmarkMqttHandler>(typeof(BenchmarkMqttHandler));
+        services.AddKeyedSingleton<IMqttHandler, BenchmarkWildcardMqttHandler>(typeof(BenchmarkWildcardMqttHandler));
         services.AddSingleton(sp => new InboundProcessorHandlerRegistry<IMqttHandler>(
             sp.GetRequiredService<IServiceScopeFactory>(),
             new MqttTopicMatcher(),

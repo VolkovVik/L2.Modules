@@ -6,6 +6,9 @@ namespace Aspu.Common.Presentation.Abstractions.InboundProcessor;
 /// </summary>
 public interface ITopicMatcher
 {
+    /// <summary>Matcher name for logs and error messages.</summary>
+    string Name { get; }
+
     /// <summary>Returns true when <paramref name="pattern"/> is a syntactically valid subscription pattern.</summary>
     bool IsValid(string pattern);
 

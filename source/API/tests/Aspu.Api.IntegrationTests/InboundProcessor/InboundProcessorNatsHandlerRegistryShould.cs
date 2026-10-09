@@ -1,7 +1,6 @@
 using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Aspu.Common.Presentation.Abstractions.NatsAdapter;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Aspu.Api.IntegrationTests.InboundProcessor;
@@ -14,10 +13,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, ExactHandler>());
 
-        var isEnabled = registry.TryResolve("orders.created", out var patterns);
+        var isEnabled = registry.TryResolve("orders.created", out var pattern);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(patterns).IsEquivalentTo(["orders.created"]);
+        await Assert.That(pattern).IsEqualTo("orders.created");
     }
 
     [Test]
@@ -26,10 +25,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, SingleTokenHandler>());
 
-        var isEnabled = registry.TryResolve("orders.updated", out var patterns);
+        var isEnabled = registry.TryResolve("orders.updated", out var pattern);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(patterns).IsEquivalentTo(["orders.*"]);
+        await Assert.That(pattern).IsEqualTo("orders.*");
     }
 
     [Test]
@@ -38,23 +37,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, TailHandler>());
 
-        var isEnabled = registry.TryResolve("orders.deleted.v2", out var patterns);
+        var isEnabled = registry.TryResolve("orders.deleted.v2", out var pattern);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(patterns).IsEquivalentTo(["orders.>"]);
-    }
-
-    [Test]
-    public async Task Resolve_All_Matching_Wildcards()
-    {
-        var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, SingleTokenHandler>()
-            .AddSingleton<INatsHandler, TailHandler>());
-
-        var isEnabled = registry.TryResolve("orders.updated", out var patterns);
-
-        await Assert.That(isEnabled).IsTrue();
-        await Assert.That(patterns).IsEquivalentTo(["orders.*", "orders.>"]);
+        await Assert.That(pattern).IsEqualTo("orders.>");
     }
 
     [Test]
@@ -62,13 +48,16 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     {
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, SingleTokenHandler>()
-            .AddSingleton<INatsHandler, TailHandler>());
+            .AddSingleton<INatsHandler, CustomersHandler>()
+            .AddSingleton<INatsHandler, InvoicesHandler>());
 
-        var isEnabled = registry.TryResolve("orders.created", out var patterns);
+        var isExactEnabled = registry.TryResolve("orders.created", out var exactPattern);
+        var isWildcardEnabled = registry.TryResolve("invoices.paid.v2", out var wildcardPattern);
 
-        await Assert.That(isEnabled).IsTrue();
-        await Assert.That(patterns).IsEquivalentTo(["orders.created"]);
+        await Assert.That(isExactEnabled).IsTrue();
+        await Assert.That(exactPattern).IsEqualTo("orders.created");
+        await Assert.That(isWildcardEnabled).IsTrue();
+        await Assert.That(wildcardPattern).IsEqualTo("invoices.>");
     }
 
     [Test]
@@ -78,10 +67,10 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
             .AddSingleton<INatsHandler, SingleTokenHandler>());
 
         registry.TryResolve("orders.updated", out _);
-        var isEnabled = registry.TryResolve("orders.updated", out var patterns);
+        var isEnabled = registry.TryResolve("orders.updated", out var pattern);
 
         await Assert.That(isEnabled).IsTrue();
-        await Assert.That(patterns).IsEquivalentTo(["orders.*"]);
+        await Assert.That(pattern).IsEqualTo("orders.*");
     }
 
     [Test]
@@ -89,68 +78,61 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     {
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, SingleTokenHandler>());
+            .AddSingleton<INatsHandler, CustomersHandler>());
 
-        var isEnabled = registry.TryResolve("payments.updated", out var patterns);
+        var isEnabled = registry.TryResolve("payments.updated", out var pattern);
 
         await Assert.That(isEnabled).IsFalse();
-        await Assert.That(patterns).IsEmpty();
+        await Assert.That(pattern).IsNull();
     }
 
     [Test]
-    public async Task Skip_Invalid_Topic()
+    public async Task Throw_For_Invalid_Topic()
     {
-        var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, InvalidHandler>());
-
-        var subscriptions = registry.GetSubscriptions();
-        var isEnabled = registry.TryResolve("orders.x.created", out _);
-
-        await Assert.That(subscriptions).IsEquivalentTo(["orders.created"]);
-        await Assert.That(isEnabled).IsFalse();
+        await Assert.That(() => CreateRegistry(services => services
+                .AddSingleton<INatsHandler, ExactHandler>()
+                .AddSingleton<INatsHandler, InvalidHandler>()))
+            .Throws<InvalidOperationException>();
     }
 
     [Test]
-    public async Task Log_Warning_For_Invalid_Topic()
-    {
-        var logger = new CapturingLogger();
-        CreateRegistry(services => services
-            .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, InvalidHandler>(), logger);
-
-        await Assert.That(logger.Entries).Count().IsEqualTo(1);
-        await Assert.That(logger.Entries[0].Level).IsEqualTo(LogLevel.Warning);
-        await Assert.That(logger.Entries[0].Message).Contains(nameof(InvalidHandler));
-        await Assert.That(logger.Entries[0].Message).Contains("orders.>.created");
-    }
+    public async Task Throw_For_Duplicate_Topic() =>
+        await Assert.That(() => CreateRegistry(services => services
+                .AddSingleton<INatsHandler, ExactHandler>()
+                .AddSingleton<INatsHandler, DuplicateExactHandler>()))
+            .Throws<InvalidOperationException>()
+            .WithMessageContaining("duplicate", StringComparison.Ordinal);
 
     [Test]
-    public async Task Be_Empty_When_Only_Invalid_Topics()
-    {
-        var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, InvalidHandler>());
+    public async Task Throw_For_Exact_Topic_Overlapping_Wildcard() =>
+        await Assert.That(() => CreateRegistry(services => services
+                .AddSingleton<INatsHandler, ExactHandler>()
+                .AddSingleton<INatsHandler, SingleTokenHandler>()))
+            .Throws<InvalidOperationException>()
+            .WithMessageContaining("overlapping", StringComparison.Ordinal);
 
-        await Assert.That(registry.IsEmpty).IsTrue();
-        await Assert.That(registry.GetSubscriptions()).IsEmpty();
-    }
+    [Test]
+    public async Task Throw_For_Overlapping_Wildcards() =>
+        await Assert.That(() => CreateRegistry(services => services
+                .AddSingleton<INatsHandler, SingleTokenHandler>()
+                .AddSingleton<INatsHandler, TailHandler>()))
+            .Throws<InvalidOperationException>()
+            .WithMessageContaining("overlapping", StringComparison.Ordinal);
 
     [Test]
     public async Task Return_Patterns_As_Subscriptions()
     {
         var registry = CreateRegistry(services => services
             .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, SingleTokenHandler>()
-            .AddSingleton<INatsHandler, TailHandler>());
+            .AddSingleton<INatsHandler, CustomersHandler>()
+            .AddSingleton<INatsHandler, InvoicesHandler>());
 
         var subscriptions = registry.GetSubscriptions();
 
-        await Assert.That(subscriptions).IsEquivalentTo(["orders.created", "orders.*", "orders.>"]);
+        await Assert.That(subscriptions).IsEquivalentTo(["orders.created", "customers.*", "invoices.>"]);
     }
 
-    private static InboundProcessorHandlerRegistry<INatsHandler> CreateRegistry(
-        Action<IServiceCollection> configure,
-        ILogger<InboundProcessorHandlerRegistry<INatsHandler>>? logger = null)
+    private static InboundProcessorHandlerRegistry<INatsHandler> CreateRegistry(Action<IServiceCollection> configure)
     {
         var services = new ServiceCollection();
         configure(services);
@@ -159,19 +141,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
         return new InboundProcessorHandlerRegistry<INatsHandler>(
             provider.GetRequiredService<IServiceScopeFactory>(),
             new NatsTopicMatcher(),
-            logger ?? NullLogger<InboundProcessorHandlerRegistry<INatsHandler>>.Instance);
-    }
-
-    private sealed class CapturingLogger : ILogger<InboundProcessorHandlerRegistry<INatsHandler>>
-    {
-        public List<(LogLevel Level, string Message)> Entries { get; } = [];
-
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
-
-        public bool IsEnabled(LogLevel logLevel) => true;
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) =>
-            Entries.Add((logLevel, formatter(state, exception)));
+            NullLogger<InboundProcessorHandlerRegistry<INatsHandler>>.Instance);
     }
 
     private sealed class ExactHandler() : TestHandler("orders.created");
@@ -179,6 +149,12 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     private sealed class SingleTokenHandler() : TestHandler("orders.*");
 
     private sealed class TailHandler() : TestHandler("orders.>");
+
+    private sealed class DuplicateExactHandler() : TestHandler("orders.created");
+
+    private sealed class CustomersHandler() : TestHandler("customers.*");
+
+    private sealed class InvoicesHandler() : TestHandler("invoices.>");
 
     private sealed class InvalidHandler() : TestHandler("orders.>.created");
 

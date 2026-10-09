@@ -40,7 +40,7 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
         }
         catch (OperationCanceledException ex) when (stoppingToken.IsCancellationRequested)
         {
-            logger.LogTrace(ex, "Inbound processor cancelled with host shutdown");
+            InboundProcessorLog.Cancelled(logger, ex);
         }
         catch (Exception ex)
         {
@@ -56,41 +56,34 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
         if (payload.IsEmpty || string.IsNullOrWhiteSpace(item.Topic))
             return;
 
-        if (!handlerRegistry.TryResolve(item.Topic, out var patterns))
+        if (!handlerRegistry.TryResolve(item.Topic, out var pattern))
         {
-            if (logger.IsEnabled(LogLevel.Warning))
-                logger.LogWarning("Inbound processor handler patterns for topic {Topic} isn't found", item.Topic);
-
+            InboundProcessorLog.PatternNotFound(logger, item.Topic);
             return;
         }
 
         await using var scope = scopeFactory.CreateAsyncScope();
-        var sp = scope.ServiceProvider;
-        var allHandlers = sp.GetServices<THandler>();
-        var handlers = allHandlers.Where(x => patterns.Contains(x.Topic.Trim(), StringComparer.Ordinal)).ToList();
-        if (!handlers.Any())
+        var handler = scope.ServiceProvider.GetKeyedService<THandler>(handlerRegistry.GetHandlerType(pattern));
+        if (handler is null)
         {
-            if (logger.IsEnabled(LogLevel.Warning))
-                logger.LogWarning("Inbound processor handlers for topic {Topic} isn't found", item.Topic);
-
+            InboundProcessorLog.HandlerNotFound(logger, item.Topic);
             return;
         }
 
-        foreach (var handler in handlers)
+        try
         {
-            try
-            {
-                await handler.HandleAsync(item.Topic, payload, cancellationToken).ConfigureAwait(false);
-            }
-            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
-            {
-                logger.LogError(ex, "Inbound processor handler {@Handler} ({@HandlerTopic}) for topic {@Topic} failed", handler.GetType().Name, handler.Topic, item.Topic);
-            }
+            await handler.HandleAsync(item.Topic, payload, cancellationToken).ConfigureAwait(false);
         }
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            InboundProcessorLog.HandlerFailed(logger, ex, handler.GetType().Name, handler.Topic, item.Topic);
+        }
+
         if (logger.IsEnabled(LogLevel.Information))
         {
-            var deltaTime = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
-            logger.LogInformation("Inbound processor handler on {@Topic} {@Payload} {@Total} ms", item.Topic, Encoding.UTF8.GetString(payload.Span), deltaTime);
+            var payloadString = Encoding.UTF8.GetString(payload.Span);
+            var delay = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
+            InboundProcessorLog.Processed(logger, item.Topic, payloadString, delay);
         }
     }
 }

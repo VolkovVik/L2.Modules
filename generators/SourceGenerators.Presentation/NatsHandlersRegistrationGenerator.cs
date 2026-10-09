@@ -64,7 +64,10 @@ public sealed class NatsHandlersRegistrationGenerator : BaseRegistrationGenerato
         sb.AppendLine("        this IServiceCollection services)");
         sb.AppendLine("    {");
         foreach (var item in items.OrderBy(x => x, StringComparer.Ordinal))
+        {
             sb.Append("        services.TryAddEnumerable(ServiceDescriptor.Scoped<").Append(InterfaceName).Append(", ").Append(item).AppendLine(">());");
+            sb.Append("        services.TryAddKeyedScoped<").Append(InterfaceName).Append(", ").Append(item).Append(">(typeof(").Append(item).AppendLine("));");
+        }
         sb.AppendLine();
         sb.AppendLine("        return services;");
         sb.AppendLine("    }");
