@@ -4,9 +4,10 @@ using Microsoft.Extensions.Options;
 namespace Aspu.Common.Presentation.Abstractions.InboundProcessor;
 
 /// <summary>
-/// In-memory queue from MQTT receive path to the background processor (single reader).
-/// Capacity from <see cref="TOptions.InboundProcessorQueueCapacity"/>;
-/// when full, <see cref="BoundedChannelFullMode.DropWrite"/>.
+/// In-memory queue from a transport subscriber (NATS or MQTT, one channel per <typeparamref name="TOptions"/>)
+/// to <see cref="InboundProcessorHostedService{TOptions, THandler}"/> (single writer, single reader).
+/// Capacity from <see cref="IInboundProcessorOptions.InboundProcessorChannelCapacity"/>;
+/// when full, <see cref="BoundedChannelFullMode.DropWrite"/> and <see cref="TryEnqueue"/> returns false.
 /// </summary>
 public sealed class InboundProcessorChannel<TOptions>(
     IOptions<TOptions> options)

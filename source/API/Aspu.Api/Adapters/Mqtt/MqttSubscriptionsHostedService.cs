@@ -2,7 +2,6 @@ using Aspu.Api.Options;
 using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 using Microsoft.Extensions.Options;
-using Serilog;
 
 namespace Aspu.Api.Adapters.Mqtt;
 
@@ -13,7 +12,8 @@ internal sealed class MqttSubscriptionsHostedService(
     IOptions<MqttOptions> options,
     MqttSubscriptionsClient mqttClient,
     InboundProcessorHandlerRegistry<IMqttHandler> handlerTopics,
-    InboundProcessorChannel<MqttOptions> channel)
+    InboundProcessorChannel<MqttOptions> channel,
+    ILogger<MqttSubscriptionsHostedService> logger)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -24,7 +24,7 @@ internal sealed class MqttSubscriptionsHostedService(
         {
             if (handlerTopics.IsEmpty)
             {
-                Log.Warning("MQTT subscriber has no handlers registered");
+                MqttSubscriptionsLog.NoHandlers(logger);
                 return;
             }
 
@@ -34,7 +34,7 @@ internal sealed class MqttSubscriptionsHostedService(
                 {
                     var subscriptions = handlerTopics.GetSubscriptions();
                     await mqttClient.RunSessionAsync(subscriptions, stoppingToken).ConfigureAwait(false);
-                    Log.Warning("MQTT session ended; reconnect in {@Seconds} s", reconnectDelay);
+                    MqttSubscriptionsLog.SessionEnded(logger, reconnectDelay);
                 }
                 catch (Exception) when (stoppingToken.IsCancellationRequested)
                 {
@@ -42,7 +42,7 @@ internal sealed class MqttSubscriptionsHostedService(
                 }
                 catch (Exception exc)
                 {
-                    Log.Error(exc, "MQTT session error; retry in {@Seconds} s", reconnectDelay);
+                    MqttSubscriptionsLog.SessionFailed(logger, exc, reconnectDelay);
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(reconnectDelay), stoppingToken)

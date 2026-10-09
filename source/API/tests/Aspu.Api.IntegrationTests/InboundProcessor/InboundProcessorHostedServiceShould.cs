@@ -48,6 +48,7 @@ internal sealed class InboundProcessorHostedServiceShould
         using var registryProvider = new ServiceCollection()
             .AddScoped<FailingDependency>(_ => new FailingDependency(throwOnCreate: false))
             .AddScoped<INatsHandler, TestHandler>()
+            .AddKeyedScoped<INatsHandler, TestHandler>(typeof(TestHandler))
             .BuildServiceProvider();
         var registry = new InboundProcessorHandlerRegistry<INatsHandler>(
             registryProvider.GetRequiredService<IServiceScopeFactory>(),

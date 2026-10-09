@@ -11,7 +11,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Exact_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, ExactHandler>());
+            .AddHandler<ExactHandler>());
 
         var isEnabled = registry.TryResolve("orders.created", out var handlerType);
 
@@ -23,7 +23,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Wildcard_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, SingleTokenHandler>());
+            .AddHandler<SingleTokenHandler>());
 
         var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
 
@@ -35,7 +35,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Tail_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, TailHandler>());
+            .AddHandler<TailHandler>());
 
         var isEnabled = registry.TryResolve("orders.deleted.v2", out var handlerType);
 
@@ -47,9 +47,9 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Exact_And_Wildcard_Together()
     {
         var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, CustomersHandler>()
-            .AddSingleton<INatsHandler, InvoicesHandler>());
+            .AddHandler<ExactHandler>()
+            .AddHandler<CustomersHandler>()
+            .AddHandler<InvoicesHandler>());
 
         var isExactEnabled = registry.TryResolve("orders.created", out var exactHandlerType);
         var isWildcardEnabled = registry.TryResolve("invoices.paid.v2", out var wildcardHandlerType);
@@ -64,7 +64,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Cached_Wildcard_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, SingleTokenHandler>());
+            .AddHandler<SingleTokenHandler>());
 
         registry.TryResolve("orders.updated", out _);
         var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
@@ -77,8 +77,8 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Not_Resolve_Unknown_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, CustomersHandler>());
+            .AddHandler<ExactHandler>()
+            .AddHandler<CustomersHandler>());
 
         var isEnabled = registry.TryResolve("payments.updated", out var handlerType);
 
@@ -90,42 +90,49 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Throw_For_Invalid_Topic()
     {
         await Assert.That(() => CreateRegistry(services => services
-                .AddSingleton<INatsHandler, ExactHandler>()
-                .AddSingleton<INatsHandler, InvalidHandler>()))
+                .AddHandler<ExactHandler>()
+                .AddHandler<InvalidHandler>()))
             .Throws<InvalidOperationException>();
     }
 
     [Test]
     public async Task Throw_For_Duplicate_Topic() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddSingleton<INatsHandler, ExactHandler>()
-                .AddSingleton<INatsHandler, DuplicateExactHandler>()))
+                .AddHandler<ExactHandler>()
+                .AddHandler<DuplicateExactHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("duplicate", StringComparison.Ordinal);
 
     [Test]
     public async Task Throw_For_Exact_Topic_Overlapping_Wildcard() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddSingleton<INatsHandler, ExactHandler>()
-                .AddSingleton<INatsHandler, SingleTokenHandler>()))
+                .AddHandler<ExactHandler>()
+                .AddHandler<SingleTokenHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("overlapping", StringComparison.Ordinal);
 
     [Test]
     public async Task Throw_For_Overlapping_Wildcards() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddSingleton<INatsHandler, SingleTokenHandler>()
-                .AddSingleton<INatsHandler, TailHandler>()))
+                .AddHandler<SingleTokenHandler>()
+                .AddHandler<TailHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("overlapping", StringComparison.Ordinal);
+
+    [Test]
+    public async Task Throw_For_Not_Keyed_Handler() =>
+        await Assert.That(() => CreateRegistry(services => services
+                .AddSingleton<INatsHandler, ExactHandler>()))
+            .Throws<InvalidOperationException>()
+            .WithMessageContaining("keyed", StringComparison.Ordinal);
 
     [Test]
     public async Task Return_Patterns_As_Subscriptions()
     {
         var registry = CreateRegistry(services => services
-            .AddSingleton<INatsHandler, ExactHandler>()
-            .AddSingleton<INatsHandler, CustomersHandler>()
-            .AddSingleton<INatsHandler, InvoicesHandler>());
+            .AddHandler<ExactHandler>()
+            .AddHandler<CustomersHandler>()
+            .AddHandler<InvoicesHandler>());
 
         var subscriptions = registry.GetSubscriptions();
 
@@ -164,5 +171,17 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;
+    }
+}
+
+internal static class InboundProcessorTestRegistration
+{
+    // Mirrors the generated Add*Handlers code: enumerable registration for the registry, keyed one for the processor.
+    public static IServiceCollection AddHandler<TImplementation>(this IServiceCollection services)
+        where TImplementation : class, INatsHandler
+    {
+        services.AddSingleton<INatsHandler, TImplementation>();
+        services.AddKeyedSingleton<INatsHandler, TImplementation>(typeof(TImplementation));
+        return services;
     }
 }

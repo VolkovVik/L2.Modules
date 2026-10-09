@@ -1,11 +1,10 @@
-﻿using Aspu.Api.Options;
+using Aspu.Api.Options;
 using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Aspu.Common.Presentation.Abstractions.NatsAdapter;
 using Microsoft.Extensions.Options;
 using NATS.Client.Core;
 using NATS.Client.JetStream;
 using NATS.Client.JetStream.Models;
-using Serilog;
 
 namespace Aspu.Api.Adapters.Nats;
 
@@ -14,7 +13,8 @@ internal sealed class NatsSubscriptionsHostedService(
     INatsJSContext jetStream,
     IOptions<NatsOptions> options,
     InboundProcessorChannel<NatsOptions> channel,
-    InboundProcessorHandlerRegistry<INatsHandler> handlerTopics) :
+    InboundProcessorHandlerRegistry<INatsHandler> handlerTopics,
+    ILogger<NatsSubscriptionsHostedService> logger) :
     BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -23,7 +23,7 @@ internal sealed class NatsSubscriptionsHostedService(
         {
             if (handlerTopics.IsEmpty)
             {
-                Log.Warning("NATS subscriber has no handlers registered");
+                NatsSubscriptionsLog.NoHandlers(logger);
                 return;
             }
 
@@ -40,7 +40,7 @@ internal sealed class NatsSubscriptionsHostedService(
         }
         catch (Exception exc)
         {
-            Log.Error(exc, "NATS JetStream hosted servise failed");
+            NatsSubscriptionsLog.SubscriberFailed(logger, exc, options.Value.IsJetStreamEnabled ? "JetStream" : "Core");
         }
         finally
         {
@@ -61,7 +61,7 @@ internal sealed class NatsSubscriptionsHostedService(
 
             var message = new InboundProcessorMessage { Type = "Nats", Topic = msg.Subject, Payload = msg.Data };
             if (!channel.TryEnqueue(message))
-                Log.Warning("NATS inbound queue rejected message on {Topic}", msg.Subject);
+                NatsSubscriptionsLog.QueueRejected(logger, msg.Subject);
         }
     }
 
@@ -101,7 +101,7 @@ internal sealed class NatsSubscriptionsHostedService(
                 }
             }
 
-            Log.Warning("NATS inbound queue rejected message on {Topic}", msg.Subject);
+            NatsSubscriptionsLog.QueueRejected(logger, msg.Subject);
             await msg.NakAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }

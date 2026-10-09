@@ -16,7 +16,7 @@ internal static partial class InboundProcessorLog
     [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "Inbound processor handler {Handler} for topic {Topic} failed")]
     public static partial void HandlerFailed(ILogger logger, Exception exception, string handler, string topic);
 
-    [LoggerMessage(EventId = 5, Level = LogLevel.Information, Message = "Inbound processor handler on {Topic} {Payload} {Total} ms")]
+    [LoggerMessage(EventId = 5, Level = LogLevel.Debug, Message = "Inbound processor handler on {Topic} {Payload} {Total} ms")]
     public static partial void Processed(ILogger logger, string topic, string payload, double total);
 
     [LoggerMessage(EventId = 6, Level = LogLevel.Error, Message = "Inbound processor handlers have invalid topic patterns for {Name}: {Handlers}")]
@@ -27,4 +27,7 @@ internal static partial class InboundProcessorLog
 
     [LoggerMessage(EventId = 8, Level = LogLevel.Error, Message = "Inbound processor handlers have overlapping topic patterns for {Name}: {Handlers}")]
     public static partial void OverlappingTopics(ILogger logger, string name, string handlers);
+
+    [LoggerMessage(EventId = 9, Level = LogLevel.Error, Message = "Inbound processor handlers aren't registered as keyed services for {Name}: {Handlers}")]
+    public static partial void NotKeyedHandlers(ILogger logger, string name, string handlers);
 }

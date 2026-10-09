@@ -41,6 +41,7 @@ public sealed class InboundProcessorHandlerRegistry<THandler>
         CheckValidate(handlers);
         CheckDuplicate(handlers);
         CheckOverlap(handlers);
+        CheckKeyed(handlers, scope);
 
         // Handler type is the keyed-service key, so the processor resolves only the matching handler.
         _handlerTypes = handlers.ToFrozenDictionary(h => h.Topic, h => h.HandlerType, StringComparer.Ordinal);
@@ -132,6 +133,23 @@ public sealed class InboundProcessorHandlerRegistry<THandler>
 
         throw new InvalidOperationException(
             $"Inbound processor handlers have overlapping topic patterns for {_matcher.Name}");
+    }
+
+    private void CheckKeyed(List<HandlerInfo> handlers, IServiceScope scope)
+    {
+        var keyedServices = scope.ServiceProvider.GetRequiredService<IServiceProviderIsKeyedService>();
+        var notKeyed = handlers
+            .Where(h => !keyedServices.IsKeyedService(typeof(THandler), h.HandlerType))
+            .Take(MaxShowErrors)
+            .ToList();
+        if (!notKeyed.Any())
+            return;
+
+        if (_logger.IsEnabled(LogLevel.Error))
+            InboundProcessorLog.NotKeyedHandlers(_logger, _matcher.Name, string.Join(", ", notKeyed));
+
+        throw new InvalidOperationException(
+            $"Inbound processor handlers aren't registered as keyed services for {_matcher.Name}");
     }
 
     private sealed record HandlerInfo(string Topic, Type HandlerType)

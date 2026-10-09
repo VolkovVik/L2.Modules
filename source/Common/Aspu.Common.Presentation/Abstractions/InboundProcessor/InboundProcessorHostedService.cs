@@ -8,7 +8,9 @@ using Microsoft.Extensions.Options;
 namespace Aspu.Common.Presentation.Abstractions.InboundProcessor;
 
 /// <summary>
-/// Reads messages from the inbound channel and runs every <see cref="IInboundProcessorHandler"/> whose topic pattern matches, in a new DI scope per message.
+/// Reads messages from the inbound channel and runs the single <see cref="IInboundProcessorHandler"/> whose topic pattern matches
+/// (patterns can't overlap, see <see cref="InboundProcessorHandlerRegistry{THandler}"/>), resolved as a keyed service in a new DI scope per message.
+/// Handler failures are logged and don't stop processing.
 /// Processing uses <c>Parallel.ForEachAsync</c> with <see cref="IInboundProcessorOptions.InboundProcessorMaxDegreeOfParallelism"/>.
 /// </summary>
 public sealed class InboundProcessorHostedService<TOptions, THandler>(
@@ -79,7 +81,7 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
             InboundProcessorLog.HandlerFailed(logger, ex, handlerType.Name, item.Topic);
         }
 
-        if (logger.IsEnabled(LogLevel.Information))
+        if (logger.IsEnabled(LogLevel.Debug))
         {
             var payloadString = Encoding.UTF8.GetString(payload.Span);
             var delay = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;

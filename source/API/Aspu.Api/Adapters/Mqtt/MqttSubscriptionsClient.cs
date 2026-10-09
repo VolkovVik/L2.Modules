@@ -4,7 +4,6 @@ using Aspu.Api.Options;
 using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Microsoft.Extensions.Options;
 using MQTTnet;
-using Serilog;
 
 namespace Aspu.Api.Adapters.Mqtt;
 
@@ -13,7 +12,8 @@ namespace Aspu.Api.Adapters.Mqtt;
 /// </summary>
 internal sealed class MqttSubscriptionsClient(
     IOptions<MqttOptions> options,
-    InboundProcessorChannel<MqttOptions> channel)
+    InboundProcessorChannel<MqttOptions> channel,
+    ILogger<MqttSubscriptionsClient> logger)
 {
     private static readonly MqttClientFactory ClientFactory = new();
 
@@ -40,14 +40,14 @@ internal sealed class MqttSubscriptionsClient(
             await client.ConnectAsync(clientOptions, cancellationToken)
                 .ConfigureAwait(false);
 
-            Log.Information("MQTT connected to {Host}:{Port}", _options.Host, _options.Port);
+            MqttSubscriptionsLog.Connected(logger, _options.Host, _options.Port);
 
             if (subscribeOptions is not null)
             {
                 await client.SubscribeAsync(subscribeOptions, cancellationToken)
                     .ConfigureAwait(false);
 
-                Log.Information("MQTT subscribed succesfully");
+                MqttSubscriptionsLog.Subscribed(logger, subscriptions.Count);
             }
 
             await _disconnectCompletion.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -63,12 +63,12 @@ internal sealed class MqttSubscriptionsClient(
             }
             catch (Exception ex)
             {
-                Log.Warning(ex, "MQTT disconnect after session end");
+                MqttSubscriptionsLog.DisconnectFailed(logger, ex);
             }
 
             client.Dispose();
 
-            Log.Information("MQTT disconnected");
+            MqttSubscriptionsLog.Disconnected(logger);
         }
     }
 
@@ -118,10 +118,10 @@ internal sealed class MqttSubscriptionsClient(
     private Task OnClientDisconnectedAsync(MqttClientDisconnectedEventArgs e)
     {
         if (e.Exception is not null)
-            Log.Warning(e.Exception, "MQTT disconnected with error");
+            MqttSubscriptionsLog.DisconnectedWithError(logger, e.Exception);
 
         if (!string.IsNullOrWhiteSpace(e.ReasonString))
-            Log.Warning("MQTT disconnected with reason {@Reason}", e.ReasonString);
+            MqttSubscriptionsLog.DisconnectedWithReason(logger, e.ReasonString);
 
         _disconnectCompletion.TrySetResult();
 
@@ -134,7 +134,7 @@ internal sealed class MqttSubscriptionsClient(
         var payload = PayloadToOwnedBuffer(message);
         var inbound = new InboundProcessorMessage { Type = "Mqtt", Topic = message.Topic, Payload = payload };
         if (!channel.TryEnqueue(inbound))
-            Log.Warning("MQTT inbound queue rejected message on {Topic}", message.Topic);
+            MqttSubscriptionsLog.QueueRejected(logger, message.Topic);
 
         return Task.CompletedTask;
     }
