@@ -25,8 +25,8 @@ public class MqttBenchmarks
         var queue = new InboundProcessorChannel<MqttOptions>(mqttOptions);
 
         var services = new ServiceCollection();
-        services.AddInboundProcessorHandler<IMqttHandler, BenchmarkMqttHandler>();
-        services.AddInboundProcessorHandler<IMqttHandler, BenchmarkWildcardMqttHandler>();
+        services.AddInboundProcessorHandler<IMqttHandler, BenchmarkMqttHandler>(TopicName);
+        services.AddInboundProcessorHandler<IMqttHandler, BenchmarkWildcardMqttHandler>(WildcardTopicName);
         services.AddSingleton(sp => new InboundProcessorHandlerRegistry<IMqttHandler>(
             sp.GetServices<InboundProcessorTopic<IMqttHandler>>(),
             sp.GetRequiredService<IServiceProviderIsKeyedService>(),
@@ -75,17 +75,17 @@ public class MqttBenchmarks
 
     }
 
-    private sealed class BenchmarkMqttHandler : IMqttHandler, IInboundTopic
+    private sealed class BenchmarkMqttHandler : IMqttHandler
     {
-        public static string Topic => TopicName;
+        public string Topic => TopicName;
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;
     }
 
-    private sealed class BenchmarkWildcardMqttHandler : IMqttHandler, IInboundTopic
+    private sealed class BenchmarkWildcardMqttHandler : IMqttHandler
     {
-        public static string Topic => WildcardTopicName;
+        public string Topic => WildcardTopicName;
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;

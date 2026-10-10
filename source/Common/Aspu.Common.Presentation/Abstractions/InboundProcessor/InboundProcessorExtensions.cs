@@ -26,16 +26,18 @@ public static class InboundProcessorExtensions
     }
 
     /// <summary>
-    /// Registers a scoped handler keyed by its type (resolved per message) and its static <see cref="IInboundTopic.Topic"/> (read by the registry).
-    /// Called by the generated <c>Add*Handlers</c> methods; use directly only for handlers outside source generation.
+    /// Registers a scoped handler keyed by its type (resolved per message) and its topic pattern (read by the registry).
+    /// Same registrations as the generated <c>Add*Handlers</c> methods; use only for handlers outside source generation,
+    /// passing the same value as the handler's <see cref="IInboundProcessorHandler.Topic"/>.
     /// </summary>
     public static IServiceCollection AddInboundProcessorHandler<THandler, TImplementation>(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        string topic)
         where THandler : class, IInboundProcessorHandler
-        where TImplementation : class, THandler, IInboundTopic
+        where TImplementation : class, THandler
     {
         services.TryAddKeyedScoped<THandler, TImplementation>(typeof(TImplementation));
-        services.AddSingleton(new InboundProcessorTopic<THandler>(TImplementation.Topic, typeof(TImplementation)));
+        services.AddSingleton(new InboundProcessorTopic<THandler>(topic, typeof(TImplementation)));
 
         return services;
     }

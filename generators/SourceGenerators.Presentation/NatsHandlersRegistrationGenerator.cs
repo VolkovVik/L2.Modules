@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
 namespace SourceGenerators.Presentation;
@@ -39,13 +40,12 @@ public sealed class NatsHandlersRegistrationGenerator : BaseRegistrationGenerato
         if (classSymbols.IsDefaultOrEmpty)
             return;
 
-        var str = GenerateString(compilation, classSymbols);
+        var str = GenerateString(context, compilation, classSymbols);
         context.AddSource("NatsHandlersRegistration.g.cs", SourceText.From(str, Encoding.UTF8));
     }
 
-    private static string GenerateString(Compilation compilation, ImmutableArray<INamedTypeSymbol?> classSymbols)
+    private static string GenerateString(SourceProductionContext context, Compilation compilation, ImmutableArray<INamedTypeSymbol?> classSymbols)
     {
-        var items = GetSymbolNames(classSymbols);
         var interfaceNamespace = GetNamespace(compilation, NamespaceName, InterfaceName, InterfaceMetadata);
         var assemblyName = compilation.AssemblyName!.Replace(".Presentation", string.Empty);
 
@@ -64,10 +64,17 @@ public sealed class NatsHandlersRegistrationGenerator : BaseRegistrationGenerato
         sb.AppendLine("    public static IServiceCollection AddNatsHandlers(");
         sb.AppendLine("        this IServiceCollection services)");
         sb.AppendLine("    {");
-        foreach (var item in items.OrderBy(x => x, StringComparer.Ordinal))
+        foreach (var (name, topic, symbol) in GetInboundHandlers(context, compilation, classSymbols))
         {
-            sb.Append("        services.TryAddKeyedScoped<").Append(InterfaceName).Append(", ").Append(item).Append(">(typeof(").Append(item).AppendLine("));");
-            sb.Append("        services.AddSingleton(new InboundProcessorTopic<").Append(InterfaceName).Append(">(").Append(item).Append(".Topic, typeof(").Append(item).AppendLine(")));");
+            if (topic is null)
+            {
+                sb.Append("#error ").Append(name).AppendLine(": Topic must be a compile-time constant string");
+                context.ReportDiagnostic(Diagnostic.Create(NonConstantTopic, symbol.Locations.FirstOrDefault(), symbol.Name, InterfaceName));
+                continue;
+            }
+
+            sb.Append("        services.TryAddKeyedScoped<").Append(InterfaceName).Append(", ").Append(name).Append(">(typeof(").Append(name).AppendLine("));");
+            sb.Append("        services.AddSingleton(new InboundProcessorTopic<").Append(InterfaceName).Append(">(").Append(SymbolDisplay.FormatLiteral(topic, quote: true)).Append(", typeof(").Append(name).AppendLine(")));");
         }
         sb.AppendLine();
         sb.AppendLine("        return services;");

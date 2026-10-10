@@ -12,7 +12,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Exact_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddInboundProcessorHandler<INatsHandler, ExactHandler>());
+            .AddHandler<ExactHandler>());
 
         var isEnabled = registry.TryResolve("orders.created", out var handlerType);
 
@@ -24,7 +24,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Wildcard_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>());
+            .AddHandler<SingleTokenHandler>());
 
         var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
 
@@ -36,7 +36,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Tail_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddInboundProcessorHandler<INatsHandler, TailHandler>());
+            .AddHandler<TailHandler>());
 
         var isEnabled = registry.TryResolve("orders.deleted.v2", out var handlerType);
 
@@ -48,9 +48,9 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Exact_And_Wildcard_Together()
     {
         var registry = CreateRegistry(services => services
-            .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
-            .AddInboundProcessorHandler<INatsHandler, CustomersHandler>()
-            .AddInboundProcessorHandler<INatsHandler, InvoicesHandler>());
+            .AddHandler<ExactHandler>()
+            .AddHandler<CustomersHandler>()
+            .AddHandler<InvoicesHandler>());
 
         var isExactEnabled = registry.TryResolve("orders.created", out var exactHandlerType);
         var isWildcardEnabled = registry.TryResolve("invoices.paid.v2", out var wildcardHandlerType);
@@ -65,7 +65,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Cached_Wildcard_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>());
+            .AddHandler<SingleTokenHandler>());
 
         registry.TryResolve("orders.updated", out _);
         var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
@@ -78,8 +78,8 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Not_Resolve_Unknown_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
-            .AddInboundProcessorHandler<INatsHandler, CustomersHandler>());
+            .AddHandler<ExactHandler>()
+            .AddHandler<CustomersHandler>());
 
         var isEnabled = registry.TryResolve("payments.updated", out var handlerType);
 
@@ -91,32 +91,32 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Throw_For_Invalid_Topic()
     {
         await Assert.That(() => CreateRegistry(services => services
-                .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
-                .AddInboundProcessorHandler<INatsHandler, InvalidHandler>()))
+                .AddHandler<ExactHandler>()
+                .AddHandler<InvalidHandler>()))
             .Throws<InvalidOperationException>();
     }
 
     [Test]
     public async Task Throw_For_Duplicate_Topic() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
-                .AddInboundProcessorHandler<INatsHandler, DuplicateExactHandler>()))
+                .AddHandler<ExactHandler>()
+                .AddHandler<DuplicateExactHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("duplicate", StringComparison.Ordinal);
 
     [Test]
     public async Task Throw_For_Exact_Topic_Overlapping_Wildcard() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
-                .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>()))
+                .AddHandler<ExactHandler>()
+                .AddHandler<SingleTokenHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("overlapping", StringComparison.Ordinal);
 
     [Test]
     public async Task Throw_For_Overlapping_Wildcards() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>()
-                .AddInboundProcessorHandler<INatsHandler, TailHandler>()))
+                .AddHandler<SingleTokenHandler>()
+                .AddHandler<TailHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("overlapping", StringComparison.Ordinal);
 
@@ -131,9 +131,9 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Return_Patterns_As_Subscriptions()
     {
         var registry = CreateRegistry(services => services
-            .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
-            .AddInboundProcessorHandler<INatsHandler, CustomersHandler>()
-            .AddInboundProcessorHandler<INatsHandler, InvoicesHandler>());
+            .AddHandler<ExactHandler>()
+            .AddHandler<CustomersHandler>()
+            .AddHandler<InvoicesHandler>());
 
         var subscriptions = registry.GetSubscriptions();
 
@@ -145,7 +145,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     {
         var services = new ServiceCollection().AddLogging();
         services.AddInboundProcessor<NatsOptions, INatsHandler, NatsTopicMatcher>();
-        services.AddInboundProcessorHandler<INatsHandler, ThrowingHandler>();
+        services.AddInboundProcessorHandler<INatsHandler, ThrowingHandler>("orders.created");
         // Same scope validation as the API in Development: scoped handlers can't come from the root provider.
         await using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
@@ -167,51 +167,38 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
             NullLogger<InboundProcessorHandlerRegistry<INatsHandler>>.Instance);
     }
 
-    private sealed class ExactHandler : TestHandler, IInboundTopic
+    private sealed class ExactHandler() : TestHandler("orders.created");
+
+    private sealed class SingleTokenHandler() : TestHandler("orders.*");
+
+    private sealed class TailHandler() : TestHandler("orders.>");
+
+    private sealed class DuplicateExactHandler() : TestHandler("orders.created");
+
+    private sealed class CustomersHandler() : TestHandler("customers.*");
+
+    private sealed class InvoicesHandler() : TestHandler("invoices.>");
+
+    private sealed class InvalidHandler() : TestHandler("orders.>.created");
+
+    private sealed class ThrowingHandler : TestHandler
     {
-        public static string Topic => "orders.created";
+        public ThrowingHandler() : base("orders.created") => throw new InvalidOperationException("Registry must not create handlers");
     }
 
-    private sealed class SingleTokenHandler : TestHandler, IInboundTopic
+    private abstract class TestHandler(string pattern) : INatsHandler
     {
-        public static string Topic => "orders.*";
-    }
+        public string Topic => pattern;
 
-    private sealed class TailHandler : TestHandler, IInboundTopic
-    {
-        public static string Topic => "orders.>";
-    }
-
-    private sealed class DuplicateExactHandler : TestHandler, IInboundTopic
-    {
-        public static string Topic => "orders.created";
-    }
-
-    private sealed class CustomersHandler : TestHandler, IInboundTopic
-    {
-        public static string Topic => "customers.*";
-    }
-
-    private sealed class InvoicesHandler : TestHandler, IInboundTopic
-    {
-        public static string Topic => "invoices.>";
-    }
-
-    private sealed class InvalidHandler : TestHandler, IInboundTopic
-    {
-        public static string Topic => "orders.>.created";
-    }
-
-    private sealed class ThrowingHandler : TestHandler, IInboundTopic
-    {
-        public ThrowingHandler() => throw new InvalidOperationException("Registry must not create handlers");
-
-        public static string Topic => "orders.created";
-    }
-
-    private abstract class TestHandler : INatsHandler
-    {
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;
     }
+}
+
+internal static class InboundProcessorTestRegistration
+{
+    // Tests don't go through the source generator, so the topic is read from an instance here.
+    public static IServiceCollection AddHandler<TImplementation>(this IServiceCollection services)
+        where TImplementation : class, INatsHandler, new() =>
+        services.AddInboundProcessorHandler<INatsHandler, TImplementation>(new TImplementation().Topic);
 }

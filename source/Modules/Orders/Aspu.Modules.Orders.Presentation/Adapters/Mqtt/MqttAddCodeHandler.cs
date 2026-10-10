@@ -1,14 +1,13 @@
 ﻿using System.Text.Json;
-using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Aspu.Common.Presentation.Abstractions.MqttAdapter;
 using Aspu.Modules.Orders.Application.UseCases.Codes.Commands.AddCode;
 using Mediator;
 
 namespace Aspu.Modules.Orders.Presentation.Adapters.Mqtt;
 
-internal sealed class MqttAddCodeHandler(IMediator mediator) : IMqttHandler, IInboundTopic
+internal sealed class MqttAddCodeHandler(IMediator mediator) : IMqttHandler
 {
-    public static string Topic => "/test/topic";
+    public string Topic => "/test/topic";
 
     public async Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken)
     {
@@ -20,17 +19,17 @@ internal sealed class MqttAddCodeHandler(IMediator mediator) : IMqttHandler, IIn
     }
 }
 
-internal sealed class OrdersAddCodeHandler1(IMediator mediator) : IMqttHandler, IInboundTopic
+internal sealed class OrdersAddCodeHandler1(IMediator mediator) : IMqttHandler
 {
-    public static string Topic => "/test/topic1";
+    public string Topic => "/test/topic1";
 
     public async Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
         await mediator.Send(new AddCodeCommand(Guid.NewGuid(), Guid.NewGuid(), "test"), cancellationToken);
 }
 
-internal sealed class OrdersAddCodeHandler2(IMediator mediator) : IMqttHandler, IInboundTopic
+internal sealed class OrdersAddCodeHandler2(IMediator mediator) : IMqttHandler
 {
-    public static string Topic => "/test/topic2";
+    public string Topic => "/test/topic2";
 
     public async Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
         await mediator.Send(new AddCodeCommand(Guid.NewGuid(), Guid.NewGuid(), "test"), cancellationToken);

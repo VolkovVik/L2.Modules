@@ -34,7 +34,7 @@ internal sealed class InboundProcessorHostedServiceShould
     {
         var services = new ServiceCollection();
         configure(services);
-        services.AddInboundProcessorHandler<INatsHandler, TestHandler>();
+        services.AddInboundProcessorHandler<INatsHandler, TestHandler>(TestHandler.HandlerTopic);
         return services.BuildServiceProvider();
     }
 
@@ -59,7 +59,7 @@ internal sealed class InboundProcessorHostedServiceShould
     }
 
     private static InboundProcessorMessage CreateMessage() =>
-        new() { Type = "Nats", Topic = TestHandler.Topic, Payload = [1] };
+        new() { Type = "Nats", Topic = TestHandler.HandlerTopic, Payload = [1] };
 
     private sealed class FailingDependency
     {
@@ -72,11 +72,13 @@ internal sealed class InboundProcessorHostedServiceShould
         }
     }
 
-    private sealed class TestHandler(FailingDependency dependency) : INatsHandler, IInboundTopic
+    private sealed class TestHandler(FailingDependency dependency) : INatsHandler
     {
         public FailingDependency Dependency { get; } = dependency;
 
-        public static string Topic => "orders.created";
+        public const string HandlerTopic = "orders.created";
+
+        public string Topic => HandlerTopic;
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("Handler failed");
