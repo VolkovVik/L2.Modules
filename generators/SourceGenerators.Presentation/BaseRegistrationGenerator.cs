@@ -1,33 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SourceGenerators.Presentation;
 
 public abstract class BaseRegistrationGenerator
 {
     protected const string Using = "using ";
-
-    protected static bool IsCandidate(SyntaxNode node) =>
-        node is ClassDeclarationSyntax { BaseList: not null };
-
-    protected static INamedTypeSymbol? GetSemanticTarget(GeneratorSyntaxContext context, string interfaceName, CancellationToken cancellationToken)
-    {
-        var classDecl = (ClassDeclarationSyntax)context.Node;
-        if (context.SemanticModel.GetDeclaredSymbol(classDecl, cancellationToken) is not INamedTypeSymbol symbol)
-            return null;
-
-        if (!symbol.IsSealed)
-            return null;
-
-        if (symbol.TypeKind is not TypeKind.Class)
-            return null;
-
-        if (symbol.DeclaredAccessibility is not (Accessibility.Internal or Accessibility.Public))
-            return null;
-
-        return symbol.AllInterfaces.Any(a => string.Equals(a.Name, interfaceName, StringComparison.Ordinal)) ? symbol : null;
-    }
 
     protected static string GetNamespace(Compilation compilation, string namespaceName, string interfaceName, string metadataName)
     {
