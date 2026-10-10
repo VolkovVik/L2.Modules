@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
 namespace SourceGenerators.Presentation;
@@ -64,7 +63,7 @@ public sealed class MqttHandlersRegistrationGenerator : BaseHandlersRegistration
         sb.AppendLine("    public static IServiceCollection AddMqttHandlers(");
         sb.AppendLine("        this IServiceCollection services)");
         sb.AppendLine("    {");
-        foreach (var (name, topic, symbol) in GetInboundHandlers(context, compilation, classSymbols))
+        foreach (var (name, topicLiteral, symbol) in GetInboundHandlers(context, compilation, classSymbols))
         {
             if (!IsRegistrableHandler(symbol))
             {
@@ -72,14 +71,14 @@ public sealed class MqttHandlersRegistrationGenerator : BaseHandlersRegistration
                 continue;
             }
 
-            if (topic is null)
+            if (topicLiteral is null)
             {
                 context.ReportDiagnostic(Diagnostic.Create(NonConstantTopic, symbol.Locations.FirstOrDefault(), symbol.Name, InterfaceName));
                 continue;
             }
 
             sb.Append("        services.TryAddKeyedScoped<").Append(InterfaceName).Append(", ").Append(name).Append(">(typeof(").Append(name).AppendLine("));");
-            sb.Append("        services.AddSingleton(new InboundProcessorTopic<").Append(InterfaceName).Append(">(").Append(SymbolDisplay.FormatLiteral(topic, quote: true)).Append(", typeof(").Append(name).AppendLine(")));");
+            sb.Append("        services.AddSingleton(new InboundProcessorTopic<").Append(InterfaceName).Append(">(").Append(topicLiteral).Append(", typeof(").Append(name).AppendLine(")));");
         }
         sb.AppendLine();
         sb.AppendLine("        return services;");

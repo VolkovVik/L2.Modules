@@ -60,12 +60,23 @@ public abstract class BaseHandlersRegistrationGenerator : BaseRegistrationGenera
         return true;
     }
 
-    protected static IEnumerable<(string Name, string? Topic, INamedTypeSymbol Symbol)> GetInboundHandlers(SourceProductionContext context, Compilation compilation, ImmutableArray<INamedTypeSymbol?> classSymbols) =>
+    /// <summary>
+    /// Handlers ordered by name; <c>TopicLiteral</c> is the trimmed constant <c>Topic</c> as a ready-to-emit C# string literal
+    /// (quoted and escaped), or null when <c>Topic</c> isn't a compile-time constant.
+    /// </summary>
+    protected static IEnumerable<(string Name, string? TopicLiteral, INamedTypeSymbol Symbol)> GetInboundHandlers(SourceProductionContext context, Compilation compilation, ImmutableArray<INamedTypeSymbol?> classSymbols) =>
         classSymbols
             .Where(x => x is not null)
             .Distinct<INamedTypeSymbol?>(SymbolEqualityComparer.Default)
-            .Select(x => (Name: x!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), Topic: GetConstantTopic(compilation, x, context.CancellationToken), Symbol: x))
+            .Select(x => (
+                Name: x!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                TopicLiteral: ToTopicLiteral(GetConstantTopic(compilation, x, context.CancellationToken)),
+                Symbol: x))
             .OrderBy(x => x.Name, StringComparer.Ordinal);
+
+    // Trimmed like the runtime registry used to do, then escaped so the emitted literal holds exactly the computed value.
+    private static string? ToTopicLiteral(string? topic) =>
+        topic is null ? null : SymbolDisplay.FormatLiteral(topic.Trim(), quote: true);
 
     // Supports `Topic => "x"`, `Topic { get => "x"; }`, `Topic { get { return "x"; } }` and `Topic { get; } = "x"`,
     // including const fields and string concatenation of constants; the nearest declaration in the class hierarchy wins.
