@@ -55,6 +55,7 @@ public sealed class MqttHandlersRegistrationGenerator : BaseRegistrationGenerato
         sb.Append(Using).Append(interfaceNamespace).Append(';').AppendLine();
         sb.Append(Using).AppendLine("Microsoft.Extensions.DependencyInjection;");
         sb.Append(Using).AppendLine("Microsoft.Extensions.DependencyInjection.Extensions;");
+        sb.Append(Using).Append(InboundProcessorNamespace).Append(';').AppendLine();
         sb.AppendLine();
         sb.Append("namespace ").Append(assemblyName).Append('.').Append(Namespace).Append(';').AppendLine();
         sb.AppendLine();
@@ -65,8 +66,8 @@ public sealed class MqttHandlersRegistrationGenerator : BaseRegistrationGenerato
         sb.AppendLine("    {");
         foreach (var item in items.OrderBy(x => x, StringComparer.Ordinal))
         {
-            sb.Append("        services.TryAddEnumerable(ServiceDescriptor.Scoped<").Append(InterfaceName).Append(", ").Append(item).AppendLine(">());");
             sb.Append("        services.TryAddKeyedScoped<").Append(InterfaceName).Append(", ").Append(item).Append(">(typeof(").Append(item).AppendLine("));");
+            sb.Append("        services.AddSingleton(new InboundProcessorTopic<").Append(InterfaceName).Append(">(").Append(item).Append(".Topic, typeof(").Append(item).AppendLine(")));");
         }
         sb.AppendLine();
         sb.AppendLine("        return services;");

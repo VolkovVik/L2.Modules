@@ -34,8 +34,7 @@ internal sealed class InboundProcessorHostedServiceShould
     {
         var services = new ServiceCollection();
         configure(services);
-        services.AddScoped<INatsHandler, TestHandler>();
-        services.AddKeyedScoped<INatsHandler, TestHandler>(typeof(TestHandler));
+        services.AddInboundProcessorHandler<INatsHandler, TestHandler>();
         return services.BuildServiceProvider();
     }
 
@@ -44,14 +43,10 @@ internal sealed class InboundProcessorHostedServiceShould
         var options = Microsoft.Extensions.Options.Options.Create(new NatsOptions());
         var scopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
 
-        // Registry instantiates handlers once to read topics, so the dependency must be creatable here.
-        using var registryProvider = new ServiceCollection()
-            .AddScoped<FailingDependency>(_ => new FailingDependency(throwOnCreate: false))
-            .AddScoped<INatsHandler, TestHandler>()
-            .AddKeyedScoped<INatsHandler, TestHandler>(typeof(TestHandler))
-            .BuildServiceProvider();
+        // Registry reads topics from registrations only, so a failing handler constructor doesn't affect it.
         var registry = new InboundProcessorHandlerRegistry<INatsHandler>(
-            registryProvider.GetRequiredService<IServiceScopeFactory>(),
+            provider.GetServices<InboundProcessorTopic<INatsHandler>>(),
+            provider.GetRequiredService<IServiceProviderIsKeyedService>(),
             new NatsTopicMatcher(),
             NullLogger<InboundProcessorHandlerRegistry<INatsHandler>>.Instance);
 
@@ -64,7 +59,7 @@ internal sealed class InboundProcessorHostedServiceShould
     }
 
     private static InboundProcessorMessage CreateMessage() =>
-        new() { Type = "Nats", Topic = TestHandler.HandlerTopic, Payload = [1] };
+        new() { Type = "Nats", Topic = TestHandler.Topic, Payload = [1] };
 
     private sealed class FailingDependency
     {
@@ -77,13 +72,11 @@ internal sealed class InboundProcessorHostedServiceShould
         }
     }
 
-    private sealed class TestHandler(FailingDependency dependency) : INatsHandler
+    private sealed class TestHandler(FailingDependency dependency) : INatsHandler, IInboundTopic
     {
-        public const string HandlerTopic = "orders.created";
-
         public FailingDependency Dependency { get; } = dependency;
 
-        public string Topic => HandlerTopic;
+        public static string Topic => "orders.created";
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("Handler failed");

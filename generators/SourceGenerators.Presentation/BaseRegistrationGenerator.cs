@@ -7,6 +7,7 @@ namespace SourceGenerators.Presentation;
 public abstract class BaseRegistrationGenerator
 {
     protected const string Using = "using ";
+    protected const string InboundProcessorNamespace = "Aspu.Common.Presentation.Abstractions.InboundProcessor";
 
     protected BaseRegistrationGenerator() { }
 
@@ -33,20 +34,20 @@ public abstract class BaseRegistrationGenerator
                 ? symbol : null;
     }
 
-#pragma warning disable MA0007 // Add a comma after the last value
     protected static ImmutableHashSet<string> GetSymbolNames(ImmutableArray<INamedTypeSymbol?> classSymbols) =>
-        [.. classSymbols
+        classSymbols
             .Where(x => x is not null)
             .Select(x => x!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
-            .Where(x => !string.IsNullOrWhiteSpace(x))];
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .ToImmutableHashSet(StringComparer.Ordinal);
 
     protected static ImmutableHashSet<string> GetSymbolNamespaces(ImmutableArray<INamedTypeSymbol?> classSymbols) =>
-        [.. classSymbols
+        classSymbols
             .Where(x => x is not null)
             .Select(x => x!.ContainingNamespace)
             .Where(x => !x.IsGlobalNamespace)
-            .Select(x => x.ToDisplayString())];
-#pragma warning restore MA0007 // Add a comma after the last value
+            .Select(x => x.ToDisplayString())
+            .ToImmutableHashSet(StringComparer.Ordinal);
 
     protected static string GetNamespace(Compilation compilation, string namespaceName, string interfaceName, string metadataName)
     {

@@ -19,4 +19,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
   </ItemGroup>
 
+  <Target Name="RestartRoslynCompilerServer" AfterTargets="Build">
+    <Exec Command="dotnet build-server shutdown" IgnoreExitCode="true" />
+  </Target>
+
 </Project>

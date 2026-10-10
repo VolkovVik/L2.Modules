@@ -25,12 +25,11 @@ public class MqttBenchmarks
         var queue = new InboundProcessorChannel<MqttOptions>(mqttOptions);
 
         var services = new ServiceCollection();
-        services.AddSingleton<IMqttHandler, BenchmarkMqttHandler>();
-        services.AddSingleton<IMqttHandler, BenchmarkWildcardMqttHandler>();
-        services.AddKeyedSingleton<IMqttHandler, BenchmarkMqttHandler>(typeof(BenchmarkMqttHandler));
-        services.AddKeyedSingleton<IMqttHandler, BenchmarkWildcardMqttHandler>(typeof(BenchmarkWildcardMqttHandler));
+        services.AddInboundProcessorHandler<IMqttHandler, BenchmarkMqttHandler>();
+        services.AddInboundProcessorHandler<IMqttHandler, BenchmarkWildcardMqttHandler>();
         services.AddSingleton(sp => new InboundProcessorHandlerRegistry<IMqttHandler>(
-            sp.GetRequiredService<IServiceScopeFactory>(),
+            sp.GetServices<InboundProcessorTopic<IMqttHandler>>(),
+            sp.GetRequiredService<IServiceProviderIsKeyedService>(),
             new MqttTopicMatcher(),
             NullLogger<InboundProcessorHandlerRegistry<IMqttHandler>>.Instance));
         var rootServices = services.BuildServiceProvider();
@@ -76,17 +75,17 @@ public class MqttBenchmarks
 
     }
 
-    private sealed class BenchmarkMqttHandler : IMqttHandler
+    private sealed class BenchmarkMqttHandler : IMqttHandler, IInboundTopic
     {
-        public string Topic => TopicName;
+        public static string Topic => TopicName;
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;
     }
 
-    private sealed class BenchmarkWildcardMqttHandler : IMqttHandler
+    private sealed class BenchmarkWildcardMqttHandler : IMqttHandler, IInboundTopic
     {
-        public string Topic => WildcardTopicName;
+        public static string Topic => WildcardTopicName;
 
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;

@@ -1,3 +1,4 @@
+using Aspu.Api.Options;
 using Aspu.Common.Presentation.Abstractions.InboundProcessor;
 using Aspu.Common.Presentation.Abstractions.NatsAdapter;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Exact_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddHandler<ExactHandler>());
+            .AddInboundProcessorHandler<INatsHandler, ExactHandler>());
 
         var isEnabled = registry.TryResolve("orders.created", out var handlerType);
 
@@ -23,7 +24,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Wildcard_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddHandler<SingleTokenHandler>());
+            .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>());
 
         var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
 
@@ -35,7 +36,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Tail_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddHandler<TailHandler>());
+            .AddInboundProcessorHandler<INatsHandler, TailHandler>());
 
         var isEnabled = registry.TryResolve("orders.deleted.v2", out var handlerType);
 
@@ -47,9 +48,9 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Exact_And_Wildcard_Together()
     {
         var registry = CreateRegistry(services => services
-            .AddHandler<ExactHandler>()
-            .AddHandler<CustomersHandler>()
-            .AddHandler<InvoicesHandler>());
+            .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
+            .AddInboundProcessorHandler<INatsHandler, CustomersHandler>()
+            .AddInboundProcessorHandler<INatsHandler, InvoicesHandler>());
 
         var isExactEnabled = registry.TryResolve("orders.created", out var exactHandlerType);
         var isWildcardEnabled = registry.TryResolve("invoices.paid.v2", out var wildcardHandlerType);
@@ -64,7 +65,7 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Resolve_Cached_Wildcard_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddHandler<SingleTokenHandler>());
+            .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>());
 
         registry.TryResolve("orders.updated", out _);
         var isEnabled = registry.TryResolve("orders.updated", out var handlerType);
@@ -77,8 +78,8 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Not_Resolve_Unknown_Topic()
     {
         var registry = CreateRegistry(services => services
-            .AddHandler<ExactHandler>()
-            .AddHandler<CustomersHandler>());
+            .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
+            .AddInboundProcessorHandler<INatsHandler, CustomersHandler>());
 
         var isEnabled = registry.TryResolve("payments.updated", out var handlerType);
 
@@ -90,39 +91,39 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Throw_For_Invalid_Topic()
     {
         await Assert.That(() => CreateRegistry(services => services
-                .AddHandler<ExactHandler>()
-                .AddHandler<InvalidHandler>()))
+                .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
+                .AddInboundProcessorHandler<INatsHandler, InvalidHandler>()))
             .Throws<InvalidOperationException>();
     }
 
     [Test]
     public async Task Throw_For_Duplicate_Topic() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddHandler<ExactHandler>()
-                .AddHandler<DuplicateExactHandler>()))
+                .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
+                .AddInboundProcessorHandler<INatsHandler, DuplicateExactHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("duplicate", StringComparison.Ordinal);
 
     [Test]
     public async Task Throw_For_Exact_Topic_Overlapping_Wildcard() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddHandler<ExactHandler>()
-                .AddHandler<SingleTokenHandler>()))
+                .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
+                .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("overlapping", StringComparison.Ordinal);
 
     [Test]
     public async Task Throw_For_Overlapping_Wildcards() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddHandler<SingleTokenHandler>()
-                .AddHandler<TailHandler>()))
+                .AddInboundProcessorHandler<INatsHandler, SingleTokenHandler>()
+                .AddInboundProcessorHandler<INatsHandler, TailHandler>()))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("overlapping", StringComparison.Ordinal);
 
     [Test]
     public async Task Throw_For_Not_Keyed_Handler() =>
         await Assert.That(() => CreateRegistry(services => services
-                .AddSingleton<INatsHandler, ExactHandler>()))
+                .AddSingleton(new InboundProcessorTopic<INatsHandler>("orders.created", typeof(ExactHandler)))))
             .Throws<InvalidOperationException>()
             .WithMessageContaining("keyed", StringComparison.Ordinal);
 
@@ -130,58 +131,87 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
     public async Task Return_Patterns_As_Subscriptions()
     {
         var registry = CreateRegistry(services => services
-            .AddHandler<ExactHandler>()
-            .AddHandler<CustomersHandler>()
-            .AddHandler<InvoicesHandler>());
+            .AddInboundProcessorHandler<INatsHandler, ExactHandler>()
+            .AddInboundProcessorHandler<INatsHandler, CustomersHandler>()
+            .AddInboundProcessorHandler<INatsHandler, InvoicesHandler>());
 
         var subscriptions = registry.GetSubscriptions();
 
         await Assert.That(subscriptions).IsEquivalentTo(["orders.created", "customers.*", "invoices.>"]);
     }
 
+    [Test]
+    public async Task Build_From_Registrations_Without_Creating_Handlers()
+    {
+        var services = new ServiceCollection().AddLogging();
+        services.AddInboundProcessor<NatsOptions, INatsHandler, NatsTopicMatcher>();
+        services.AddInboundProcessorHandler<INatsHandler, ThrowingHandler>();
+        // Same scope validation as the API in Development: scoped handlers can't come from the root provider.
+        await using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+        var registry = provider.GetRequiredService<InboundProcessorHandlerRegistry<INatsHandler>>();
+
+        await Assert.That(registry.GetSubscriptions()).IsEquivalentTo(["orders.created"]);
+    }
+
     private static InboundProcessorHandlerRegistry<INatsHandler> CreateRegistry(Action<IServiceCollection> configure)
     {
         var services = new ServiceCollection();
         configure(services);
-        // Registry reads handlers only in its constructor, so the provider can be disposed right after.
+        // Registry reads registrations only in its constructor, so the provider can be disposed right after.
         using var provider = services.BuildServiceProvider();
         return new InboundProcessorHandlerRegistry<INatsHandler>(
-            provider.GetRequiredService<IServiceScopeFactory>(),
+            provider.GetServices<InboundProcessorTopic<INatsHandler>>(),
+            provider.GetRequiredService<IServiceProviderIsKeyedService>(),
             new NatsTopicMatcher(),
             NullLogger<InboundProcessorHandlerRegistry<INatsHandler>>.Instance);
     }
 
-    private sealed class ExactHandler() : TestHandler("orders.created");
-
-    private sealed class SingleTokenHandler() : TestHandler("orders.*");
-
-    private sealed class TailHandler() : TestHandler("orders.>");
-
-    private sealed class DuplicateExactHandler() : TestHandler("orders.created");
-
-    private sealed class CustomersHandler() : TestHandler("customers.*");
-
-    private sealed class InvoicesHandler() : TestHandler("invoices.>");
-
-    private sealed class InvalidHandler() : TestHandler("orders.>.created");
-
-    private abstract class TestHandler(string pattern) : INatsHandler
+    private sealed class ExactHandler : TestHandler, IInboundTopic
     {
-        public string Topic => pattern;
+        public static string Topic => "orders.created";
+    }
 
+    private sealed class SingleTokenHandler : TestHandler, IInboundTopic
+    {
+        public static string Topic => "orders.*";
+    }
+
+    private sealed class TailHandler : TestHandler, IInboundTopic
+    {
+        public static string Topic => "orders.>";
+    }
+
+    private sealed class DuplicateExactHandler : TestHandler, IInboundTopic
+    {
+        public static string Topic => "orders.created";
+    }
+
+    private sealed class CustomersHandler : TestHandler, IInboundTopic
+    {
+        public static string Topic => "customers.*";
+    }
+
+    private sealed class InvoicesHandler : TestHandler, IInboundTopic
+    {
+        public static string Topic => "invoices.>";
+    }
+
+    private sealed class InvalidHandler : TestHandler, IInboundTopic
+    {
+        public static string Topic => "orders.>.created";
+    }
+
+    private sealed class ThrowingHandler : TestHandler, IInboundTopic
+    {
+        public ThrowingHandler() => throw new InvalidOperationException("Registry must not create handlers");
+
+        public static string Topic => "orders.created";
+    }
+
+    private abstract class TestHandler : INatsHandler
+    {
         public Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken) =>
             Task.CompletedTask;
-    }
-}
-
-internal static class InboundProcessorTestRegistration
-{
-    // Mirrors the generated Add*Handlers code: enumerable registration for the registry, keyed one for the processor.
-    public static IServiceCollection AddHandler<TImplementation>(this IServiceCollection services)
-        where TImplementation : class, INatsHandler
-    {
-        services.AddSingleton<INatsHandler, TImplementation>();
-        services.AddKeyedSingleton<INatsHandler, TImplementation>(typeof(TImplementation));
-        return services;
     }
 }
