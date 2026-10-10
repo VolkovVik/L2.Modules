@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace SourceGenerators.Presentation;
 
 [Generator]
-public sealed class HttpEndpointsRegistrationGenerator : BaseRegistrationGenerator, IIncrementalGenerator
+public sealed class HttpEndpointsRegistrationGenerator : BaseHttpRegistrationGenerator, IIncrementalGenerator
 {
     private const string InterfaceName = "IHttpEndpoint";
     private const string NamespaceName = "Aspu.Common.Presentation.Abstractions.HttpAdapter";

@@ -183,7 +183,9 @@ internal sealed class InboundProcessorNatsHandlerRegistryShould
 
     private sealed class ThrowingHandler : TestHandler
     {
+#pragma warning disable S1144
         public ThrowingHandler() : base("orders.created") => throw new InvalidOperationException("Registry must not create handlers");
+#pragma warning restore S1144
     }
 
     private abstract class TestHandler(string pattern) : INatsHandler

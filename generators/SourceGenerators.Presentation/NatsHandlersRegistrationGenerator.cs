@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace SourceGenerators.Presentation;
 
 [Generator]
-public sealed class NatsHandlersRegistrationGenerator : BaseRegistrationGenerator, IIncrementalGenerator
+public sealed class NatsHandlersRegistrationGenerator : BaseHandlersRegistrationGenerator, IIncrementalGenerator
 {
     private const string InterfaceName = "INatsHandler";
     private const string NamespaceName = "Aspu.Common.Presentation.Abstractions.NatsAdapter";
@@ -23,7 +23,7 @@ public sealed class NatsHandlersRegistrationGenerator : BaseRegistrationGenerato
         var classDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (s, _) => IsCandidate(s), // quick filter
-                transform: static (ctx, ct) => GetSemanticTarget(ctx, InterfaceName, ct)) // get symbol
+                transform: static (ctx, ct) => GetInboundHandlerTarget(ctx, InterfaceName, ct)) // get symbol
             .Where(static m => m is not null)!;
 
         var collectedClasses = classDeclarations.Collect();
@@ -66,9 +66,14 @@ public sealed class NatsHandlersRegistrationGenerator : BaseRegistrationGenerato
         sb.AppendLine("    {");
         foreach (var (name, topic, symbol) in GetInboundHandlers(context, compilation, classSymbols))
         {
+            if (!IsRegistrableHandler(symbol))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(NotRegistrableHandler, symbol.Locations.FirstOrDefault(), symbol.Name, InterfaceName));
+                continue;
+            }
+
             if (topic is null)
             {
-                sb.Append("#error ").Append(name).AppendLine(": Topic must be a compile-time constant string");
                 context.ReportDiagnostic(Diagnostic.Create(NonConstantTopic, symbol.Locations.FirstOrDefault(), symbol.Name, InterfaceName));
                 continue;
             }
