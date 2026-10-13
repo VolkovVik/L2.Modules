@@ -3,7 +3,6 @@
   <ItemGroup>
     <PackageReference Include="CSharpFunctionalExtensions" />
     <PackageReference Include="Mediator.Abstractions" />
-    <PackageReference Include="Serilog" />
   </ItemGroup>
 
 </Project>

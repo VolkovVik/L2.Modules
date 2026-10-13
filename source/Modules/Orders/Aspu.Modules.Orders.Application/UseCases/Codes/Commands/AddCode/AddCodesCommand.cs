@@ -51,11 +51,11 @@ public sealed class AddCodeCommandHandler(
 
 public sealed record CodeNotification(Guid Id) : IAppNotification;
 
-public sealed class CodeNotificationHandler : IAppNotificationHandler<CodeNotification>
+public sealed class CodeNotificationHandler(ILogger<CodeNotificationHandler> logger) : IAppNotificationHandler<CodeNotification>
 {
     public ValueTask Handle(CodeNotification notification, CancellationToken cancellationToken)
     {
-        Serilog.Log.Debug("Add code: {@Id}", notification.Id);
+        CodeNotificationLog.AddCodeHandled(logger, notification.Id);
         return ValueTask.CompletedTask;
     }
 }

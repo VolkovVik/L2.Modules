@@ -3,7 +3,7 @@ using Aspu.Common.Domain.Results;
 using Aspu.Modules.Orders.Domain.Model.CodeAggregate;
 using FluentValidation;
 using Mediator;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Aspu.Modules.Orders.Application.UseCases.Codes.Commands.GetCodeById;
 
@@ -35,11 +35,11 @@ public sealed class GetCodeByIdCommandHandler(IMediator mediator)
 
 public sealed record CodeNotification(Guid Id) : IAppNotification;
 
-public sealed class CodeNotificationHandler : IAppNotificationHandler<CodeNotification>
+public sealed class CodeNotificationHandler(ILogger<CodeNotificationHandler> logger) : IAppNotificationHandler<CodeNotification>
 {
     public ValueTask Handle(CodeNotification notification, CancellationToken cancellationToken)
     {
-        Log.Debug("Get code by ID: {@Id}", notification.Id);
+        CodeNotificationLog.GetCodeByIdHandled(logger, notification.Id);
         return ValueTask.CompletedTask;
     }
 }

@@ -30,4 +30,7 @@ internal static partial class InboundProcessorLog
 
     [LoggerMessage(EventId = 9, Level = LogLevel.Error, Message = "Inbound processor handlers aren't registered as keyed services for {Name}: {Handlers}")]
     public static partial void NotKeyedHandlers(ILogger logger, string name, string handlers);
+
+    [LoggerMessage(EventId = 10, Level = LogLevel.Warning, Message = "Inbound processor message on topic {Topic} is dropped: {Reason}")]
+    public static partial void MessageDropped(ILogger logger, string? topic, string reason);
 }

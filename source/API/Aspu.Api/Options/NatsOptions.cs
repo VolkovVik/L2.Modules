@@ -27,6 +27,19 @@ public sealed class NatsOptions : IInboundProcessorOptions
     public int ReconnectWaitMaxSeconds { get; init; } = 1;
 
     /// <summary>
+    /// Delay before the subscriber restarts after its subscription failed or ended
+    /// (stream/consumer setup error, consumer deleted, unexpected exception).
+    /// Connection drops are handled by the NATS client itself (<see cref="ReconnectWaitMaxSeconds"/>).
+    /// </summary>
+    public int SubscriptionRetryDelaySeconds { get; init; } = 5;
+
+    /// <summary>
+    /// JetStream: delay before a message rejected by the full inbound queue is redelivered.
+    /// Without it the consumer's MaxDeliver attempts are spent within milliseconds and the message is dropped.
+    /// </summary>
+    public int JetStreamRedeliveryDelaySeconds { get; init; } = 5;
+
+    /// <summary>
     /// Bounded channel capacity between MQTT receive and the inbound processor.
     /// Minimum effective value is 1.
     /// </summary>

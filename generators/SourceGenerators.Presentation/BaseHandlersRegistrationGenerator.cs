@@ -72,11 +72,29 @@ public abstract class BaseHandlersRegistrationGenerator(string interfaceName, st
         sb.Append("    public static IServiceCollection Add").Append(transport).AppendLine("Handlers(");
         sb.AppendLine("        this IServiceCollection services)");
         sb.AppendLine("    {");
+        foreach (var handler in GetUniqueTopicHandlers(context, GetValidHandlers(context, handlers)))
+        {
+            var name = handler.FullName;
+            var topicLiteral = SymbolDisplay.FormatLiteral(handler.Topic!, quote: true);
+            sb.Append("        services.TryAddKeyedScoped<").Append(interfaceName).Append(", ").Append(name).Append(">(typeof(").Append(name).AppendLine("));");
+            sb.Append("        services.AddSingleton(new InboundProcessorTopic<").Append(interfaceName).Append(">(").Append(topicLiteral).Append(", typeof(").Append(name).AppendLine(")));");
+        }
+        sb.AppendLine();
+        sb.AppendLine("        return services;");
+        sb.AppendLine("    }");
+        sb.AppendLine("}");
+        return sb.ToString();
+    }
+
+    // Reports handlers that can't be registered or have an unusable topic; the rest have a non-empty Topic.
+    private List<InboundHandlerModel> GetValidHandlers(SourceProductionContext context, ImmutableArray<InboundHandlerModel?> handlers)
+    {
+        var valid = new List<InboundHandlerModel>();
+
         // Distinct: a partial handler yields one equal model per declaration.
         foreach (var handler in handlers.Distinct().OrderBy(h => h!.FullName, StringComparer.Ordinal))
         {
-            var name = handler!.FullName;
-            var location = handler.Location?.ToLocation();
+            var location = handler!.Location?.ToLocation();
 
             if (!handler.IsRegistrable)
             {
@@ -103,15 +121,32 @@ public abstract class BaseHandlersRegistrationGenerator(string interfaceName, st
                 continue;
             }
 
-            var topicLiteral = SymbolDisplay.FormatLiteral(handler.Topic, quote: true);
-            sb.Append("        services.TryAddKeyedScoped<").Append(interfaceName).Append(", ").Append(name).Append(">(typeof(").Append(name).AppendLine("));");
-            sb.Append("        services.AddSingleton(new InboundProcessorTopic<").Append(interfaceName).Append(">(").Append(topicLiteral).Append(", typeof(").Append(name).AppendLine(")));");
+            valid.Add(handler);
         }
-        sb.AppendLine();
-        sb.AppendLine("        return services;");
-        sb.AppendLine("    }");
-        sb.AppendLine("}");
-        return sb.ToString();
+
+        return valid;
+    }
+
+    // Same topic in two handlers of this module is reported here, at build time, instead of failing the registry at startup.
+    // Only exact duplicates: wildcard overlaps need transport matching rules and stay a runtime registry check,
+    // as do duplicates across modules, which are compiled separately.
+    private IEnumerable<InboundHandlerModel> GetUniqueTopicHandlers(SourceProductionContext context, List<InboundHandlerModel> handlers)
+    {
+        foreach (var group in handlers.GroupBy(h => h.Topic!, StringComparer.Ordinal))
+        {
+            var sameTopic = group.ToList();
+            if (sameTopic.Count == 1)
+            {
+                yield return sameTopic[0];
+                continue;
+            }
+
+            foreach (var handler in sameTopic)
+            {
+                var others = string.Join(", ", sameTopic.Where(h => !ReferenceEquals(h, handler)).Select(h => h.Name));
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.DuplicateTopic, handler.Location?.ToLocation(), handler.Name, interfaceName, group.Key, others));
+            }
+        }
     }
 
     // Unlike the shared IsCandidate, records count too: `sealed record X : INatsHandler` must not be skipped silently.

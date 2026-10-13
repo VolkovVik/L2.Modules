@@ -52,17 +52,26 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
 
     public async Task ProcessOneAsync(InboundProcessorMessage item, CancellationToken cancellationToken)
     {
-        var startTime = Stopwatch.GetTimestamp();
+        if (string.IsNullOrWhiteSpace(item.Topic))
+        {
+            InboundProcessorLog.MessageDropped(logger, item.Topic, "empty topic");
+            return;
+        }
 
         var payload = item.Payload.AsMemory();
-        if (payload.IsEmpty || string.IsNullOrWhiteSpace(item.Topic))
+        if (payload.IsEmpty)
+        {
+            InboundProcessorLog.MessageDropped(logger, item.Topic, "empty payload");
             return;
+        }
 
         if (!handlerRegistry.TryResolve(item.Topic, out var handlerType))
         {
             InboundProcessorLog.PatternNotFound(logger, item.Topic);
             return;
         }
+
+        var startTime = Stopwatch.GetTimestamp();
 
         try
         {

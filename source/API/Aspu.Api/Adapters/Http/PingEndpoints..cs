@@ -2,7 +2,6 @@ using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Serilog;
 
 namespace Aspu.Api.Adapters.Http;
 
@@ -40,27 +39,27 @@ internal sealed class PingValidator : AbstractValidator<Ping>
     }
 }
 
-public sealed class PingHandler(IMediator mediator) : IRequestHandler<Ping, Pong?>
+public sealed class PingHandler(IMediator mediator, ILogger<PingHandler> logger) : IRequestHandler<Ping, Pong?>
 {
     public async ValueTask<Pong?> Handle(Ping request, CancellationToken cancellationToken)
     {
         var id = request.Id!.Value;
-        Log.Debug("Start {@Id}", id);
+        PingLog.Started(logger, id);
         var result = new Pong(id);
-        Log.Debug("Publish {@Id}", id);
+        PingLog.Publishing(logger, id);
         await mediator.Publish(new PingNotification(id), cancellationToken);
-        Log.Debug("Stop {@Id}", id);
+        PingLog.Finished(logger, id);
         return result;
     }
 }
 
 public sealed record PingNotification(Guid Id) : INotification;
 
-public sealed class PingNotificationHandler : INotificationHandler<PingNotification>
+public sealed class PingNotificationHandler(ILogger<PingNotificationHandler> logger) : INotificationHandler<PingNotification>
 {
     public ValueTask Handle(PingNotification notification, CancellationToken cancellationToken)
     {
-        Log.Debug("Ping notification: {@Id}", notification.Id);
+        PingLog.NotificationHandled(logger, notification.Id);
         return ValueTask.CompletedTask;
     }
 }

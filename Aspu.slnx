@@ -14,6 +14,9 @@
     <Project Path="generators/SourceGenerators.Domain/SourceGenerators.Domain.csproj" Id="0efcf7db-47a2-4f73-bc3f-41630c2d8d96" />
     <Project Path="generators/SourceGenerators.Presentation/SourceGenerators.Presentation.csproj" Id="5a252b3b-5484-479e-ad75-0f4ec11336aa" />
   </Folder>
+  <Folder Name="/generators/tests/">
+    <Project Path="generators/tests/SourceGenerators.Presentation.Tests/SourceGenerators.Presentation.Tests.csproj" />
+  </Folder>
   <Folder Name="/nbomber/">
     <Project Path="nbomber/Aspu.Nbomber/Aspu.Nbomber.csproj" Id="6ab91040-30fb-4822-b425-9db1882a534b" />
   </Folder>

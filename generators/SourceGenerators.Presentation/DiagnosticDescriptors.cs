@@ -35,4 +35,12 @@ public static class DiagnosticDescriptors
         category: "Aspu.Presentation",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor DuplicateTopic = new(
+        id: "ASPU005",
+        title: "Inbound handler topic is duplicated",
+        messageFormat: "Handler '{0}' implements {1} with Topic '{2}', which is also used by {3}",
+        category: "Aspu.Presentation",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }

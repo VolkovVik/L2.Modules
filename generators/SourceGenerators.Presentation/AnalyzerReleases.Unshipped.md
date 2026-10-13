@@ -9,3 +9,4 @@ ASPU001 | Aspu.Presentation | Error | Inbound handler topic must be a constant
 ASPU002 | Aspu.Presentation | Error | Inbound handler can't be registered
 ASPU003 | Aspu.Presentation | Error | Inbound handler topic is empty
 ASPU004 | Aspu.Presentation | Error | Inbound handler can't be generic
+ASPU005 | Aspu.Presentation | Error | Inbound handler topic is duplicated

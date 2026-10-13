@@ -1,12 +1,12 @@
 using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.SourceGenerators.Application;
-using Serilog;
 
 namespace Aspu.Api.Adapters.Signalr;
 
 internal sealed class SignalrMessageWorker(
     SignalrNotificationChannel channel,
-    ISignalrNotificationPublisher notificationPublisher)
+    ISignalrNotificationPublisher notificationPublisher,
+    ILogger<SignalrMessageWorker> logger)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -49,7 +49,7 @@ internal sealed class SignalrMessageWorker(
         }
         catch (Exception exc)
         {
-            Log.Error(exc, "Failed to publish SignalR notification {NotificationType}", notification.GetType().Name);
+            SignalrMessageWorkerLog.PublishFailed(logger, exc, notification.GetType().Name);
         }
     }
 }

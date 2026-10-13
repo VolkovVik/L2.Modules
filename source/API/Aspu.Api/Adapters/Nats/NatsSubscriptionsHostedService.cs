@@ -17,8 +17,15 @@ internal sealed class NatsSubscriptionsHostedService(
     ILogger<NatsSubscriptionsHostedService> logger) :
     BackgroundService
 {
+    /// <summary>
+    /// Host loop: restarts the subscription after a failure or an unexpected end, like the MQTT subscriber,
+    /// so a single error doesn't stop NATS intake until the application restarts.
+    /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var mode = options.Value.IsJetStreamEnabled ? "JetStream" : "Core";
+        var retryDelay = Math.Max(1, options.Value.SubscriptionRetryDelaySeconds);
+
         try
         {
             if (handlerTopics.IsEmpty)
@@ -28,22 +35,33 @@ internal sealed class NatsSubscriptionsHostedService(
             }
 
             var subjects = handlerTopics.GetSubscriptions();
-            if (!options.Value.IsJetStreamEnabled)
-                await ExecuteInternalAsync(subjects, stoppingToken);
-            else
-                await JetstreamExecuteInternalAsync(subjects, stoppingToken);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    if (!options.Value.IsJetStreamEnabled)
+                        await ExecuteInternalAsync(subjects, stoppingToken).ConfigureAwait(false);
+                    else
+                        await JetstreamExecuteInternalAsync(subjects, stoppingToken).ConfigureAwait(false);
 
-        }
-        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-        {
-            // graceful shutdown
-        }
-        catch (Exception exc)
-        {
-            NatsSubscriptionsLog.SubscriberFailed(logger, exc, options.Value.IsJetStreamEnabled ? "JetStream" : "Core");
+                    NatsSubscriptionsLog.SubscriptionEnded(logger, mode, retryDelay);
+                }
+                catch (Exception) when (stoppingToken.IsCancellationRequested)
+                {
+                    break; // graceful shutdown
+                }
+                catch (Exception exc)
+                {
+                    NatsSubscriptionsLog.SubscriberFailed(logger, exc, mode, retryDelay);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(retryDelay), stoppingToken)
+                    .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            }
         }
         finally
         {
+            // Completed only when the host stops, so the inbound processor keeps running between retries.
             channel.CompleteWriter();
         }
     }
@@ -61,7 +79,7 @@ internal sealed class NatsSubscriptionsHostedService(
 
             var message = new InboundProcessorMessage { Type = "Nats", Topic = msg.Subject, Payload = msg.Data };
             if (!channel.TryEnqueue(message))
-                NatsSubscriptionsLog.QueueRejected(logger, msg.Subject);
+                NatsSubscriptionsLog.QueueFullDropped(logger, msg.Subject);
         }
     }
 
@@ -89,20 +107,29 @@ internal sealed class NatsSubscriptionsHostedService(
             .CreateOrUpdateConsumerAsync(options.Value.StreamName, consumerConfig, cancellationToken)
             .ConfigureAwait(false);
 
+        var redeliveryDelay = TimeSpan.FromSeconds(Math.Max(1, options.Value.JetStreamRedeliveryDelaySeconds));
+
         await foreach (var msg in consumer.ConsumeAsync<byte[]>(cancellationToken: cancellationToken).ConfigureAwait(false))
         {
-            if (msg.Data is not null && !string.IsNullOrWhiteSpace(msg.Subject))
+            // Redelivery can't fix a message without payload or subject (the processor drops it anyway),
+            // so it's terminated instead of being nak'ed up to MaxDeliver times.
+            if (msg.Data is not { Length: > 0 } || string.IsNullOrWhiteSpace(msg.Subject))
             {
-                var message = new InboundProcessorMessage { Type = "Nats", Topic = msg.Subject, Payload = msg.Data };
-                if (channel.TryEnqueue(message))
-                {
-                    await msg.AckAsync(cancellationToken: cancellationToken).ConfigureAwait(false); // then ack
-                    continue;
-                }
+                NatsSubscriptionsLog.EmptyMessageTerminated(logger, msg.Subject);
+                await msg.AckTerminateAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                continue;
             }
 
-            NatsSubscriptionsLog.QueueRejected(logger, msg.Subject);
-            await msg.NakAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+            var message = new InboundProcessorMessage { Type = "Nats", Topic = msg.Subject, Payload = msg.Data };
+            if (channel.TryEnqueue(message))
+            {
+                await msg.AckAsync(cancellationToken: cancellationToken).ConfigureAwait(false); // then ack
+                continue;
+            }
+
+            // Delayed nak: an immediate one would burn all MaxDeliver attempts while the queue is still full.
+            NatsSubscriptionsLog.QueueRejected(logger, msg.Subject, redeliveryDelay);
+            await msg.NakAsync(delay: redeliveryDelay, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }
 }
