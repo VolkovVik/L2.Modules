@@ -45,13 +45,11 @@ public class MqttBenchmarks
                 NullLogger<InboundProcessorHostedService<MqttOptions, IMqttHandler>>.Instance),
             MatchedTopic = new InboundProcessorMessage
             {
-                Type = "Mqtt",
                 Topic = TopicName,
                 Payload = new byte[128],
             },
             WildcardTopic = new InboundProcessorMessage
             {
-                Type = "Mqtt",
                 Topic = "benchmark/device-1/wildcard",
                 Payload = new byte[128],
             },

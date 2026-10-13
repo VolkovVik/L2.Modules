@@ -132,7 +132,7 @@ internal sealed class MqttSubscriptionsClient(
     {
         var message = e.ApplicationMessage;
         var payload = PayloadToOwnedBuffer(message);
-        var inbound = new InboundProcessorMessage { Type = "Mqtt", Topic = message.Topic, Payload = payload };
+        var inbound = new InboundProcessorMessage { Topic = message.Topic, Payload = payload };
         if (!channel.TryEnqueue(inbound))
             MqttSubscriptionsLog.QueueRejected(logger, message.Topic);
 

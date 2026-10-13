@@ -40,7 +40,7 @@ internal sealed class InboundProcessorHostedServiceShould
         var logger = new CapturingLogger();
         using var service = CreateService(provider, logger);
 
-        await service.ProcessOneAsync(new InboundProcessorMessage { Type = "Nats", Topic = topic, Payload = payload }, CancellationToken.None);
+        await service.ProcessOneAsync(new InboundProcessorMessage { Topic = topic, Payload = payload }, CancellationToken.None);
 
         // Only the drop is logged: the handler (which always throws) isn't reached.
         await Assert.That(logger.Entries).Count().IsEqualTo(1);
@@ -92,7 +92,7 @@ internal sealed class InboundProcessorHostedServiceShould
     }
 
     private static InboundProcessorMessage CreateMessage() =>
-        new() { Type = "Nats", Topic = TestHandler.HandlerTopic, Payload = [1] };
+        new() { Topic = TestHandler.HandlerTopic, Payload = [1] };
 
     private sealed class FailingDependency
     {

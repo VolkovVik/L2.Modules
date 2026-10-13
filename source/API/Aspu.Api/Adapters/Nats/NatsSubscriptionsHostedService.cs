@@ -77,7 +77,7 @@ internal sealed class NatsSubscriptionsHostedService(
             if (msg.Data is null || string.IsNullOrWhiteSpace(msg.Subject))
                 continue;
 
-            var message = new InboundProcessorMessage { Type = "Nats", Topic = msg.Subject, Payload = msg.Data };
+            var message = new InboundProcessorMessage { Topic = msg.Subject, Payload = msg.Data };
             if (!channel.TryEnqueue(message))
                 NatsSubscriptionsLog.QueueFullDropped(logger, msg.Subject);
         }
@@ -120,7 +120,7 @@ internal sealed class NatsSubscriptionsHostedService(
                 continue;
             }
 
-            var message = new InboundProcessorMessage { Type = "Nats", Topic = msg.Subject, Payload = msg.Data };
+            var message = new InboundProcessorMessage { Topic = msg.Subject, Payload = msg.Data };
             if (channel.TryEnqueue(message))
             {
                 await msg.AckAsync(cancellationToken: cancellationToken).ConfigureAwait(false); // then ack

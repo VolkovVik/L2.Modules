@@ -1,13 +1,25 @@
 ---
-description: MQTT-адаптеры в Presentation (IMqttMessageHandler, регистрация DI)
-globs: "**/Adapters/Mqtt/**/*.cs"
+description: MQTT- и NATS-хендлеры в Presentation (IMqttHandler/INatsHandler, топик, регистрация генератором)
+globs: "**/Adapters/{Mqtt,Nats}/**/*.cs"
 alwaysApply: false
 ---
 
-# MQTT в Presentation
+# MQTT и NATS хендлеры в Presentation
 
-- Реализуй `IMqttMessageHandler` из `Aspu.Common.Presentation.Abstractions.Mqtt`: свойство `Topic`, метод `HandleAsync`.
-- В обработчике обычно десериализуешь payload в command/query и вызываешь `IMediator.Send(...)` (см. существующие классы в `*.Presentation.Adapters.Mqtt`).
-- Регистрация: `services.TryAddEnumerable(ServiceDescriptor.Scoped<IMqttMessageHandler, ТвойHandler>());` в `*Configuration.cs` модуля (метод `AddPresentation` или аналог).
+- Реализуй `IMqttHandler` (`Aspu.Common.Presentation.Abstractions.MqttAdapter`) или `INatsHandler` (`Aspu.Common.Presentation.Abstractions.NatsAdapter`): свойство `Topic` и метод `HandleAsync`.
+- В обработчике обычно десериализуешь payload в command/query и вызываешь `IMediator.Send(...)` (см. существующие классы в `*.Presentation.Adapters.Mqtt` / `*.Presentation.Adapters.Nats`).
+- `Topic` — константная строка, объявленная в самом хендлере или его базовом классе в том же проекте: `public string Topic => "orders/+";`. Допустимы литерал, `const`, сложение констант; значение из конфигурации или вычисляемое во время работы — нельзя. Пробелы по краям обрезаются. Wildcards — по правилам транспорта (MQTT: `+`, `#`; NATS: `*`, `>`).
+- Класс хендлера — `sealed`, `internal` или `public` (включая внешние классы, если вложен), не generic.
 
-Топики должны быть согласованы с подпиской на стороне API (`MqttSubscriber*` / реестр обработчиков). Не дублируй один и тот же `Topic` разными обработчиками без явной необходимости.
+## Регистрация
+
+- Вручную не регистрируй: source generator модуля находит все хендлеры и генерирует `AddMqttHandlers()` / `AddNatsHandlers()` (keyed scoped по типу хендлера + `InboundProcessorTopic` с топиком). Они вызываются в `PresentationConfiguration` модуля.
+- Нарушения ловятся при сборке:
+  - `ASPU001` — `Topic` не константа;
+  - `ASPU002` — класс не `sealed` или не виден (`private`/`protected`, в т.ч. внешний класс);
+  - `ASPU003` — `Topic` пустой или из пробелов;
+  - `ASPU004` — хендлер generic или вложен в generic-тип;
+  - `ASPU005` — тот же `Topic` у двух хендлеров модуля.
+- Хендлер вне source generation регистрируй только через `services.AddInboundProcessorHandler<IMqttHandler, ТвойHandler>("топик")`, передавая тот же топик, что в `Topic`. Не используй `TryAddEnumerable` — реестр такой хендлер не увидит.
+
+Топики не должны дублироваться и пересекаться по wildcard между хендлерами (в том числе разных модулей): это проверяет реестр при старте приложения и падает с ошибкой.

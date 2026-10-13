@@ -4,7 +4,7 @@ namespace Aspu.Modules.Orders.Domain.Model.CodeAggregate.DomainEvents;
 
 public sealed record CodeValidatedDomainEvent(Guid CodeId, Guid OrderId, Guid OrderUnitId, string Value) : INotification;
 
-public sealed class PingNotificationHandler : INotificationHandler<CodeValidatedDomainEvent>
+public sealed class CodeValidatedDomainEventHandler : INotificationHandler<CodeValidatedDomainEvent>
 {
     public ValueTask Handle(CodeValidatedDomainEvent notification, CancellationToken cancellationToken) =>
         ValueTask.CompletedTask;
