@@ -2,10 +2,10 @@
 
 public abstract record DomainEvent : IDomainEvent
 {
-    protected DomainEvent()
+    protected DomainEvent(DateTime occurredOnUtc)
     {
         Id = Guid.NewGuid();
-        OccurredOnUtc = DateTime.UtcNow;
+        OccurredOnUtc = occurredOnUtc;
     }
 
     protected DomainEvent(Guid id, DateTime occurredOnUtc)

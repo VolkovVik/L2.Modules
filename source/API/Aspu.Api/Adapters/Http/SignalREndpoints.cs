@@ -1,4 +1,5 @@
-﻿using Aspu.Common.Application.Ports.SignalrPort;
+﻿using Aspu.Common.Application.Ports.Clock;
+using Aspu.Common.Application.Ports.SignalrPort;
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 using Aspu.Common.SourceGenerators.Application;
 
@@ -12,9 +13,10 @@ internal sealed class SignalrEndpoints : IHttpEndpoint
     {
         routes.MapGet("/signalr", static async (
             ISignalrNotificationPublisher publisher,
+            IDateTimeProvider dateTimeProvider,
             CancellationToken cancellationToken) =>
         {
-            var notification = new Test1Notification("Test description");
+            var notification = new Test1Notification("Test description", dateTimeProvider.UtcNow);
             await publisher.PublishAsync(notification, cancellationToken);
         })
             .WithName("GetSignalRTest")
@@ -26,9 +28,10 @@ internal sealed class SignalrEndpoints : IHttpEndpoint
 
         routes.MapGet("/channel", static async (
             ISignalrNotificationChannel channel,
+            IDateTimeProvider dateTimeProvider,
             CancellationToken cancellationToken) =>
         {
-            var notification = new Test2Notification("Error description", 100);
+            var notification = new Test2Notification("Error description", 100, dateTimeProvider.UtcNow);
             channel.TryWrite(notification);
         })
             .WithName("GetChannelTest")

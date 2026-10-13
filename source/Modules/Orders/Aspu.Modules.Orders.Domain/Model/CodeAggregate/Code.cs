@@ -194,14 +194,15 @@ public sealed class Code : Aggregate
     /// </summary>
     /// <param name="orderId">Order identifier</param>
     /// <param name="orderUnitId">Product type identifier</param>
+    /// <param name="utcNow">Current UTC date</param>
     /// <returns></returns>
-    public AppResult<object, Error> SetPrinting(Guid orderId, Guid orderUnitId)
+    public AppResult<object, Error> SetPrinting(Guid orderId, Guid orderUnitId, DateTime utcNow)
     {
         if (OrderId != orderId)
             return Errors.CodeHasOtherOrder(Value);
         if (OrderUnitId != orderUnitId)
             return Errors.CodeHasOtherOrderUnit(Value);
-        if (UseUntil.HasValue && DateTime.UtcNow >= UseUntil.Value)
+        if (UseUntil.HasValue && utcNow >= UseUntil.Value)
             return Errors.CodeHasExpiredStatus(Value);
         if (PrintedStatus != CodePrintedStatus.Unprinted)
             return Errors.CodeHasNotUnprintedStatus(Value);
@@ -221,10 +222,8 @@ public sealed class Code : Aggregate
     /// <param name="orderUnitId">Product type identifier</param>
     /// <param name="printedOn">Print date</param>
     /// <returns></returns>
-    public AppResult<object, Error> SetPrinted(Guid orderId, Guid orderUnitId, DateTime? printedOn = null)
+    public AppResult<object, Error> SetPrinted(Guid orderId, Guid orderUnitId, DateTime printedOn)
     {
-        printedOn ??= DateTime.UtcNow;
-
         if (OrderId != orderId)
             return Errors.CodeHasOtherOrder(Value);
         if (OrderUnitId != orderUnitId)
@@ -247,14 +246,15 @@ public sealed class Code : Aggregate
     /// </summary>
     /// <param name="orderId">Order identifier</param>
     /// <param name="orderUnitId">Product type identifier</param>
+    /// <param name="utcNow">Current UTC date</param>
     /// <returns></returns>
-    public AppResult<object, Error> SetUnprinted(Guid orderId, Guid orderUnitId)
+    public AppResult<object, Error> SetUnprinted(Guid orderId, Guid orderUnitId, DateTime utcNow)
     {
         if (OrderId != orderId)
             return Errors.CodeHasOtherOrder(Value);
         if (OrderUnitId != orderUnitId)
             return Errors.CodeHasOtherOrderUnit(Value);
-        if (UseUntil.HasValue && DateTime.UtcNow >= UseUntil.Value)
+        if (UseUntil.HasValue && utcNow >= UseUntil.Value)
             return Errors.CodeHasExpiredStatus(Value);
         if (PrintedStatus == CodePrintedStatus.Unprinted)
             return Errors.CodeAlreadyHasUnprintedStatus(Value);
@@ -274,10 +274,8 @@ public sealed class Code : Aggregate
     /// <param name="orderUnitId">Product type identifier</param>
     /// <param name="defectedOn">Defect write-off date</param>
     /// <returns></returns>
-    public AppResult<object, Error> SetDefected(Guid orderId, Guid orderUnitId, DateTime? defectedOn = null)
+    public AppResult<object, Error> SetDefected(Guid orderId, Guid orderUnitId, DateTime defectedOn)
     {
-        defectedOn ??= DateTime.UtcNow;
-
         if (OrderId != orderId)
             return Errors.CodeHasOtherOrder(Value);
         if (OrderUnitId != orderUnitId)
@@ -314,10 +312,8 @@ public sealed class Code : Aggregate
     /// <param name="validatedOn">Validation date</param>
     /// <param name="isResetDefected">Flag to reset defect write-off</param>
     /// <returns></returns>
-    public AppResult<object, Error> SetValidated(Guid orderId, Guid orderUnitId, DateTime? validatedOn = null, bool isResetDefected = false)
+    public AppResult<object, Error> SetValidated(Guid orderId, Guid orderUnitId, DateTime validatedOn, bool isResetDefected = false)
     {
-        validatedOn ??= DateTime.UtcNow;
-
         if (OrderId != orderId)
             return Errors.CodeHasOtherOrder(Value);
         if (OrderUnitId != orderUnitId)

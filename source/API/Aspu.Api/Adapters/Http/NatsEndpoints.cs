@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Aspu.Common.Application.Ports.Clock;
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NATS.Client.Core;
@@ -34,6 +35,7 @@ internal sealed class NatsEndpoints : IHttpEndpoint
             int sensorId1,
             int fieldId,
             INatsClient? client,
+            IDateTimeProvider dateTimeProvider,
             CancellationToken cancellationToken) =>
         {
             if (client is null)
@@ -41,7 +43,7 @@ internal sealed class NatsEndpoints : IHttpEndpoint
 
             var payload = new
             {
-                TimestampUtc = DateTime.UtcNow,
+                TimestampUtc = dateTimeProvider.UtcNow,
                 FieldId = string.Create(CultureInfo.InvariantCulture, $"field{fieldId}"),
                 SensorId = string.Create(CultureInfo.InvariantCulture, $"sensor{sensorId1}"),
             };
@@ -58,6 +60,7 @@ internal sealed class NatsEndpoints : IHttpEndpoint
             int sensorId,
             int fieldId,
             INatsClient? client,
+            IDateTimeProvider dateTimeProvider,
             CancellationToken cancellationToken) =>
         {
             if (client is null)
@@ -65,7 +68,7 @@ internal sealed class NatsEndpoints : IHttpEndpoint
 
             var payload = new
             {
-                TimestampUtc = DateTime.UtcNow,
+                TimestampUtc = dateTimeProvider.UtcNow,
                 FieldId = string.Create(CultureInfo.InvariantCulture, $"field{fieldId}"),
                 SensorId = string.Create(CultureInfo.InvariantCulture, $"sensor{sensorId}"),
             };
@@ -79,12 +82,12 @@ internal sealed class NatsEndpoints : IHttpEndpoint
             .MapToApiVersion(1);
 
 
-        routes.MapPost("/jetstream", static async (CreateJob request, INatsJSContext js, CancellationToken cancellationToken) =>
+        routes.MapPost("/jetstream", static async (CreateJob request, INatsJSContext js, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken) =>
         {
             var payload = new
             {
                 Id = Guid.NewGuid(),
-                TimestampUtc = DateTime.UtcNow,
+                TimestampUtc = dateTimeProvider.UtcNow,
                 request.Payload,
             };
 
