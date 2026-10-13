@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Aspu.Common.Domain.Errors;
+using Aspu.Common.Domain.Results;
 using CSharpFunctionalExtensions;
 
 namespace Aspu.Modules.Orders.Domain.Model.SharedKernel;
@@ -35,7 +36,7 @@ public sealed class Volume : ValueObject
     /// </summary>
     /// <param name="value">Value in milliliters</param>
     /// <returns>Result</returns>
-    public static Common.Domain.Results.Result<Volume, Error> Create(int value)
+    public static AppResult<Volume, Error> Create(int value)
     {
         if (value <= 0)
             return Error.ValueIsRequired(nameof(value));
@@ -87,8 +88,8 @@ public sealed class Volume : ValueObject
     public string GetPathValue(int decimalPlaces = 3)
     {
         var shift = decimalPlaces == 3 ? 1 : Math.Pow(10, 3 - decimalPlaces);
-        var firstPath = decimalPlaces.ToString("D", CultureInfo.CurrentCulture);
-        var secondPath = ((int)(Value / shift)).ToString("D", CultureInfo.CurrentCulture).PadLeft(6, '0');
+        var firstPath = decimalPlaces.ToString("D", CultureInfo.InvariantCulture);
+        var secondPath = ((int)(Value / shift)).ToString("D", CultureInfo.InvariantCulture).PadLeft(6, '0');
         return firstPath + secondPath;
     }
 

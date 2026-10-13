@@ -8,8 +8,10 @@ using Microsoft.Extensions.Options;
 namespace Aspu.Common.Presentation.Abstractions.InboundProcessor;
 
 /// <summary>
-/// Reads messages from the inbound channel and runs <see cref="IInboundProcessorHandler"/> per message in a new DI scope.
-/// Processing uses <c>Parallel.ForEachAsync</c> with <see cref="MqttOptions.InboundProcessorMaxDegreeOfParallelism"/>.
+/// Reads messages from the inbound channel and runs the single <see cref="IInboundProcessorHandler"/> whose topic pattern matches
+/// (patterns can't overlap, see <see cref="InboundProcessorHandlerRegistry{THandler}"/>), resolved as a keyed service in a new DI scope per message.
+/// Handler failures are logged and don't stop processing.
+/// Processing uses <c>Parallel.ForEachAsync</c> with <see cref="IInboundProcessorOptions.InboundProcessorMaxDegreeOfParallelism"/>.
 /// </summary>
 public sealed class InboundProcessorHostedService<TOptions, THandler>(
     IOptions<TOptions> options,
@@ -40,7 +42,7 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
         }
         catch (OperationCanceledException ex) when (stoppingToken.IsCancellationRequested)
         {
-            logger.LogTrace(ex, "Inbound processor cancelled with host shutdown");
+            InboundProcessorLog.Cancelled(logger, ex);
         }
         catch (Exception ex)
         {
@@ -50,41 +52,53 @@ public sealed class InboundProcessorHostedService<TOptions, THandler>(
 
     public async Task ProcessOneAsync(InboundProcessorMessage item, CancellationToken cancellationToken)
     {
-        var startTime = Stopwatch.GetTimestamp();
-
-        var payload = item.Payload.AsMemory();
-        if (payload.IsEmpty || string.IsNullOrWhiteSpace(item.Topic))
-            return;
-
-        if (!handlerRegistry.IsEnabled(item.Topic))
+        if (string.IsNullOrWhiteSpace(item.Topic))
         {
-            if (logger.IsEnabled(LogLevel.Warning))
-                logger.LogWarning("Inbound processor handler for topic {Topic} isn't found", item.Topic);
+            InboundProcessorLog.MessageDropped(logger, item.Topic, "empty topic");
             return;
         }
 
-        await using var scope = scopeFactory.CreateAsyncScope();
-        var sp = scope.ServiceProvider;
-        var handlers = sp.GetServices<THandler>();
-        var handler = handlers.FirstOrDefault(x => string.Equals(x.Topic, item.Topic, StringComparison.OrdinalIgnoreCase));
-        if (handler is null)
+        var payload = item.Payload.AsMemory();
+        if (payload.IsEmpty)
+        {
+            InboundProcessorLog.MessageDropped(logger, item.Topic, "empty payload");
             return;
+        }
+
+        if (!handlerRegistry.TryResolve(item.Topic, out var handlerType))
+        {
+            InboundProcessorLog.PatternNotFound(logger, item.Topic);
+            return;
+        }
+
+        var startTime = Stopwatch.GetTimestamp();
 
         try
         {
+            await using var scope = scopeFactory.CreateAsyncScope();
+            var handler = scope.ServiceProvider.GetKeyedService<THandler>(handlerType);
+            if (handler is null)
+            {
+                InboundProcessorLog.HandlerNotFound(logger, item.Topic);
+                return;
+            }
+
             await handler.HandleAsync(item.Topic, payload, cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            logger.LogError(ex, "Inbound processor handler for topic {Topic} failed", item.Topic);
+            return;
         }
-        finally
+        catch (Exception ex)
         {
-            if (logger.IsEnabled(LogLevel.Information))
-            {
-                var deltaTime = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
-                logger.LogInformation("Inbound processor handler on {@Topic} {@Payload} {@Total} ms", item.Topic, Encoding.UTF8.GetString(payload.Span), deltaTime);
-            }
+            InboundProcessorLog.HandlerFailed(logger, ex, handlerType.Name, item.Topic);
+        }
+
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            var payloadString = Encoding.UTF8.GetString(payload.Span);
+            var delay = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
+            InboundProcessorLog.Processed(logger, item.Topic, payloadString, delay);
         }
     }
 }

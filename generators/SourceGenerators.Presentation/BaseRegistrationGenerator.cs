@@ -1,52 +1,10 @@
-﻿using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
 
 namespace SourceGenerators.Presentation;
 
 public abstract class BaseRegistrationGenerator
 {
     protected const string Using = "using ";
-
-    protected BaseRegistrationGenerator() { }
-
-    protected static bool IsCandidate(SyntaxNode node) =>
-        node is ClassDeclarationSyntax { BaseList: not null };
-
-    protected static INamedTypeSymbol? GetSemanticTarget(GeneratorSyntaxContext context, string interfaceName, CancellationToken cancellationToken)
-    {
-        var classDecl = (ClassDeclarationSyntax)context.Node;
-        if (context.SemanticModel.GetDeclaredSymbol(classDecl, cancellationToken) is not INamedTypeSymbol symbol)
-            return null;
-
-        if (symbol.TypeKind is not TypeKind.Class)
-            return null;
-
-        if (symbol.DeclaredAccessibility is not (Accessibility.Internal or Accessibility.Public))
-            return null;
-
-        if (!symbol.IsSealed)
-            return null;
-
-        return symbol.AllInterfaces.Any(a =>
-            string.Equals(a.Name, interfaceName, StringComparison.Ordinal))
-                ? symbol : null;
-    }
-
-#pragma warning disable MA0007 // Add a comma after the last value
-    protected static ImmutableHashSet<string> GetSymbolNames(ImmutableArray<INamedTypeSymbol?> classSymbols) =>
-        [.. classSymbols
-            .Where(x => x is not null)
-            .Select(x => x!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
-            .Where(x => !string.IsNullOrWhiteSpace(x))];
-
-    protected static ImmutableHashSet<string> GetSymbolNamespaces(ImmutableArray<INamedTypeSymbol?> classSymbols) =>
-        [.. classSymbols
-            .Where(x => x is not null)
-            .Select(x => x!.ContainingNamespace)
-            .Where(x => !x.IsGlobalNamespace)
-            .Select(x => x.ToDisplayString())];
-#pragma warning restore MA0007 // Add a comma after the last value
 
     protected static string GetNamespace(Compilation compilation, string namespaceName, string interfaceName, string metadataName)
     {
@@ -78,3 +36,4 @@ public abstract class BaseRegistrationGenerator
         return null;
     }
 }
+

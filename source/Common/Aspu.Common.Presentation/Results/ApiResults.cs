@@ -5,7 +5,7 @@ namespace Aspu.Common.Presentation.Results;
 
 public static class ApiResults
 {
-    public static IResult Problem<TValue, TError>(Domain.Results.Result<TValue, TError> result)
+    public static IResult Problem<TValue, TError>(Domain.Results.AppResult<TValue, TError> result)
         where TError : IError
     {
         if (result.IsSuccess)

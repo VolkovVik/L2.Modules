@@ -26,7 +26,7 @@ public class SignalrBenchmarks
     private static Context s_ctx = null!;
 
     public static readonly Test1Notification Notification =
-        new("Test description");
+        new("Test description", DateTime.UtcNow);
 
     [GlobalSetup]
 #pragma warning disable MA0051 // Method is too long
