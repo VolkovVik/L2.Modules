@@ -2,6 +2,7 @@
 using Aspu.Common.Application.Ports.Clock;
 using Aspu.Common.Presentation.Abstractions.HttpAdapter;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using NATS.Client.Core;
 using NATS.Client.JetStream;
 
@@ -15,8 +16,10 @@ internal sealed class NatsEndpoints : IHttpEndpoint
     public void MapEndpoint(IEndpointRouteBuilder routes)
 #pragma warning restore MA0051 // Method is too long
     {
+        // NATS clients are registered only when Nats:IsEnabled is true. [FromServices] keeps minimal API from
+        // inferring an unregistered type as the request body (which fails at startup) and binds null instead.
         routes.MapGet("/ping", static async Task<Results<Ok<string>, BadRequest>> (
-            INatsClient? client,
+            [FromServices] INatsClient? client,
             CancellationToken cancellationToken) =>
         {
             if (client is null)
@@ -34,8 +37,8 @@ internal sealed class NatsEndpoints : IHttpEndpoint
         routes.MapGet("/test", static async Task<Results<Ok, BadRequest>> (
             int sensorId1,
             int fieldId,
-            INatsClient? client,
             IDateTimeProvider dateTimeProvider,
+            [FromServices] INatsClient? client,
             CancellationToken cancellationToken) =>
         {
             if (client is null)
@@ -59,8 +62,8 @@ internal sealed class NatsEndpoints : IHttpEndpoint
         routes.MapGet("/test/{sensorId:int}/{fieldId:int}", static async Task<Results<Ok, BadRequest>> (
             int sensorId,
             int fieldId,
-            INatsClient? client,
             IDateTimeProvider dateTimeProvider,
+            [FromServices] INatsClient? client,
             CancellationToken cancellationToken) =>
         {
             if (client is null)
@@ -82,8 +85,15 @@ internal sealed class NatsEndpoints : IHttpEndpoint
             .MapToApiVersion(1);
 
 
-        routes.MapPost("/jetstream", static async (CreateJob request, INatsJSContext js, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken) =>
+        routes.MapPost("/jetstream", static async (
+            CreateJob request,
+            IDateTimeProvider dateTimeProvider,
+            [FromServices] INatsJSContext? js,
+            CancellationToken cancellationToken) =>
         {
+            if (js is null)
+                return TypedResults.BadRequest();
+
             var payload = new
             {
                 Id = Guid.NewGuid(),

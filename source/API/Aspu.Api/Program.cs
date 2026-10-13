@@ -13,7 +13,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Configuration.AddModuleConfiguration([]);
+    builder.Configuration.AddModuleConfiguration(builder.Environment, []);
 
     builder.Services.AddOptions(builder.Configuration);
 
